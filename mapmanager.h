@@ -35,7 +35,7 @@ public:
 
     static void SaveMap(const string &path, const Map &map);
 
-    static string GetMapString(const Map &map);
+    [[nodiscard]] static string GetMapString(const Map &map);
 };
 
 #endif //SNAKEFOP_MAPMANAGER_H

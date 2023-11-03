@@ -6,6 +6,7 @@
 #include <random>
 
 class Game {
+public:
     enum Direction {
         Right, Down, Left, Up
     };
@@ -14,6 +15,7 @@ class Game {
         Alive, Dead
     };
 
+private:
     default_random_engine random;
 
     struct GameStatus {
@@ -24,6 +26,7 @@ class Game {
         State state;
         int score;
         int length;
+        int desiredLength;
 
         /// Definition:
         /// If p points to (x, y), this point is occupied by the snake.
@@ -68,7 +71,9 @@ public:
     /// @brief Move the snake one step forward.
     void Step();
 
-    const GameStatus &GetStatus() const;
+    [[nodiscard]] const GameStatus &GetStatus() const;
+
+    [[nodiscard]] string GetStatisticsString() const;
 
 private:
     void GenerateFood();
