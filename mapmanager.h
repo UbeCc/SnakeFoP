@@ -1,3 +1,6 @@
+#ifndef SNAKEFOP_MAPMANAGER_H
+#define SNAKEFOP_MAPMANAGER_H
+
 #include <array>
 #include <vector>
 #include <string>
@@ -26,3 +29,5 @@ public:
     static void SaveMap(const string &path, const Map &map);
     static string GetMapString(const Map &map);
 };
+
+#endif //SNAKEFOP_MAPMANAGER_H

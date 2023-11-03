@@ -1,12 +1,12 @@
 /// CLI Main, entry point to test background task execution.
 
 #include <iostream>
-#include "MapManager.h"
+#include "mapmanager.h"
+#include "configmanager.h"
 
 using namespace std;
 
 int main() {
-    Map m = MapManager::LoadMap("map.txt");
-    cout << MapManager::GetMapString(m);
+    Config f = ConfigManager::LoadConfig("config/default.txt");
     return 0;
 }
