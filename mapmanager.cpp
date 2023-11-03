@@ -31,6 +31,11 @@ Map MapManager::LoadMap(const string &path)
         throw runtime_error("Failed to read map width and height");
     }
 
+    if (map.width <= 1 || map.height <= 1 || map.width > 100 || map.height > 100)
+    {
+        throw runtime_error("Invalid map width or height");
+    }
+
     for (int i = 0; i < 4; i++)
     {
         ifs >> map.borderIsObstacle[i];
@@ -56,13 +61,17 @@ Map MapManager::LoadMap(const string &path)
 
     for (int i = 0; i < obstacleCount; i++)
     {
-        Point obstacle;
+        Point obstacle{};
         ifs >> obstacle.x >> obstacle.y;
         map.obstacles.push_back(obstacle);
 
         if (!ifs.good())
         {
             throw runtime_error("Failed to read obstacle " + to_string(i));
+        }
+
+        if (obstacle.x < 0 || obstacle.x >= map.width || obstacle.y < 0 || obstacle.y >= map.height) {
+            throw runtime_error("Obstacle out of map");
         }
     }
 
@@ -71,10 +80,13 @@ Map MapManager::LoadMap(const string &path)
 
     if (!ifs.good())
     {
+        // Standard map format ends here.
         if (ifs.eof())
         {
-            portalCount = 0;
+            map.spawnPoint = {0, 0};
+            return map;
         }
+
         else
         {
             throw runtime_error("Failed to read portals count");
@@ -88,17 +100,46 @@ Map MapManager::LoadMap(const string &path)
 
     for (int i = 0; i < portalCount; i++)
     {
-        Point portal1, portal2;
+        Point portal1{}, portal2{};
         ifs >> portal1.x >> portal1.y >> portal2.x >> portal2.y;
-        map.portals.push_back(make_pair(portal1, portal2));
+        map.portals.push_back({portal1, portal2});
 
         if (!ifs.good())
         {
             throw runtime_error("Failed to read portal " + to_string(i));
         }
+
+        if (portal1.x < 0 || portal1.x >= map.width || portal1.y < 0 || portal1.y >= map.height) {
+            throw runtime_error("Portal out of map");
+        }
     }
 
-    ifs.close();
+    ifs >> map.spawnPoint.x >> map.spawnPoint.y;
+
+    if (!ifs.good())
+    {
+        throw runtime_error("Failed to read spawn point");
+    }
+
+    if (map.spawnPoint.x < 0 || map.spawnPoint.x >= map.width || map.spawnPoint.y < 0 || map.spawnPoint.y >= map.height)
+    {
+        throw runtime_error("Spawn point out of map");
+    }
+
+    for (auto &o : map.obstacles) {
+        if (o.x == map.spawnPoint.x && o.y == map.spawnPoint.y) {
+            throw runtime_error("Spawn point is an obstacle");
+        }
+    }
+
+    for (auto &p : map.portals) {
+        if (p[0].x == map.spawnPoint.x && p[0].y == map.spawnPoint.y) {
+            throw runtime_error("Spawn point is a portal");
+        }
+        if (p[1].x == map.spawnPoint.x && p[1].y == map.spawnPoint.y) {
+            throw runtime_error("Spawn point is a portal");
+        }
+    }
 
     return map;
 }
@@ -113,14 +154,13 @@ void MapManager::SaveMap(const string &path, const Map &map)
     }
 
     ofs << GetMapString(map);
-    ofs.close();
 }
 
 string MapManager::GetMapString(const Map &map)
 {
     stringstream ss;
     ss << map.width << " " << map.height << endl;
-    
+
     for (int i = 0; i < 3; i++)
     {
         ss << map.borderIsObstacle[i] << " ";
@@ -139,7 +179,7 @@ string MapManager::GetMapString(const Map &map)
 
     for (auto portal : map.portals)
     {
-        ss << portal.first.x << " " << portal.first.y << " " << portal.second.x << " " << portal.second.y << endl;
+        ss << portal[0].x << " " << portal[0].y << " " << portal[1].x << " " << portal[1].y << endl;
     }
 
     return ss.str();

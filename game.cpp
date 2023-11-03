@@ -1,0 +1,147 @@
+#include <stdexcept>
+#include <algorithm>
+#include "game.h"
+
+Game::Game(const Map &map, const Config &config) : status({map, config, Right, Right, Alive, 0, 1}) {
+    status.map = vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty));
+    status.portal = vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty));
+
+    for (auto &obstacle: map.obstacles) {
+        status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
+    }
+
+    for (auto portal : map.portals) {
+        status.portal[portal[0].x][portal[0].y] = portal[1];
+        status.portal[portal[1].x][portal[1].y] = portal[0];
+    }
+
+    random.seed(config.randomSeed);
+
+    status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
+    status.head = map.spawnPoint;
+    status.tail = map.spawnPoint;
+
+    GenerateFood();
+}
+
+bool Game::ChangeDirection(Game::Direction direction) {
+    // Cannot turn 180 degrees
+    if (status.direction - direction == 2 || status.direction - direction == -2) {
+        return false;
+    }
+
+    status.nextDirection = direction;
+    return true;
+}
+
+void Game::Step() {
+    auto &head = status.head;
+    auto &tail = status.tail;
+    auto &map = status.map;
+    auto &portal = status.portal;
+    auto &mapDefinition = status.mapDefinition;
+    auto &config = status.config;
+    auto &direction = status.direction;
+    auto &state = status.state;
+
+    if (state == Dead) {
+        throw runtime_error("The snake is dead");
+    }
+
+    direction = status.nextDirection;
+
+    // Calculate next head
+    Point nextHead = head;
+
+    switch (direction) {
+        case Right:
+            nextHead.x++;
+            break;
+        case Down:
+            nextHead.y++;
+            break;
+        case Left:
+            nextHead.x--;
+            break;
+        case Up:
+            nextHead.y--;
+            break;
+    }
+
+    // Check if the snake hits the vertical border
+    if (nextHead.x < 0 || nextHead.x >= mapDefinition.width) {
+        // Hits the vertical wall
+        if (mapDefinition.borderIsObstacle[2] || mapDefinition.borderIsObstacle[3]) {
+            state = Dead;
+            return;
+        }
+
+        // Teleport to the other side
+        if (nextHead.x < 0) {
+            nextHead.x = mapDefinition.width - 1;
+        } else {
+            nextHead.x = 0;
+        }
+    }
+
+    // Hits the horizontal border
+    if (nextHead.y < 0 || nextHead.y >= mapDefinition.height) {
+        if (mapDefinition.borderIsObstacle[0] || mapDefinition.borderIsObstacle[1]) {
+            state = Dead;
+            return;
+        }
+
+        // Teleport to the other side
+        if (nextHead.y < 0) {
+            nextHead.y = mapDefinition.height - 1;
+        } else {
+            nextHead.y = 0;
+        }
+    }
+
+    // Check if the snake hits a portal
+    if (portal[nextHead.x][nextHead.y] != SpecialPoint::Empty) {
+        nextHead = status.portal[nextHead.x][nextHead.y];
+    }
+
+    // Hits an obstacle
+    if (map[nextHead.x][nextHead.y] == SpecialPoint::Obstacle) {
+        state = Dead;
+        return;
+    }
+
+    // Hits itself
+    if (map[nextHead.x][nextHead.y] != SpecialPoint::Empty && nextHead != tail) {
+        state = Dead;
+        return;
+    }
+
+    // Check if the snake eats a food
+    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) {
+        status.score += map[nextHead.x][nextHead.y].y;
+        status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
+        GenerateFood();
+    }
+
+    // Move the snake
+    Point nextTail = map[tail.x][tail.y];
+
+    // Lengthen the snake
+    if (status.length < status.score) {
+        ++status.length;
+    }
+
+    // Or go forward
+    else {
+        map[tail.x][tail.y] = SpecialPoint::Empty;
+        tail = nextTail;
+    }
+
+    map[head.x][head.y] = nextHead;
+    head = nextHead;
+    map[head.x][head.y] = SpecialPoint::Head;
+}
+
+const Game::GameStatus &Game::GetStatus() const {
+    return status;
+}
