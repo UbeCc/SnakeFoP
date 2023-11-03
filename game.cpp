@@ -1,16 +1,29 @@
 #include <stdexcept>
 #include <algorithm>
+#include <sstream>
 #include "game.h"
 
-Game::Game(const Map &map, const Config &config) : status({map, config, Right, Right, Alive, 0, 1}) {
-    status.map = vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty));
-    status.portal = vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty));
-
+Game::Game(const Map &map, const Config &config) :
+        status({
+                       map,
+                       config,
+                       Right,
+                       Right,
+                       Alive,
+                       0,
+                       1,
+                       2,
+                       vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+                       vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+                       vector<Point>(),
+                       map.spawnPoint,
+                       map.spawnPoint
+               }) {
     for (auto &obstacle: map.obstacles) {
         status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
     }
 
-    for (auto portal : map.portals) {
+    for (auto portal: map.portals) {
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
     }
@@ -18,8 +31,6 @@ Game::Game(const Map &map, const Config &config) : status({map, config, Right, R
     random.seed(config.randomSeed);
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
-    status.head = map.spawnPoint;
-    status.tail = map.spawnPoint;
 
     GenerateFood();
 }
@@ -40,7 +51,6 @@ void Game::Step() {
     auto &map = status.map;
     auto &portal = status.portal;
     auto &mapDefinition = status.mapDefinition;
-    auto &config = status.config;
     auto &direction = status.direction;
     auto &state = status.state;
 
@@ -111,7 +121,9 @@ void Game::Step() {
     }
 
     // Hits itself
-    if (map[nextHead.x][nextHead.y] != SpecialPoint::Empty && nextHead != tail) {
+    if (map[nextHead.x][nextHead.y] != SpecialPoint::Empty
+        && map[nextHead.x][nextHead.y].x != SpecialPoint::Food.x
+        && !(nextHead == tail && status.desiredLength == status.length)) {
         state = Dead;
         return;
     }
@@ -119,6 +131,7 @@ void Game::Step() {
     // Check if the snake eats a food
     if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) {
         status.score += map[nextHead.x][nextHead.y].y;
+        status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
         GenerateFood();
     }
@@ -127,11 +140,11 @@ void Game::Step() {
     Point nextTail = map[tail.x][tail.y];
 
     // Lengthen the snake
-    if (status.length < status.score) {
+    if (status.length < status.desiredLength) {
         ++status.length;
     }
 
-    // Or go forward
+        // Or go forward
     else {
         map[tail.x][tail.y] = SpecialPoint::Empty;
         tail = nextTail;
@@ -144,4 +157,76 @@ void Game::Step() {
 
 const Game::GameStatus &Game::GetStatus() const {
     return status;
+}
+
+void Game::GenerateFood() {
+    int retries = 100;
+    while (retries-- && (int) status.foods.size() < status.config.foodCount) {
+        int x = (int) (random() % status.mapDefinition.width);
+        int y = (int) (random() % status.mapDefinition.height);
+
+        if (status.map[x][y] == SpecialPoint::Empty && status.portal[x][y] == SpecialPoint::Empty) {
+            status.map[x][y] = SpecialPoint::Food;
+
+            float s = (float) (random() % 10000) / 10000.0f;
+            if ((s -= status.config.foodProbabilities[0]) < 0) {
+                status.map[x][y].y = 1;
+            } else if (s < status.config.foodProbabilities[1]) {
+                status.map[x][y].y = 2;
+            } else {
+                status.map[x][y].y = 3;
+            }
+
+            status.foods.push_back({x, y});
+        }
+    }
+
+    // Still not even 1 food
+    if (status.foods.empty()) {
+        for (int x = 0; x < status.mapDefinition.width; ++x) {
+            for (int y = 0; y < status.mapDefinition.height; ++y) {
+                if (status.map[x][y] == SpecialPoint::Empty) {
+                    status.map[x][y] = SpecialPoint::Food;
+                    status.foods.push_back({x, y});
+                    return;
+                }
+            }
+        }
+    }
+}
+
+string Game::GetStatisticsString() const {
+    stringstream ss;
+    ss << "Score: " << status.score << ", Length: " << status.length << ", State: "
+       << (status.state == Alive ? "Alive" : "Dead") << endl << endl;
+    ss << (status.mapDefinition.borderIsObstacle[0] ? string(status.mapDefinition.width + 2, '#') : string(
+            status.mapDefinition.width + 2, '-')) << endl;
+    for (int y = 0; y < status.mapDefinition.height; ++y) {
+        ss << (status.mapDefinition.borderIsObstacle[2] ? "#" : "|");
+        for (int x = 0; x < status.mapDefinition.width; ++x) {
+            if (status.map[x][y] == SpecialPoint::Empty) {
+                if (status.portal[x][y] != SpecialPoint::Empty) {
+                    ss << "P";
+                } else {
+                    ss << " ";
+                }
+            } else if (status.map[x][y] == SpecialPoint::Obstacle) {
+                ss << "#";
+            } else if (status.map[x][y] == SpecialPoint::Head) {
+                ss << "O";
+            } else if (status.map[x][y].x == SpecialPoint::Food.x) {
+                ss << status.map[x][y].y;
+            } else {
+                ss << "o";
+            }
+        }
+        ss << (status.mapDefinition.borderIsObstacle[3] ? "#" : "|");
+        ss << endl;
+    }
+
+    ss << (status.mapDefinition.borderIsObstacle[1] ? string(status.mapDefinition.width + 2, '#') : string(
+            status.mapDefinition.width + 2, '-')) << endl;
+    ss << endl;
+
+    return ss.str();
 }

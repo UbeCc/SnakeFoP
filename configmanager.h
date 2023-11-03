@@ -8,7 +8,7 @@ using namespace std;
 
 struct Config {
     int level;
-    unsigned int randomSeed;
+    int randomSeed;
     int foodCount;
     array<float, 3> foodProbabilities;
 };
@@ -17,7 +17,7 @@ class ConfigManager {
 public:
     static Config LoadConfig(const string &path);
     static void SaveConfig(const string &path, const Config &config);
-    static string GetConfigString(const Config &config);
+    [[nodiscard]] static string GetConfigString(const Config &config);
 };
 
 #endif //SNAKEFOP_CONFIGMANAGER_H
