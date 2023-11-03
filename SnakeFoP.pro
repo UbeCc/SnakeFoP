@@ -9,6 +9,10 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    # for cli
+    configmanager.cpp \
+    mapmanager.cpp \
+    # for gui
     main.cpp \
     playpage.cpp \
     resultpage.cpp \
@@ -16,9 +20,14 @@ SOURCES += \
     widget.cpp
 
 HEADERS += \
+    # for cli
+    configmanager.h \
+    mapmanager.h \
+    # for gui
     playpage.h \
     resultpage.h \
     settingpage.h \
+    status.h \
     widget.h
 
 FORMS += \

@@ -13,12 +13,12 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLabel" name="envLabel">
+  <widget class="QLabel" name="configLabel">
    <property name="geometry">
     <rect>
      <x>220</x>
      <y>100</y>
-     <width>58</width>
+     <width>171</width>
      <height>16</height>
     </rect>
    </property>
@@ -29,9 +29,9 @@
   <widget class="QLabel" name="mapLabel">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>200</x>
      <y>150</y>
-     <width>58</width>
+     <width>191</width>
      <height>16</height>
     </rect>
    </property>
@@ -39,7 +39,7 @@
     <string>TextLabel</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="envButton">
+  <widget class="QPushButton" name="configButton">
    <property name="geometry">
     <rect>
      <x>70</x>

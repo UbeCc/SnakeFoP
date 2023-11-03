@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include "resultpage.h"
+#include "mapmanager.h"
+#include "configmanager.h"
 
 namespace Ui {
 class PlayPage;
@@ -21,8 +23,9 @@ private slots:
 
 private:
     Ui::PlayPage *ui;
-    ResultPage *resultpage = new ResultPage();
+    ResultPage *resultPage = new ResultPage();
     void gameOver();
+    void initPlay();
 };
 
 #endif // PLAYPAGE_H

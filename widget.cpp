@@ -16,5 +16,5 @@ Widget::~Widget()
 
 void Widget::on_enterButton_clicked() {
     this->hide();
-    settingpage->show();
+    settingPage->show();
 }

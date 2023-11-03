@@ -21,6 +21,6 @@ private slots:
 
 private:
     Ui::MainPage *ui;
-    SettingPage *settingpage = new SettingPage();
+    SettingPage *settingPage = new SettingPage();
 };
 #endif // WIDGET_H

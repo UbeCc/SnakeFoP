@@ -21,5 +21,9 @@ void PlayPage::on_btn_clicked() {
 void PlayPage::gameOver() {
     qDebug() << "test" << Qt::endl;
     this->done(0);
-    resultpage->show();
+    resultPage->show();
+}
+
+void PlayPage::initPlay() {
+
 }

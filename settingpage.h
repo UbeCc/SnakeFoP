@@ -17,13 +17,13 @@ public:
     ~SettingPage();
 
 private slots:
-    void on_envButton_clicked();
+    void on_configButton_clicked();
     void on_mapButton_clicked();
     void on_confirmButton_clicked();
 
 private:
     Ui::SettingPage *ui;
-    PlayPage *playpage = new PlayPage();
+    PlayPage *playPage = new PlayPage();
 };
 
 #endif // SETTINGPAGE_H
