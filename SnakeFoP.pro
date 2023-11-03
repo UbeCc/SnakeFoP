@@ -3,6 +3,7 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
+CONFIG += sdk_no_version_check
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -12,9 +13,11 @@ SOURCES += \
     # for cli
     configmanager.cpp \
     mapmanager.cpp \
+#    game.cpp \
     # for gui
     main.cpp \
     playpage.cpp \
+    recordmanager.cpp \
     resultpage.cpp \
     settingpage.cpp \
     widget.cpp
@@ -23,8 +26,10 @@ HEADERS += \
     # for cli
     configmanager.h \
     mapmanager.h \
+#    game.h \
     # for gui
     playpage.h \
+    recordmanager.h \
     resultpage.h \
     settingpage.h \
     status.h \
