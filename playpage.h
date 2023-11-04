@@ -12,6 +12,8 @@ class PlayPage;
 
 class Widget;
 class ResultPage;
+class GameCanvas;
+
 
 class PlayPage : public QDialog
 {
@@ -21,7 +23,6 @@ public:
     explicit PlayPage(QWidget *parent = nullptr);
     ~PlayPage();
     void initPlay();
-    virtual void paintEvent(QPaintEvent*);
     virtual void keyPressEvent(QKeyEvent*);
     int getScore();
     int getLength();
@@ -35,6 +36,7 @@ private:
     Ui::PlayPage *ui;
     QTimer *gameTimer;
     ResultPage *resultPage;
+    GameCanvas *gameCanvas;
     void gameOver();
 };
 

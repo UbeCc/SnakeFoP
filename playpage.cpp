@@ -10,11 +10,106 @@
 
 using namespace std;
 
+class GameCanvas : public QWidget {
+private:
+    const Game *game;
+
+public:
+    GameCanvas(QWidget *parent = nullptr) : QWidget(parent) {
+        setFocusPolicy(Qt::StrongFocus);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        setMinimumSize(300, 300);
+    }
+
+    void SetGame(const Game *game) {
+        this->game = game;
+    }
+
+    void paintEvent(QPaintEvent *event) override {
+        auto &status = game->GetStatus();
+        int col = status.mapDefinition.height, row = status.mapDefinition.width;
+
+        auto size = event->rect().size();
+        int width = size.width(), height = size.height();
+
+        const int blockSize = min(width / col, height / row);
+
+        width = blockSize * col;
+        height = blockSize * row;
+
+        const int xOffset = (size.width() - width) / 2;
+        const int yOffset = (size.height() - height) / 2;
+
+        constexpr double BLOCK_MARGIN = 0.05;
+        const int margin = (int) (blockSize * BLOCK_MARGIN);
+
+        QPainter painter(this);
+
+        // draw playground
+        painter.setBrush(Qt::gray);
+        painter.setPen(Qt::transparent);
+        painter.drawRect(xOffset, yOffset, col * blockSize, row * blockSize);
+
+        // draw snake
+        painter.setBrush(Qt::green);
+        Point head = status.head;
+        painter.drawRect(xOffset + margin + head.x * blockSize, yOffset + margin + head.y * blockSize,
+                         blockSize - 2 * margin, blockSize - 2 * margin);
+
+        painter.setBrush(Qt::red);
+        Point tail = status.tail;
+        Point curPoint = tail;
+        while (curPoint != head) {
+            painter.drawRect(xOffset + margin + curPoint.x * blockSize, yOffset + margin + curPoint.y * blockSize,
+                             blockSize - 2 * margin, blockSize - 2 * margin);
+            curPoint = status.map[curPoint.x][curPoint.y];
+        }
+
+        // draw foods
+        auto foods = status.foods;
+        for (const auto &food: foods) {
+            painter.setBrush(Qt::white);
+            painter.setPen(Qt::transparent);
+            painter.drawEllipse(xOffset + margin + food.x * blockSize, yOffset + margin + food.y * blockSize,
+                                blockSize - 2 * margin, blockSize - 2 * margin);
+            painter.setPen(Qt::black);
+            int x = margin + food.x * blockSize + blockSize / 2;
+            int y = margin + food.y * blockSize + blockSize / 2;
+            painter.drawText(xOffset + x, yOffset + y + 5, QString::number(status.map[food.x][food.y].y));
+        }
+
+        // draw obstacles
+        painter.setBrush(Qt::black);
+        painter.setPen(Qt::transparent);
+        auto obstacles = status.mapDefinition.obstacles;
+        for (const auto &obstacle: obstacles) {
+            painter.drawRect(xOffset + margin + obstacle.x * blockSize, yOffset + margin + obstacle.y * blockSize,
+                             blockSize - 2 * margin, blockSize - 2 * margin);
+        }
+
+        // draw portals
+        auto portals = status.mapDefinition.portals;
+        for (const auto &portal: portals) {
+            Point start = portal[0], end = portal[1];
+            painter.setBrush(QColorConstants::Svg::darkblue);
+            painter.drawEllipse(xOffset + margin + start.x * blockSize, yOffset + margin + start.y * blockSize,
+                                blockSize - 2 * margin, blockSize - 2 * margin);
+            painter.setBrush(QColorConstants::Svg::midnightblue);
+            painter.drawEllipse(xOffset + margin + end.x * blockSize, yOffset + margin + end.y * blockSize,
+                                blockSize - 2 * margin, blockSize - 2 * margin);
+        }
+    }
+};
+
 PlayPage::PlayPage(QWidget *parent) :
         widget(dynamic_cast<Widget *>(parent)),
         ui(new Ui::PlayPage),
         resultPage(new ResultPage(this)) {
     ui->setupUi(this);
+    gameCanvas = new GameCanvas(this);
+    ui->horizontalLayout_2->replaceWidget(ui->GameCanvas, gameCanvas);
+    delete ui->GameCanvas;
+    ui->GameCanvas = gameCanvas;
 }
 
 PlayPage::~PlayPage() {
@@ -32,63 +127,11 @@ void PlayPage::initPlay() {
                     ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString()));
     ui->ConfigLabel->setText(widget->GetGameConfigPath().fileName());
     ui->MapLabel->setText(widget->GetGameMapPath().fileName());
+    gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
-    int col = status.mapDefinition.height, row = status.mapDefinition.width;
-    resize(MARGIN * 4 + (col + 7) * BLOCK_SIZE, MARGIN * 2 + row * BLOCK_SIZE);
     gameTimer = new QTimer(this);
     connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
     gameTimer->start(TIME_INTERVAL * 2);
-}
-
-void PlayPage::paintEvent(QPaintEvent *event) {
-    auto &status = game->GetStatus();
-    int col = status.mapDefinition.height, row = status.mapDefinition.width;
-    QPainter painter(this);
-
-    // draw playground
-    painter.setBrush(Qt::yellow);
-    painter.setPen(Qt::blue);
-    painter.drawRect(MARGIN, MARGIN, col * BLOCK_SIZE, row * BLOCK_SIZE);
-
-    // draw snake
-    painter.setBrush(Qt::red);
-    painter.setPen(Qt::green);
-    Point tail = status.tail;
-    Point curPoint = tail;
-    while (curPoint.x >= 0) {
-        painter.drawRect(MARGIN + curPoint.x * BLOCK_SIZE, MARGIN + curPoint.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-        curPoint = status.map[curPoint.x][curPoint.y];
-    }
-
-    // draw foods
-    auto foods = status.foods;
-    for (auto i = foods.begin(); i != foods.end(); ++i) {
-        painter.setBrush(Qt::white);
-        painter.drawEllipse(MARGIN + i->x * BLOCK_SIZE, MARGIN + i->y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-        painter.setBrush(Qt::black);
-        int x = MARGIN + i->x * BLOCK_SIZE + BLOCK_SIZE / 2;
-        int y = MARGIN + i->y * BLOCK_SIZE + BLOCK_SIZE / 2;
-        int xOffset = -5;
-        int yOffset = 5;
-        painter.drawText(x + xOffset, y + yOffset, QString::number(status.map[i->x][i->y].y));
-    }
-
-    // draw obstacles
-    painter.setBrush(Qt::black);
-    auto obstacles = status.mapDefinition.obstacles;
-    for (auto i = obstacles.begin(); i != obstacles.end(); ++i) {
-        painter.drawRect(MARGIN + i->x * BLOCK_SIZE, MARGIN + i->y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    }
-
-    // draw portals
-    auto portals = status.mapDefinition.portals;
-    for (auto i = portals.begin(); i != portals.end(); ++i) {
-        Point start = (*i)[0], end = (*i)[1];
-        painter.setBrush(QColorConstants::Svg::darkblue);
-        painter.drawEllipse(MARGIN + start.x * BLOCK_SIZE, MARGIN + start.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-        painter.setBrush(QColorConstants::Svg::midnightblue);
-        painter.drawEllipse(MARGIN + end.x * BLOCK_SIZE, MARGIN + end.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    }
 }
 
 void PlayPage::Step() {
@@ -102,7 +145,7 @@ void PlayPage::Step() {
     ui->ScoreLabel->setText(QString::number(status.score));
     ui->LengthLabel->setText(QString::number(status.length));
 
-    update();
+    ui->GameCanvas->update();
 }
 
 void PlayPage::keyPressEvent(QKeyEvent *event) {
