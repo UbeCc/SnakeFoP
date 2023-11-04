@@ -17,6 +17,7 @@ SettingPage::SettingPage(QWidget *parent) :
     ui(new Ui::SettingPage)
 {
     ui->setupUi(this);
+    ui->header->setReadOnly(true);
 }
 
 SettingPage::~SettingPage()
@@ -63,3 +64,10 @@ void SettingPage::on_confirmButton_clicked() {
     playPage->initPlay();
     playPage->show();
 }
+
+void SettingPage::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    if(gameConfigPath == "") ui->configLabel->setText("您还未选择配置文件");
+    if(gameMapPath == "") ui->mapLabel->setText("您还未选择地图文件");
+}
+

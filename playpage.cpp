@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <time.h>
 #include <QTimer>
+#include <QFileInfo>
 #include <QString>
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -25,12 +26,9 @@ PlayPage::~PlayPage()
     delete ui;
 }
 
-void PlayPage::on_btn_clicked() {
-    gameOver();
-}
-
 void PlayPage::gameOver() {
-    qDebug() << "test" << Qt::endl;
+    gameScore = game->GetStatus().score;
+    gameTimer->stop();
     this->done(0);
     resultPage->show();
 }
@@ -39,9 +37,9 @@ void PlayPage::initPlay() {
     game = new Game(MapManager::LoadMap(gameMapPath), ConfigManager::LoadConfig(gameConfigPath));
     auto &status = game->GetStatus();
     int col = status.mapDefinition.height, row = status.mapDefinition.width;
-    resize(MARGIN * 4 + (col + 3) * BLOCK_SIZE, MARGIN * 2 + row * BLOCK_SIZE);
+    resize(MARGIN * 4 + (col + 7) * BLOCK_SIZE, MARGIN * 2 + row * BLOCK_SIZE);
     game->GenerateFood();
-    QTimer *gameTimer = new QTimer(this);
+    gameTimer = new QTimer(this);
     connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
     gameTimer->start(TIME_INTERVAL * 2);
 }
@@ -59,9 +57,11 @@ void PlayPage::paintEvent(QPaintEvent *event) {
     // draw snake
     painter.setBrush(Qt::red);
     painter.setPen(Qt::green);
+    gameLength = 0;
     Point tail = status.tail;
     Point curPoint = tail;
     while(curPoint.x >= 0) {
+        ++gameLength;
         painter.drawRect(MARGIN + curPoint.x * BLOCK_SIZE, MARGIN + curPoint.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         curPoint = status.map[curPoint.x][curPoint.y];
     }
@@ -96,9 +96,15 @@ void PlayPage::paintEvent(QPaintEvent *event) {
         painter.drawEllipse(MARGIN + end.x * BLOCK_SIZE, MARGIN + end.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
     }
 
+    QFileInfo configFileInfo = QFileInfo(QString::fromStdString(gameConfigPath));
+    QFileInfo mapFileInfo = QFileInfo(QString::fromStdString(gameMapPath));
+
     painter.setPen(Qt::black);
     painter.setFont(QFont("Arial", 14));
-    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 2 * BLOCK_SIZE, "Score " + QString::number(status.score));
+    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 2 * BLOCK_SIZE, "得分: " + QString::number(status.score));
+    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 3 * BLOCK_SIZE, "长度: " + QString::number(gameLength));
+    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 4 * BLOCK_SIZE, "配置: " + configFileInfo.fileName());
+    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 5 * BLOCK_SIZE, "地图: " + mapFileInfo.fileName());
 }
 
 void PlayPage::Step() {
@@ -111,19 +117,22 @@ void PlayPage::Step() {
 }
 
 void PlayPage::keyPressEvent(QKeyEvent *event) {
-    bool flag = false;
     Game::Direction direction = game->GetStatus().direction;
     switch(event->key()) {
     case Qt::Key_Up:
+    case Qt::Key_W:
         if(direction != Game::Down) game->ChangeDirection(Game::Up);
         break;
     case Qt::Key_Down:
+    case Qt::Key_S:
         if(direction != Game::Up) game->ChangeDirection(Game::Down);
         break;
     case Qt::Key_Left:
+    case Qt::Key_A:
         if(direction != Game::Right) game->ChangeDirection(Game::Left);
         break;
     case Qt::Key_Right:
+    case Qt::Key_D:
         if(direction != Game::Left) game->ChangeDirection(Game::Right);
         break;
     default:

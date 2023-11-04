@@ -13,6 +13,7 @@ class ResultPage : public QDialog
 
 public:
     explicit ResultPage(QWidget *parent = nullptr);
+    virtual void showEvent(QShowEvent*);
     ~ResultPage();
 
 private slots:

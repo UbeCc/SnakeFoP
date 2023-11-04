@@ -14,6 +14,7 @@ class SettingPage : public QDialog
 
 public:
     explicit SettingPage(QWidget *parent = nullptr);
+    virtual void showEvent(QShowEvent*);
     ~SettingPage();
 
 private slots:

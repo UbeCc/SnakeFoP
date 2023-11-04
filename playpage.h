@@ -3,8 +3,6 @@
 
 #include <QDialog>
 #include "resultpage.h"
-#include "mapmanager.h"
-#include "configmanager.h"
 #include "game.h"
 
 namespace Ui {
@@ -23,13 +21,12 @@ public:
     virtual void keyPressEvent(QKeyEvent*);
 
 private slots:
-    void on_btn_clicked();
     void Step();
-
 
 private:
     Game *game;
     Ui::PlayPage *ui;
+    QTimer *gameTimer;
     ResultPage *resultPage = new ResultPage();
     void gameOver();
 };

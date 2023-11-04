@@ -1,5 +1,6 @@
 #include "resultpage.h"
 #include "ui_resultpage.h"
+#include "status.h"
 
 ResultPage::ResultPage(QWidget *parent) :
     QDialog(parent),
@@ -24,4 +25,11 @@ void ResultPage::on_replayButton_clicked() {
             return;
         }
     }
+}
+
+
+void ResultPage::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    ui->scoreLabel->setText("您的最终得分是: " + QString::number(gameScore));
+    ui->lengthLabel->setText("您的最终长度是: " + QString::number(gameLength));
 }
