@@ -2,10 +2,13 @@
 #define SETTINGPAGE_H
 
 #include <QDialog>
+#include "widget.h"
 
 namespace Ui {
 class SettingPage;
 }
+
+class Widget;
 
 class SettingPage : public QDialog
 {
@@ -22,6 +25,7 @@ private slots:
 
 private:
     Ui::SettingPage *ui;
+    Widget *widget;
 };
 
 #endif // SETTINGPAGE_H

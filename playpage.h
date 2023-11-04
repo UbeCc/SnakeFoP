@@ -4,10 +4,14 @@
 #include <QDialog>
 #include "resultpage.h"
 #include "game.h"
+#include "widget.h"
 
 namespace Ui {
 class PlayPage;
 }
+
+class Widget;
+class ResultPage;
 
 class PlayPage : public QDialog
 {
@@ -19,15 +23,18 @@ public:
     void initPlay();
     virtual void paintEvent(QPaintEvent*);
     virtual void keyPressEvent(QKeyEvent*);
+    int getScore();
+    int getLength();
 
 private slots:
     void Step();
 
 private:
+    Widget *widget;
     Game *game;
     Ui::PlayPage *ui;
     QTimer *gameTimer;
-    ResultPage *resultPage = new ResultPage();
+    ResultPage *resultPage;
     void gameOver();
 };
 

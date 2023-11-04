@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QFileInfo>
 #include "playpage.h"
 #include "settingpage.h"
 
@@ -9,20 +10,28 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainPage; }
 QT_END_NAMESPACE
 
+class PlayPage;
+class SettingPage;
+
 class Widget : public QWidget
 {
     Q_OBJECT
 
 public:
-    Widget(QWidget *parent = nullptr);
-    ~Widget();
+    explicit Widget(QWidget *parent = nullptr);
+    ~Widget() override;
+    void SetGameConfigPath(const QFileInfo &path);
+    void SetGameMapPath(const QFileInfo &path);
+    [[nodiscard]] QFileInfo GetGameConfigPath() const;
+    [[nodiscard]] QFileInfo GetGameMapPath() const;
 
 private slots:
     void on_enterButton_clicked();
 
 private:
     Ui::MainPage *ui;
-    SettingPage *settingPage = new SettingPage(this);
-    PlayPage *playPage = new PlayPage(this);
+    SettingPage *settingPage;
+    PlayPage *playPage;
+    QFileInfo gameConfigPath, gameMapPath;
 };
 #endif // WIDGET_H

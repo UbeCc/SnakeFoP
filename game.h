@@ -70,11 +70,13 @@ public:
 
     /// @brief Move the snake one step forward.
     void Step();
-    void GenerateFood();
 
     [[nodiscard]] const GameStatus &GetStatus() const;
 
     [[nodiscard]] string GetStatisticsString() const;
+
+private:
+    void GenerateFood();
 };
 
 #endif //SNAKEFOP_GAME_H

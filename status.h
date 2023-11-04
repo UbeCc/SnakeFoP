@@ -10,7 +10,4 @@ const int BLOCK_SIZE = 25;
 const int MARGIN = 5;
 const int TIME_INTERVAL = 200;
 
-extern string gameMapPath, gameConfigPath;
-extern int gameLength, gameScore;
-
 #endif // STATUS_H

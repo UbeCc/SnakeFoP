@@ -12,11 +12,10 @@
 
 using namespace std;
 
-QString configFilePath = "./config/default.txt", mapFilePath = "./maps/test_map.txt";
-
 SettingPage::SettingPage(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::SettingPage)
+    ui(new Ui::SettingPage),
+    widget(dynamic_cast<Widget*>(parent))
 {
     ui->setupUi(this);
 }
@@ -27,19 +26,17 @@ SettingPage::~SettingPage()
 }
 
 void SettingPage::on_configButton_clicked() {
-    configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
+    QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(configFilePath);
-    ui->configLabel->setText(QString("当前选中") + fileInfo.fileName());
-    // TODO: add filename check
-    gameConfigPath = configFilePath.toStdString();
+    ui->configLabel->setText(fileInfo.fileName());
+    widget->SetGameConfigPath(fileInfo);
 }
 
 void SettingPage::on_mapButton_clicked() {
-    mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
+    QString mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(mapFilePath);
-    ui->mapLabel->setText(QString("当前选中") + fileInfo.fileName());
-    // TODO: add filename check
-    gameMapPath = mapFilePath.toStdString();
+    ui->mapLabel->setText(fileInfo.fileName());
+    widget->SetGameMapPath(fileInfo);
 }
 
 void SettingPage::on_confirmButton_clicked() {

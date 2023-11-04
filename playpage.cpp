@@ -1,44 +1,40 @@
-#include <QDebug>
 #include "playpage.h"
 #include "ui_playpage.h"
 #include <QPainter>
-#include <time.h>
 #include <QTimer>
-#include <QFileInfo>
 #include <QString>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include "game.h"
 #include "status.h"
-#include <cstring>
 
 using namespace std;
 
-// extern string gameConfigPath, gameMapPath;
-
-PlayPage::PlayPage(QWidget *parent): ui(new Ui::PlayPage)
-{
+PlayPage::PlayPage(QWidget *parent) :
+        widget(dynamic_cast<Widget *>(parent)),
+        ui(new Ui::PlayPage),
+        resultPage(new ResultPage(this)) {
     ui->setupUi(this);
 }
 
-PlayPage::~PlayPage()
-{
+PlayPage::~PlayPage() {
     delete ui;
 }
 
 void PlayPage::gameOver() {
-    gameScore = game->GetStatus().score;
     gameTimer->stop();
     this->done(0);
     resultPage->show();
 }
 
 void PlayPage::initPlay() {
-    game = new Game(MapManager::LoadMap(gameMapPath), ConfigManager::LoadConfig(gameConfigPath));
+    game = new Game(MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString()),
+                    ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString()));
+    ui->ConfigLabel->setText(widget->GetGameConfigPath().fileName());
+    ui->MapLabel->setText(widget->GetGameMapPath().fileName());
     auto &status = game->GetStatus();
     int col = status.mapDefinition.height, row = status.mapDefinition.width;
     resize(MARGIN * 4 + (col + 7) * BLOCK_SIZE, MARGIN * 2 + row * BLOCK_SIZE);
-    game->GenerateFood();
     gameTimer = new QTimer(this);
     connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
     gameTimer->start(TIME_INTERVAL * 2);
@@ -57,18 +53,16 @@ void PlayPage::paintEvent(QPaintEvent *event) {
     // draw snake
     painter.setBrush(Qt::red);
     painter.setPen(Qt::green);
-    gameLength = 0;
     Point tail = status.tail;
     Point curPoint = tail;
-    while(curPoint.x >= 0) {
-        ++gameLength;
+    while (curPoint.x >= 0) {
         painter.drawRect(MARGIN + curPoint.x * BLOCK_SIZE, MARGIN + curPoint.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         curPoint = status.map[curPoint.x][curPoint.y];
     }
 
     // draw foods
     auto foods = status.foods;
-    for(auto i = foods.begin(); i != foods.end(); ++i) {
+    for (auto i = foods.begin(); i != foods.end(); ++i) {
         painter.setBrush(Qt::white);
         painter.drawEllipse(MARGIN + i->x * BLOCK_SIZE, MARGIN + i->y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         painter.setBrush(Qt::black);
@@ -82,60 +76,63 @@ void PlayPage::paintEvent(QPaintEvent *event) {
     // draw obstacles
     painter.setBrush(Qt::black);
     auto obstacles = status.mapDefinition.obstacles;
-    for(auto i = obstacles.begin(); i != obstacles.end(); ++i) {
+    for (auto i = obstacles.begin(); i != obstacles.end(); ++i) {
         painter.drawRect(MARGIN + i->x * BLOCK_SIZE, MARGIN + i->y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
     }
 
     // draw portals
     auto portals = status.mapDefinition.portals;
-    for(auto i = portals.begin(); i != portals.end(); ++i) {
+    for (auto i = portals.begin(); i != portals.end(); ++i) {
         Point start = (*i)[0], end = (*i)[1];
         painter.setBrush(QColorConstants::Svg::darkblue);
         painter.drawEllipse(MARGIN + start.x * BLOCK_SIZE, MARGIN + start.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
         painter.setBrush(QColorConstants::Svg::midnightblue);
         painter.drawEllipse(MARGIN + end.x * BLOCK_SIZE, MARGIN + end.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
     }
-
-    QFileInfo configFileInfo = QFileInfo(QString::fromStdString(gameConfigPath));
-    QFileInfo mapFileInfo = QFileInfo(QString::fromStdString(gameMapPath));
-
-    painter.setPen(Qt::black);
-    painter.setFont(QFont("Arial", 14));
-    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 2 * BLOCK_SIZE, "得分: " + QString::number(status.score));
-    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 3 * BLOCK_SIZE, "长度: " + QString::number(gameLength));
-    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 4 * BLOCK_SIZE, "配置: " + configFileInfo.fileName());
-    painter.drawText(MARGIN * 3 + col * BLOCK_SIZE, MARGIN + 5 * BLOCK_SIZE, "地图: " + mapFileInfo.fileName());
 }
 
 void PlayPage::Step() {
-    qDebug() << "step\n";
     game->Step();
-    if(game->GetStatus().state == Game::Dead) {
+    const auto &status = game->GetStatus();
+
+    if (status.state == Game::Dead) {
         gameOver();
     }
+
+    ui->ScoreLabel->setText(QString::number(status.score));
+    ui->LengthLabel->setText(QString::number(status.length));
+
     update();
 }
 
 void PlayPage::keyPressEvent(QKeyEvent *event) {
     Game::Direction direction = game->GetStatus().direction;
-    switch(event->key()) {
-    case Qt::Key_Up:
-    case Qt::Key_W:
-        if(direction != Game::Down) game->ChangeDirection(Game::Up);
-        break;
-    case Qt::Key_Down:
-    case Qt::Key_S:
-        if(direction != Game::Up) game->ChangeDirection(Game::Down);
-        break;
-    case Qt::Key_Left:
-    case Qt::Key_A:
-        if(direction != Game::Right) game->ChangeDirection(Game::Left);
-        break;
-    case Qt::Key_Right:
-    case Qt::Key_D:
-        if(direction != Game::Left) game->ChangeDirection(Game::Right);
-        break;
-    default:
-        break;
+    switch (event->key()) {
+        case Qt::Key_Up:
+        case Qt::Key_W:
+            if (direction != Game::Down) game->ChangeDirection(Game::Up);
+            break;
+        case Qt::Key_Down:
+        case Qt::Key_S:
+            if (direction != Game::Up) game->ChangeDirection(Game::Down);
+            break;
+        case Qt::Key_Left:
+        case Qt::Key_A:
+            if (direction != Game::Right) game->ChangeDirection(Game::Left);
+            break;
+        case Qt::Key_Right:
+        case Qt::Key_D:
+            if (direction != Game::Left) game->ChangeDirection(Game::Right);
+            break;
+        default:
+            break;
     }
+}
+
+int PlayPage::getScore() {
+    return game->GetStatus().score;
+}
+
+int PlayPage::getLength() {
+    return game->GetStatus().length;
 }

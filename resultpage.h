@@ -2,10 +2,13 @@
 #define RESULTPAGE_H
 
 #include <QDialog>
+#include "playpage.h"
 
 namespace Ui {
 class ResultPage;
 }
+
+class PlayPage;
 
 class ResultPage : public QDialog
 {
@@ -20,6 +23,7 @@ private slots:
     void on_replayButton_clicked();
 
 private:
+    PlayPage *playPage;
     Ui::ResultPage *ui;
 };
 
