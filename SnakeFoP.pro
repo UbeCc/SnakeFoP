@@ -13,20 +13,21 @@ SOURCES += \
     # for cli
     configmanager.cpp \
     mapmanager.cpp \
-#    game.cpp \
+    game.cpp \
     # for gui
     main.cpp \
     playpage.cpp \
     recordmanager.cpp \
     resultpage.cpp \
     settingpage.cpp \
+    status.cpp \
     widget.cpp
 
 HEADERS += \
     # for cli
     configmanager.h \
     mapmanager.h \
-#    game.h \
+    game.h \
     # for gui
     playpage.h \
     recordmanager.h \
