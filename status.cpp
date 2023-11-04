@@ -3,5 +3,5 @@
 
 using namespace std;
 
-string gameMapPath = "", gameConfigPath = "";
+string gameMapPath = "./maps/test_map.txt", gameConfigPath = "./config/default.txt";
 int gameLength = 1, gameScore = 0;
