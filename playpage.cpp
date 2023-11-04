@@ -67,17 +67,14 @@ public:
         }
 
         // draw foods
-        auto foods = status.foods;
-        for (const auto &food: foods) {
-            painter.setBrush(Qt::white);
-            painter.setPen(Qt::transparent);
-            painter.drawEllipse(xOffset + margin + food.x * blockSize, yOffset + margin + food.y * blockSize,
-                                blockSize - 2 * margin, blockSize - 2 * margin);
 
-            painter.setPen(Qt::black);
-            int x = margin + food.x * blockSize + blockSize / 2;
-            int y = margin + food.y * blockSize + blockSize / 2;
-            painter.drawText(xOffset + x, yOffset + y + 5, QString::number(status.map[food.x][food.y].y));
+        painter.setBrush(Qt::white);
+        painter.setPen(Qt::transparent);
+        auto &foods = status.foods;
+        for (const auto &food: foods) {
+            int sizeFactor = (3 + 2 * (3 - status.map[food.x][food.y].y)) * margin;
+            painter.drawEllipse(xOffset + sizeFactor + food.x * blockSize, yOffset + sizeFactor + food.y * blockSize,
+                                blockSize - 2 * sizeFactor, blockSize - 2 * sizeFactor);
         }
 
         // draw obstacles
@@ -94,11 +91,10 @@ public:
         for (const auto &portal: portals) {
             Point start = portal[0], end = portal[1];
             painter.setBrush(QColorConstants::Svg::darkblue);
-            painter.drawEllipse(xOffset + margin + start.x * blockSize, yOffset + margin + start.y * blockSize,
-                                blockSize - 2 * margin, blockSize - 2 * margin);
-            painter.setBrush(QColorConstants::Svg::midnightblue);
-            painter.drawEllipse(xOffset + margin + end.x * blockSize, yOffset + margin + end.y * blockSize,
-                                blockSize - 2 * margin, blockSize - 2 * margin);
+            painter.drawRect(xOffset + 6 * margin + start.x * blockSize, yOffset + 6 * margin + start.y * blockSize,
+                                blockSize - 12 * margin, blockSize - 12 * margin);
+            painter.drawRect(xOffset + 6 * margin + end.x * blockSize, yOffset + 6 * margin + end.y * blockSize,
+                                blockSize - 12 * margin, blockSize - 12 * margin);
         }
     }
 };
@@ -133,7 +129,7 @@ void PlayPage::initPlay() {
     auto &status = game->GetStatus();
     gameTimer = new QTimer(this);
     connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
-    gameTimer->start(TIME_INTERVAL * 2);
+    gameTimer->start((int)(1000 * (1. / status.config.level)));
 }
 
 void PlayPage::Step() {
