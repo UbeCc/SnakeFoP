@@ -115,15 +115,19 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
     Game::Direction direction = game->GetStatus().direction;
     switch(event->key()) {
     case Qt::Key_Up:
+    case Qt::Key_W:
         if(direction != Game::Down) game->ChangeDirection(Game::Up);
         break;
     case Qt::Key_Down:
+    case Qt::Key_S:
         if(direction != Game::Up) game->ChangeDirection(Game::Down);
         break;
     case Qt::Key_Left:
+    case Qt::Key_A:
         if(direction != Game::Right) game->ChangeDirection(Game::Left);
         break;
     case Qt::Key_Right:
+    case Qt::Key_D:
         if(direction != Game::Left) game->ChangeDirection(Game::Right);
         break;
     default:

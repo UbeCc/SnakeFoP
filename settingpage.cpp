@@ -28,7 +28,7 @@ bool configFlag = false, mapFlag = false;
 QString configFilePath, mapFilePath;
 void SettingPage::on_configButton_clicked() {
     if(!configFlag) {
-        configFilePath = "/Users/ubec/workspace/SnakeFoP/SnakeFoP/config/default.txt";
+        configFilePath = "./config/default.txt";
         configFlag = true;
         QFileInfo fileInfo = QFileInfo(configFilePath);
         ui->configLabel->setText(QString("当前选中") + fileInfo.fileName());
@@ -44,7 +44,7 @@ void SettingPage::on_configButton_clicked() {
 
 void SettingPage::on_mapButton_clicked() {
     if(!mapFlag) {
-        mapFilePath = "/Users/ubec/workspace/SnakeFoP/SnakeFoP/maps/test_map.txt";
+        mapFilePath = "./maps/test_map.txt";
         mapFlag = true;
         QFileInfo fileInfo = QFileInfo(mapFilePath);
         ui->mapLabel->setText(QString("当前选中") + fileInfo.fileName());
