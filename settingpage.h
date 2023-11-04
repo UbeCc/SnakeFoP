@@ -2,7 +2,6 @@
 #define SETTINGPAGE_H
 
 #include <QDialog>
-#include "playpage.h"
 
 namespace Ui {
 class SettingPage;
@@ -23,7 +22,6 @@ private slots:
 
 private:
     Ui::SettingPage *ui;
-    PlayPage *playPage = new PlayPage();
 };
 
 #endif // SETTINGPAGE_H

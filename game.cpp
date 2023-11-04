@@ -57,8 +57,7 @@ void Game::Step() {
     auto &state = status.state;
 
     if (state == Dead) {
-//        throw runtime_error("The snake is dead");
-        return;
+        throw runtime_error("The snake is dead");
     }
 
     direction = status.nextDirection;

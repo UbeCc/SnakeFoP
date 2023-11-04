@@ -15,6 +15,9 @@ Widget::~Widget()
 }
 
 void Widget::on_enterButton_clicked() {
-    this->hide();
-    settingPage->show();
+    if (settingPage->exec() == QDialog::Accepted) {
+        this->hide();
+        playPage->initPlay();
+        playPage->show();
+    }
 }

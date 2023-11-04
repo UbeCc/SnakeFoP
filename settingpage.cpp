@@ -43,7 +43,5 @@ void SettingPage::on_mapButton_clicked() {
 }
 
 void SettingPage::on_confirmButton_clicked() {
-    this->done(0);
-    playPage->initPlay();
-    playPage->show();
+    this->accept();
 }

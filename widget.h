@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include "playpage.h"
 #include "settingpage.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,6 +22,7 @@ private slots:
 
 private:
     Ui::MainPage *ui;
-    SettingPage *settingPage = new SettingPage();
+    SettingPage *settingPage = new SettingPage(this);
+    PlayPage *playPage = new PlayPage(this);
 };
 #endif // WIDGET_H
