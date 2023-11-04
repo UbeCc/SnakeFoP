@@ -1,6 +1,7 @@
 #include "resultpage.h"
 #include "ui_resultpage.h"
 #include "status.h"
+#include "settingpage.h"
 
 ResultPage::ResultPage(QWidget *parent) :
     QDialog(parent),
@@ -16,10 +17,8 @@ ResultPage::~ResultPage()
 }
 
 void ResultPage::on_replayButton_clicked() {
-    foreach(QWidget *widget, QApplication::allWidgets()) {
-        qDebug() << widget->windowTitle();
-        QString title = widget->windowTitle();
-        if(title == "Widget" && widget->isWindow()) {
+    foreach(QWidget *widget, QApplication::topLevelWidgets()) {
+        if (dynamic_cast<SettingPage*>(widget) != nullptr) {
             this->close();
             widget->show();
             return;
