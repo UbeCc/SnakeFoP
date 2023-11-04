@@ -56,10 +56,11 @@ public:
         painter.drawRect(xOffset + margin + head.x * blockSize, yOffset + margin + head.y * blockSize,
                          blockSize - 2 * margin, blockSize - 2 * margin);
 
-        painter.setBrush(Qt::red);
         Point tail = status.tail;
         Point curPoint = tail;
+        int l = -status.length;
         while (curPoint != head) {
+            painter.setBrush(QColor::fromHsv(0, max(32, 255 + 8 * ++l), 255));
             painter.drawRect(xOffset + margin + curPoint.x * blockSize, yOffset + margin + curPoint.y * blockSize,
                              blockSize - 2 * margin, blockSize - 2 * margin);
             curPoint = status.map[curPoint.x][curPoint.y];
@@ -72,6 +73,7 @@ public:
             painter.setPen(Qt::transparent);
             painter.drawEllipse(xOffset + margin + food.x * blockSize, yOffset + margin + food.y * blockSize,
                                 blockSize - 2 * margin, blockSize - 2 * margin);
+
             painter.setPen(Qt::black);
             int x = margin + food.x * blockSize + blockSize / 2;
             int y = margin + food.y * blockSize + blockSize / 2;
