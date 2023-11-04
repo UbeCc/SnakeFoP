@@ -9,14 +9,12 @@
 using namespace std;
 
 struct Record {
-    string mapPath, configPath;
     Map map;
     Config config;
     string sequence;
     vector<pair<Point, int> > foodSequence;
     string moveSequence;
     void replay();
-    Record() {}
 };
 
 class RecordManager

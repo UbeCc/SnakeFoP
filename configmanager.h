@@ -14,8 +14,12 @@ struct Config {
 };
 
 class ConfigManager {
+private:
+    static Config LoadConfigFromStream(istream &stream);
+
 public:
     static Config LoadConfig(const string &path);
+    static Config LoadConfigFromString(const string &configString);
     static void SaveConfig(const string &path, const Config &config);
     [[nodiscard]] static string GetConfigString(const Config &config);
 };

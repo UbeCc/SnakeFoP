@@ -2,31 +2,13 @@
 #include <fstream>
 #include <sstream>
 
-/**
- * @brief Load map from given path.
- *
- * @remark Map file format:
- * L1: width height
- * L2: borderIsObstacle[0] borderIsObstacle[1] borderIsObstacle[2] borderIsObstacle[3]
- * L3: number of obstacles
- * L4+: obstacles (x, y)
- * L4+number of obstacles: number of portals
- * L5+number of obstacles: portals (x1, y1, x2, y2)
- */
-Map MapManager::LoadMap(const string &path)
-{
-    ifstream ifs(path);
-
-    if (!ifs.is_open())
-    {
-        throw runtime_error("Failed to open file " + path);
-    }
+Map MapManager::LoadMapFromStream(std::istream &stream) {
 
     Map map;
 
-    ifs >> map.width >> map.height;
+    stream >> map.width >> map.height;
 
-    if (!ifs.good())
+    if (!stream.good())
     {
         throw runtime_error("Failed to read map width and height");
     }
@@ -38,18 +20,18 @@ Map MapManager::LoadMap(const string &path)
 
     for (int i = 0; i < 4; i++)
     {
-        ifs >> map.borderIsObstacle[i];
+        stream >> map.borderIsObstacle[i];
     }
 
-    if (!ifs.good())
+    if (!stream.good())
     {
         throw runtime_error("Failed to read border");
     }
 
     int obstacleCount;
-    ifs >> obstacleCount;
+    stream >> obstacleCount;
 
-    if (!ifs.good())
+    if (!stream.good())
     {
         throw runtime_error("Failed to read obstacles count");
     }
@@ -62,10 +44,10 @@ Map MapManager::LoadMap(const string &path)
     for (int i = 0; i < obstacleCount; i++)
     {
         Point obstacle{};
-        ifs >> obstacle.x >> obstacle.y;
+        stream >> obstacle.x >> obstacle.y;
         map.obstacles.push_back(obstacle);
 
-        if (!ifs.good())
+        if (!stream.good())
         {
             throw runtime_error("Failed to read obstacle " + to_string(i));
         }
@@ -76,12 +58,12 @@ Map MapManager::LoadMap(const string &path)
     }
 
     int portalCount;
-    ifs >> portalCount;
+    stream >> portalCount;
 
-    if (!ifs.good())
+    if (!stream.good())
     {
         // Standard map format ends here.
-        if (ifs.eof())
+        if (stream.eof())
         {
             map.spawnPoint = {0, 0};
             return map;
@@ -101,10 +83,10 @@ Map MapManager::LoadMap(const string &path)
     for (int i = 0; i < portalCount; i++)
     {
         Point portal1{}, portal2{};
-        ifs >> portal1.x >> portal1.y >> portal2.x >> portal2.y;
+        stream >> portal1.x >> portal1.y >> portal2.x >> portal2.y;
         map.portals.push_back({portal1, portal2});
 
-        if (!ifs.good())
+        if (!stream.good())
         {
             throw runtime_error("Failed to read portal " + to_string(i));
         }
@@ -114,9 +96,9 @@ Map MapManager::LoadMap(const string &path)
         }
     }
 
-    ifs >> map.spawnPoint.x >> map.spawnPoint.y;
+    stream >> map.spawnPoint.x >> map.spawnPoint.y;
 
-    if (!ifs.good())
+    if (!stream.good())
     {
         throw runtime_error("Failed to read spawn point");
     }
@@ -142,6 +124,35 @@ Map MapManager::LoadMap(const string &path)
     }
 
     return map;
+}
+
+/**
+ * @brief Load map from given path.
+ *
+ * @remark Map file format:
+ * L1: width height
+ * L2: borderIsObstacle[0] borderIsObstacle[1] borderIsObstacle[2] borderIsObstacle[3]
+ * L3: number of obstacles
+ * L4+: obstacles (x, y)
+ * L4+number of obstacles: number of portals
+ * L5+number of obstacles: portals (x1, y1, x2, y2)
+ */
+Map MapManager::LoadMap(const string &path)
+{
+    ifstream ifs(path);
+
+    if (!ifs.is_open())
+    {
+        throw runtime_error("Failed to open file " + path);
+    }
+
+    return LoadMapFromStream(ifs);
+}
+
+Map MapManager::LoadMapFromString(const string &mapString)
+{
+    stringstream ss(mapString);
+    return LoadMapFromStream(ss);
 }
 
 void MapManager::SaveMap(const string &path, const Map &map)

@@ -5,34 +5,28 @@
 
 using namespace std;
 
-Config ConfigManager::LoadConfig(const std::string &path) {
-    ifstream ifs(path);
+Config ConfigManager::LoadConfigFromStream(istream &stream) {
+    Config config{};
 
-    if (!ifs.is_open()) {
-        throw runtime_error("Failed to open file " + path);
-    }
+    stream >> config.level;
 
-    Config config;
-
-    ifs >> config.level;
-
-    if (!ifs.good()) {
+    if (!stream.good()) {
         throw runtime_error("Failed to read level");
     }
 
-    ifs >> config.randomSeed;
+    stream >> config.randomSeed;
 
-    if (!ifs.good()) {
+    if (!stream.good()) {
         throw runtime_error("Failed to read random seed");
     }
 
     if (config.randomSeed == -1) {
-        config.randomSeed = time(nullptr);
+        config.randomSeed = (int)time(nullptr);
     }
 
-    ifs >> config.foodCount;
+    stream >> config.foodCount;
 
-    if (!ifs.good()) {
+    if (!stream.good()) {
         throw runtime_error("Failed to read food count");
     }
 
@@ -40,9 +34,9 @@ Config ConfigManager::LoadConfig(const std::string &path) {
         throw runtime_error("Food count should be within range [1, 20]");
     }
 
-    ifs >> config.foodProbabilities[0] >> config.foodProbabilities[1] >> config.foodProbabilities[2];
+    stream >> config.foodProbabilities[0] >> config.foodProbabilities[1] >> config.foodProbabilities[2];
 
-    if (!ifs.good()) {
+    if (!stream.good()) {
         throw runtime_error("Failed to read food probabilities");
     }
 
@@ -53,10 +47,25 @@ Config ConfigManager::LoadConfig(const std::string &path) {
     }
 
     if (abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > 1e-6) {
-        throw runtime_error("Sum of food probabilities should be less than or equal to 1");
+        throw runtime_error("Sum of food probabilities should be 1");
     }
 
     return config;
+}
+
+Config ConfigManager::LoadConfigFromString(const std::string &configString) {
+    stringstream ss(configString);
+    return LoadConfigFromStream(ss);
+}
+
+Config ConfigManager::LoadConfig(const std::string &path) {
+    ifstream ifs(path);
+
+    if (!ifs.is_open()) {
+        throw runtime_error("Failed to open file " + path);
+    }
+
+    return LoadConfigFromStream(ifs);
 }
 
 void ConfigManager::SaveConfig(const std::string &path, const Config &config) {

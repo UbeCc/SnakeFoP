@@ -30,8 +30,13 @@ struct Map {
 };
 
 class MapManager {
+private:
+    static Map LoadMapFromStream(istream &stream);
+
 public:
     static Map LoadMap(const string &path);
+
+    static Map LoadMapFromString(const string &mapString);
 
     static void SaveMap(const string &path, const Map &map);
 

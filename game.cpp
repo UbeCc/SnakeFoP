@@ -3,22 +3,26 @@
 #include <sstream>
 #include "game.h"
 
-Game::Game(const Map &map, const Config &config) :
-        status({
-                       map,
-                       config,
-                       Right,
-                       Right,
-                       Alive,
-                       0,
-                       1,
-                       2,
-                       vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
-                       vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
-                       vector<Point>(),
-                       map.spawnPoint,
-                       map.spawnPoint
-               }) {
+Game::Game(const Map &map, const Config &config) : random(config.randomSeed),
+                                                   status({
+                                                                  map,
+                                                                  config,
+                                                                  Right,
+                                                                  Right,
+                                                                  Alive,
+                                                                  0,
+                                                                  1,
+                                                                  2,
+                                                                  vector<vector<Point>>(map.width,
+                                                                                        vector<Point>(map.height,
+                                                                                                      SpecialPoint::Empty)),
+                                                                  vector<vector<Point>>(map.width,
+                                                                                        vector<Point>(map.height,
+                                                                                                      SpecialPoint::Empty)),
+                                                                  vector<Point>(),
+                                                                  map.spawnPoint,
+                                                                  map.spawnPoint
+                                                          }) {
     for (auto &obstacle: map.obstacles) {
         status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
     }
@@ -27,8 +31,6 @@ Game::Game(const Map &map, const Config &config) :
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
     }
-
-    random.seed(config.randomSeed);
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
 
