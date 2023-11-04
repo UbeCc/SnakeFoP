@@ -46,3 +46,15 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    config/* \
+    maps/* \
+
+copyconfig.commands = $(COPY_DIR) $$PWD/config $$OUT_PWD
+copymaps.commands = $(COPY_DIR) $$PWD/maps $$OUT_PWD
+first.depends = $(first) copymaps copyconfig
+export(first.depends)
+export(copyconfig.commands)
+export(copymaps.commands)
+QMAKE_EXTRA_TARGETS += first copyconfig copymaps
