@@ -26,7 +26,6 @@ public:
     void initPlay(const QFileInfo&);
     int getScore();
     int getLength();
-    void showEvent(QShowEvent *event) override;
 
 private slots:
     void Step();

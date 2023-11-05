@@ -1,6 +1,7 @@
 #include "recordmanager.h"
 #include <fstream>
 #include <sstream>
+#include <QDebug>
 #include <algorithm>
 
 /**
@@ -14,9 +15,13 @@
  *      or food generation (F, X, Y, V)
  *          position: (X, Y); score: V
  */
-Record RecordManager::LoadRecord(const string &path) {
+Record RecordManager::LoadRecord(const string &path, Record &record) {
+    record.foodSequence.clear();
+    record.moveSequence.clear();
+    record.sequence.clear();
+    record.timestamp.clear();
+
     ifstream ifs(path);
-    Record record;
 
     if (!ifs.is_open()) {
         throw runtime_error("Failed to open file " + path);
@@ -43,14 +48,15 @@ Record RecordManager::LoadRecord(const string &path) {
             int value;
             ifs >> tme >> x >> y >> value;
             record.foodSequence.emplace_back(Point{x, y}, value);
-            record.timestamp.push_back(tme);
+            record.timestamp.emplace_back(tme);
         } else if (op == 'M') {
             int tme;
             char dire;
             ifs >> tme >> dire;
             record.moveSequence += dire;
-            record.timestamp.push_back(tme);
+            record.timestamp.emplace_back(tme);
         }
+//        qDebug() << "size: " << record.timestamp.size() << "\n";
         record.sequence += op;
     }
 

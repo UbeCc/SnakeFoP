@@ -22,7 +22,7 @@ void RePlayPage::recordButton_clicked() {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     ui->RecordLabel->setText(fileInfo.fileName());
-    record = RecordManager::LoadRecord(fileInfo.filePath().toStdString());
+    record = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord);
 }
 
 void RePlayPage::playButton_clicked() {
@@ -66,7 +66,9 @@ RePlayPage::~RePlayPage() {
 void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     curStep = 0;
     ui->RecordLabel->setText(fileInfo.fileName());
-    Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString()));
+    Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord));
+    // qDebug() << Widget::gameRecord.timestamp.size() << "\n";
+    // Widget::PrintRecord();
     game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
@@ -74,9 +76,13 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, [&]() {
         game->Step();
+        ui->ScoreLabel->setText(QString::number(status.score));
+        ui->LengthLabel->setText(QString::number(status.length));
+        ui->GameCanvas->update();
         if(Widget::IsEnd()) gameOver();
     });
     gameIntervalTimer = new QTimer(this);
+    gameElapsedTimer = new QElapsedTimer();
     gameIntervalTimer->setSingleShot(true);
     connect(gameIntervalTimer, &QTimer::timeout, this, [&]() {
         Step();
@@ -85,10 +91,9 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
         gameIntervalTimer->start(Widget::GetRecord().timestamp[curStep] - Widget::GetRecord().timestamp[curStep - 1]);
         gameElapsedTimer->restart();
     });
-
     gameTimer->start((int)(1000 * (1. / status.config.level)));
-    gameIntervalTimer->start(Widget::GetRecord().timestamp[0]);
     gameElapsedTimer->start();
+    gameIntervalTimer->start(Widget::GetRecord().timestamp[0]);
 }
 
 void RePlayPage::gameOver() {
@@ -138,8 +143,4 @@ int RePlayPage::getScore() {
 
 int RePlayPage::getLength() {
     return game->GetStatus().length;
-}
-
-void RePlayPage::showEvent(QShowEvent *event) {
-    // qDebug() << "QWQ";
 }

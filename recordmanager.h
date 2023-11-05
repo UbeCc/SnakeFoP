@@ -23,7 +23,7 @@ struct Record {
 class RecordManager
 {
 public:
-    static Record LoadRecord(const string &path);
+    static Record LoadRecord(const string &path, Record &);
     static void SaveRecord(const string &path, const Record &record);
 };
 
