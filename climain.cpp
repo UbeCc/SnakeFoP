@@ -12,7 +12,7 @@ int main() {
     default_random_engine random(time(nullptr));
     Config f = ConfigManager::LoadConfig("config/default.txt");
     Map m = MapManager::LoadMap("maps/test_map.txt");
-    Game g(m, f);
+    Game g(m, f, 0);
 
     cout << g.GetStatisticsString() << endl;
     while (g.GetStatus().state == Game::State::Alive) {

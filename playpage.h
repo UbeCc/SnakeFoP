@@ -15,16 +15,16 @@ class Widget;
 class ResultPage;
 class GameCanvas: public QWidget {
 private:
-    const Game *game;
+    const Game *game{};
 
 public:
-    GameCanvas(QWidget *parent = nullptr) : QWidget(parent) {
+    explicit GameCanvas(QWidget *parent = nullptr) : QWidget(parent) {
         setFocusPolicy(Qt::StrongFocus);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         setMinimumSize(300, 300);
     }
-    void SetGame(const Game *game);
-    void paintEvent(QPaintEvent *event);
+    void SetGame(const Game *_game);
+    void paintEvent(QPaintEvent *event) override;
 };
 
 class PlayPage : public QDialog
@@ -33,9 +33,9 @@ class PlayPage : public QDialog
 
 public:
     explicit PlayPage(QWidget *parent = nullptr);
-    ~PlayPage();
+    ~PlayPage() override;
     void initPlay();
-    virtual void keyPressEvent(QKeyEvent*);
+    void keyPressEvent(QKeyEvent*) override;
     int getScore();
     int getLength();
 

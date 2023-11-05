@@ -50,19 +50,19 @@ QFileInfo Widget::GetGameMapPath() const {
     return gameMapPath;
 }
 
-void Widget::ResetRecord(Map map, Config config) {
+void Widget::ResetRecord(const Map& map, Config config) {
     foodPtr = 0;
     gameRecord.reset(map, config);
 }
 
-void Widget::ResetRecord(Record record) {
+void Widget::ResetRecord(const Record& record) {
     foodPtr = 0;
     gameRecord.reset(record);
 }
 
 void Widget::UpdateRecordFood(int x, int y, int v) {
     gameRecord.sequence += "F";
-    gameRecord.foodSequence.push_back(make_pair(Point{x, y}, v));
+    gameRecord.foodSequence.emplace_back(Point{x, y}, v);
 }
 
 void Widget::UpdateRecordMovement(char movement) {
@@ -78,8 +78,8 @@ int Widget::foodPtr = 0;
 Record Widget::gameRecord;
 
 void Widget::PrintFood() {
-    for(auto i = gameRecord.foodSequence.begin(); i != gameRecord.foodSequence.end(); ++i) {
-        qDebug() << i->first.x << " " << i->first.y << "\n";
+    for(const auto & i : gameRecord.foodSequence) {
+        qDebug() << i.first.x << " " << i.first.y << "\n";
     }
 }
 

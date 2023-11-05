@@ -16,8 +16,8 @@ class ResultPage : public QDialog
 
 public:
     explicit ResultPage(QWidget *parent = nullptr);
-    virtual void showEvent(QShowEvent*);
-    ~ResultPage();
+    void showEvent(QShowEvent*) override;
+    ~ResultPage() override;
 
 private slots:
     void on_replayButton_clicked();

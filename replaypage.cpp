@@ -38,7 +38,9 @@ RePlayPage::RePlayPage(QWidget *parent) :
     initFlag(false),
     playFlag(false),
     widget(dynamic_cast<Widget *>(parent)),
-    ui(new Ui::RePlayPage) {
+    game(nullptr),
+    ui(new Ui::RePlayPage),
+    gameTimer(nullptr){
     ui->setupUi(this);
     gameCanvas = new GameCanvas(this);
     ui->horizontalLayout_2->replaceWidget(ui->GameCanvas, gameCanvas);
@@ -65,7 +67,7 @@ RePlayPage::~RePlayPage() {
     delete ui;
 }
 
-void RePlayPage::initPlay(QFileInfo fileInfo) {
+void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     ui->RecordLabel->setText(fileInfo.fileName());
     Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString()));
     game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);

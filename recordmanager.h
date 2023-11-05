@@ -15,14 +15,13 @@ struct Record {
     string sequence;
     vector<pair<Point, int> > foodSequence;
     string moveSequence;
-    void reset(Map, Config);
-    void reset(Record);
+    void reset(const Map&, const Config&);
+    void reset(const Record&);
 };
 
 class RecordManager
 {
 public:
-    RecordManager();
     static Record LoadRecord(const string &path);
     static void SaveRecord(const string &path, const Record &record);
 };

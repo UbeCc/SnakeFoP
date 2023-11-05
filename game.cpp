@@ -246,4 +246,4 @@ string Game::GetStatisticsString() const {
 
 void Game::SetStatus(State state) {
     status.state = state;
-};
+}

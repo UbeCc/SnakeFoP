@@ -16,7 +16,7 @@ class SettingPage : public QDialog
 
 public:
     explicit SettingPage(QWidget *parent = nullptr);
-    ~SettingPage();
+    ~SettingPage() override;
 
 private slots:
     void on_configButton_clicked();
