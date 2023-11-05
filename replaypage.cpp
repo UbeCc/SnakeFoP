@@ -84,7 +84,7 @@ void RePlayPage::gameOver() {
 }
 
 void RePlayPage::Step() {
-    game->Step(1);
+    game->Step();
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead) {

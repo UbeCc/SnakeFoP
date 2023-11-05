@@ -135,7 +135,7 @@ void PlayPage::initPlay() {
 }
 
 void PlayPage::Step() {
-    game->Step(0);
+    game->Step();
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead) {
