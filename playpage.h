@@ -5,6 +5,7 @@
 #include "resultpage.h"
 #include "game.h"
 #include "widget.h"
+#include "replaypage.h"
 
 namespace Ui {
 class PlayPage;
@@ -12,8 +13,19 @@ class PlayPage;
 
 class Widget;
 class ResultPage;
-class GameCanvas;
+class GameCanvas: public QWidget {
+private:
+    const Game *game;
 
+public:
+    GameCanvas(QWidget *parent = nullptr) : QWidget(parent) {
+        setFocusPolicy(Qt::StrongFocus);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        setMinimumSize(300, 300);
+    }
+    void SetGame(const Game *game);
+    void paintEvent(QPaintEvent *event);
+};
 
 class PlayPage : public QDialog
 {

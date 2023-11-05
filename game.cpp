@@ -3,7 +3,7 @@
 #include <sstream>
 #include "game.h"
 
-Game::Game(const Map &map, const Config &config) : random(config.randomSeed),
+Game::Game(const Map &map, const Config &config, int _mode) : random(config.randomSeed),
                                                    status({
                                                                   map,
                                                                   config,
@@ -34,7 +34,11 @@ Game::Game(const Map &map, const Config &config) : random(config.randomSeed),
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
 
-    GenerateFood();
+    if(mode == 0) GenerateFood();
+    else {
+        while(status.foods.size() != status.config.foodCount)
+            UpdateFood();
+    }
 }
 
 bool Game::ChangeDirection(Game::Direction direction) {
@@ -47,7 +51,7 @@ bool Game::ChangeDirection(Game::Direction direction) {
     return true;
 }
 
-void Game::Step() {
+void Game::Step(int mode) {
     auto &head = status.head;
     auto &tail = status.tail;
     auto &map = status.map;
@@ -135,7 +139,8 @@ void Game::Step() {
         status.score += map[nextHead.x][nextHead.y].y;
         status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
-        GenerateFood();
+        if(mode == 0) GenerateFood();
+        else UpdateFood();
     }
 
     // Move the snake
@@ -178,7 +183,7 @@ void Game::GenerateFood() {
             } else {
                 status.map[x][y].y = 3;
             }
-
+            Widget::UpdateRecordFood(x, y, status.map[x][y].y);
             status.foods.push_back({x, y});
         }
     }
@@ -189,12 +194,20 @@ void Game::GenerateFood() {
             for (int y = 0; y < status.mapDefinition.height; ++y) {
                 if (status.map[x][y] == SpecialPoint::Empty) {
                     status.map[x][y] = SpecialPoint::Food;
+                    Widget::UpdateRecordFood(x, y, status.map[x][y].y);
                     status.foods.push_back({x, y});
                     return;
                 }
             }
         }
     }
+}
+
+void Game::UpdateFood() {
+    auto food = Widget::GetNextFood();
+    int x = food.first.x, y = food.first.y;
+    status.map[x][y].y = food.second;
+    status.foods.push_back({x, y});
 }
 
 string Game::GetStatisticsString() const {

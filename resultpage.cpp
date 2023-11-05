@@ -1,6 +1,5 @@
 #include "resultpage.h"
 #include "ui_resultpage.h"
-#include "status.h"
 #include "widget.h"
 
 ResultPage::ResultPage(QWidget *parent) :

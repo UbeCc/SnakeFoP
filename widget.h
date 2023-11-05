@@ -3,14 +3,17 @@
 
 #include <QWidget>
 #include <QFileInfo>
+#include "recordmanager.h"
 #include "playpage.h"
 #include "settingpage.h"
+#include "replaypage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainPage; }
 QT_END_NAMESPACE
 
 class PlayPage;
+class RePlayPage;
 class SettingPage;
 
 class Widget : public QWidget
@@ -20,6 +23,11 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = nullptr);
     ~Widget() override;
+    static void ResetRecord(Map, Config);
+    static void UpdateRecordFood(int, int, int);
+    static void UpdateRecordMovement(char);
+    static pair<Point, int> GetNextFood();
+    [[nodiscard]] static Record GetRecord();
     void SetGameConfigPath(const QFileInfo &path);
     void SetGameMapPath(const QFileInfo &path);
     [[nodiscard]] QFileInfo GetGameConfigPath() const;
@@ -27,11 +35,16 @@ public:
 
 private slots:
     void on_enterButton_clicked();
+    void on_replayButton_clicked();
 
 private:
     Ui::MainPage *ui;
     SettingPage *settingPage;
+    RePlayPage *replayPage;
     PlayPage *playPage;
     QFileInfo gameConfigPath, gameMapPath;
+
+    static int foodPtr;
+    static Record gameRecord;
 };
 #endif // WIDGET_H

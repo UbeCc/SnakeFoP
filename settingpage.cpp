@@ -1,13 +1,8 @@
-#include "status.h"
 #include "settingpage.h"
 #include "ui_settingpage.h"
 #include <QFileDialog>
 #include <QFileInfo>
-#include "status.h"
 #include "configmanager.h"
-#include "mapmanager.h"
-#include "game.h"
-#include <cstring>
 #include <QCoreApplication>
 
 using namespace std;

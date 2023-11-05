@@ -17,7 +17,7 @@ public:
 
 private:
     default_random_engine random;
-
+    int mode;
     struct GameStatus {
         const Map mapDefinition;
         const Config config;
@@ -63,13 +63,13 @@ private:
 public:
     Game() = delete;
     Game(const Game &) = delete;
-    Game(const Map &map, const Config &config);
+    Game(const Map &map, const Config &config, int _mode);
 
     /// @returns false if the direction is invalid
     bool ChangeDirection(Direction direction);
 
     /// @brief Move the snake one step forward.
-    void Step();
+    void Step(int);
 
     [[nodiscard]] const GameStatus &GetStatus() const;
 
@@ -77,6 +77,7 @@ public:
 
 private:
     void GenerateFood();
+    void UpdateFood();
 };
 
 #endif //SNAKEFOP_GAME_H

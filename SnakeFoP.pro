@@ -18,9 +18,9 @@ SOURCES += \
     main.cpp \
     playpage.cpp \
     recordmanager.cpp \
+    replaypage.cpp \
     resultpage.cpp \
     settingpage.cpp \
-    status.cpp \
     widget.cpp
 
 HEADERS += \
@@ -31,13 +31,14 @@ HEADERS += \
     # for gui
     playpage.h \
     recordmanager.h \
+    replaypage.h \
     resultpage.h \
     settingpage.h \
-    status.h \
     widget.h
 
 FORMS += \
     playpage.ui \
+    replaypage.ui \
     resultpage.ui \
     settingpage.ui \
     widget.ui

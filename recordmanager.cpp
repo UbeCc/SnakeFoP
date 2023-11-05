@@ -83,3 +83,11 @@ void RecordManager::SaveRecord(const string &path, const Record &record) {
         seqPtr++;
     }
 }
+
+void Record::reset(Map _map, Config _config) {
+    map = _map;
+    config = _config;
+    sequence = "";
+    while(!foodSequence.empty()) foodSequence.pop_back();
+    moveSequence = "";
+}
