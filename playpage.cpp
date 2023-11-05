@@ -125,6 +125,8 @@ void PlayPage::initPlay() {
                     ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString()));
     ui->ConfigLabel->setText(widget->GetGameConfigPath().fileName());
     ui->MapLabel->setText(widget->GetGameMapPath().fileName());
+    ui->ScoreLabel->setText("0");
+    ui->LengthLabel->setText("1");
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
     gameTimer = new QTimer(this);
