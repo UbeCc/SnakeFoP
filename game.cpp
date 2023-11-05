@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <sstream>
 #include "game.h"
+#include "widget.h"
 
 Game::Game(const Map &map, const Config &config, int _mode) : random(config.randomSeed),
                                                    status({
