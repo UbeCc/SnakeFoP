@@ -16,6 +16,7 @@ struct Record {
     vector<pair<Point, int> > foodSequence;
     string moveSequence;
     void reset(Map, Config);
+    void reset(Record);
 };
 
 class RecordManager

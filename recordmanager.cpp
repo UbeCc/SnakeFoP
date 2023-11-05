@@ -1,6 +1,7 @@
 #include "recordmanager.h"
 #include <fstream>
 #include <sstream>
+#include <QDebug>
 #include <algorithm>
 
 /**
@@ -39,7 +40,7 @@ Record RecordManager::LoadRecord(const string &path) {
     char op;
     while (ifs >> op) {
         if (op == 'F') {
-            char x, y;
+            int x, y;
             int value;
             ifs >> x >> y >> value;
             record.foodSequence.emplace_back(Point{x, y}, value);
@@ -90,4 +91,12 @@ void Record::reset(Map _map, Config _config) {
     sequence = "";
     while(!foodSequence.empty()) foodSequence.pop_back();
     moveSequence = "";
+}
+
+void Record::reset(Record record) {
+    map = record.map;
+    config = record.config;
+    sequence = record.sequence;
+    foodSequence = record.foodSequence;
+    moveSequence = record.moveSequence;
 }

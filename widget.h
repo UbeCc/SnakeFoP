@@ -24,10 +24,14 @@ public:
     explicit Widget(QWidget *parent = nullptr);
     ~Widget() override;
     static void ResetRecord(Map, Config);
+    static void ResetRecord(Record);
     static void UpdateRecordFood(int, int, int);
     static void UpdateRecordMovement(char);
+    static void PrintFood();
     static pair<Point, int> GetNextFood();
     [[nodiscard]] static Record GetRecord();
+    [[nodiscard]] static Map GetMap();
+    [[nodiscard]] static Config GetConfig();
     void SetGameConfigPath(const QFileInfo &path);
     void SetGameMapPath(const QFileInfo &path);
     [[nodiscard]] QFileInfo GetGameConfigPath() const;
@@ -43,7 +47,7 @@ private:
     RePlayPage *replayPage;
     PlayPage *playPage;
     QFileInfo gameConfigPath, gameMapPath;
-
+public:
     static int foodPtr;
     static Record gameRecord;
 };

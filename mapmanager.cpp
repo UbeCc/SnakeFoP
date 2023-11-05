@@ -193,5 +193,7 @@ string MapManager::GetMapString(const Map &map)
         ss << portal[0].x << " " << portal[0].y << " " << portal[1].x << " " << portal[1].y << endl;
     }
 
+    ss << map.spawnPoint.x << " " << map.spawnPoint.y << endl;
+
     return ss.str();
 }

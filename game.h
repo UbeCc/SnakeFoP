@@ -72,7 +72,7 @@ public:
     void Step(int);
 
     [[nodiscard]] const GameStatus &GetStatus() const;
-
+    void SetStatus(State);
     [[nodiscard]] string GetStatisticsString() const;
 
 private:

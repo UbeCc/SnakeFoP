@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include <QFileDialog>
 
 Widget::Widget(QWidget *parent)
         : QWidget(parent),
@@ -19,6 +20,9 @@ Widget::~Widget() {
 
 void Widget::on_replayButton_clicked() {
     this->hide();
+    QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
+    QFileInfo fileInfo = QFileInfo(recordFilePath);
+    replayPage->initPlay(fileInfo);
     replayPage->show();
 }
 
@@ -51,6 +55,11 @@ void Widget::ResetRecord(Map map, Config config) {
     gameRecord.reset(map, config);
 }
 
+void Widget::ResetRecord(Record record) {
+    foodPtr = 0;
+    gameRecord.reset(record);
+}
+
 void Widget::UpdateRecordFood(int x, int y, int v) {
     gameRecord.sequence += "F";
     gameRecord.foodSequence.push_back(make_pair(Point{x, y}, v));
@@ -68,6 +77,20 @@ Record Widget::GetRecord() {
 int Widget::foodPtr = 0;
 Record Widget::gameRecord;
 
+void Widget::PrintFood() {
+    for(auto i = gameRecord.foodSequence.begin(); i != gameRecord.foodSequence.end(); ++i) {
+        qDebug() << i->first.x << " " << i->first.y << "\n";
+    }
+}
+
 pair<Point, int> Widget::GetNextFood() {
     return gameRecord.foodSequence[foodPtr++];
+}
+
+Map Widget::GetMap() {
+    return gameRecord.map;
+}
+
+Config Widget::GetConfig() {
+    return gameRecord.config;
 }

@@ -22,7 +22,7 @@ class RePlayPage : public QDialog
 public:
     explicit RePlayPage(QWidget *parent = nullptr);
     ~RePlayPage();
-    void initPlay();
+    void initPlay(QFileInfo);
     int getScore();
     int getLength();
     virtual void showEvent(QShowEvent *event);

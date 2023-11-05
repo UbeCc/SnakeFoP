@@ -33,11 +33,11 @@ Game::Game(const Map &map, const Config &config, int _mode) : random(config.rand
     }
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
-
     if(mode == 0) GenerateFood();
     else {
-        while(status.foods.size() != status.config.foodCount)
+        while((int)status.foods.size() != status.config.foodCount) {
             UpdateFood();
+        }
     }
 }
 
@@ -245,3 +245,7 @@ string Game::GetStatisticsString() const {
 
     return ss.str();
 }
+
+void Game::SetStatus(State state) {
+    status.state = state;
+};

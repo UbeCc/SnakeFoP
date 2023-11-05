@@ -25,17 +25,12 @@ void RePlayPage::recordButton_clicked() {
 }
 
 void RePlayPage::playButton_clicked() {
-    if(!initFlag) {
-        initFlag = true;
-        initPlay();
+    if(playFlag) {
+        playFlag = false;
+        gameTimer->stop();
     } else {
-        if(playFlag) {
-            playFlag = false;
-            gameTimer->stop();
-        } else {
-            playFlag = true;
-            gameTimer->start();
-        }
+        playFlag = true;
+        gameTimer->start();
     }
 }
 
@@ -70,10 +65,13 @@ RePlayPage::~RePlayPage() {
     delete ui;
 }
 
-void RePlayPage::initPlay() {
-    game = new Game(record.map, record.config, 1);
+void RePlayPage::initPlay(QFileInfo fileInfo) {
+    ui->RecordLabel->setText(fileInfo.fileName());
+    Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString()));
+    game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
+    game->SetStatus(Game::Alive);
     gameTimer = new QTimer(this);
     connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
     gameTimer->start((int)(1000 * (1. / status.config.level)));
