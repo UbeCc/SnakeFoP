@@ -21,8 +21,8 @@ class RePlayPage : public QDialog
 
 public:
     explicit RePlayPage(QWidget *parent = nullptr);
-    ~RePlayPage();
-    void initPlay(QFileInfo);
+    ~RePlayPage() override;
+    void initPlay(const QFileInfo&);
     int getScore();
     int getLength();
     void showEvent(QShowEvent *event) override;

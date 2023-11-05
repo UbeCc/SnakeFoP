@@ -6,14 +6,13 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include "game.h"
-#include "status.h"
 #include "recordmanager.h"
 #include <QDir>
 
 using namespace std;
 
-void GameCanvas::SetGame(const Game *game) {
-    this->game = game;
+void GameCanvas::SetGame(const Game *_game) {
+    this->game = _game;
 }
 
 void GameCanvas::paintEvent(QPaintEvent *event) {
@@ -91,13 +90,16 @@ void GameCanvas::paintEvent(QPaintEvent *event) {
 
 PlayPage::PlayPage(QWidget *parent) :
         widget(dynamic_cast<Widget *>(parent)),
+        game(nullptr),
         ui(new Ui::PlayPage),
+        gameTimer(new QTimer(this)),
         resultPage(new ResultPage(this)) {
     ui->setupUi(this);
     gameCanvas = new GameCanvas(this);
     ui->horizontalLayout_2->replaceWidget(ui->GameCanvas, gameCanvas);
     delete ui->GameCanvas;
     ui->GameCanvas = gameCanvas;
+    connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
 }
 
 PlayPage::~PlayPage() {
@@ -126,16 +128,14 @@ void PlayPage::initPlay() {
     ui->MapLabel->setText(widget->GetGameMapPath().fileName());
     ui->ScoreLabel->setText("0");
     ui->LengthLabel->setText("1");
-    widget->ResetRecord(map, config);
+    Widget::ResetRecord(map, config);
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
-    gameTimer = new QTimer(this);
-    connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
-    gameTimer->start((int)(1000 * (1. / status.config.level)));
+    gameTimer->start((int) (1000 * (1. / status.config.level)));
 }
 
 void PlayPage::Step() {
-    game->Step(0);
+    game->Step();
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead) {

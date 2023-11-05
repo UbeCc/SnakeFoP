@@ -4,26 +4,23 @@
 #include "game.h"
 #include "widget.h"
 
-Game::Game(const Map &map, const Config &config, int _mode) : random(config.randomSeed),
-                                                   status({
-                                                                  map,
-                                                                  config,
-                                                                  Right,
-                                                                  Right,
-                                                                  Alive,
-                                                                  0,
-                                                                  1,
-                                                                  2,
-                                                                  vector<vector<Point>>(map.width,
-                                                                                        vector<Point>(map.height,
-                                                                                                      SpecialPoint::Empty)),
-                                                                  vector<vector<Point>>(map.width,
-                                                                                        vector<Point>(map.height,
-                                                                                                      SpecialPoint::Empty)),
-                                                                  vector<Point>(),
-                                                                  map.spawnPoint,
-                                                                  map.spawnPoint
-                                                          }) {
+Game::Game(const Map &map, const Config &config, int _mode)
+        : random(config.randomSeed),
+          mode(_mode),
+          status({map,
+                  config,
+                  Right,
+                  Right,
+                  Alive,
+                  0,
+                  1,
+                  2,
+                  vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+                  vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+                  vector<Point>(),
+                  map.spawnPoint,
+                  map.spawnPoint
+                 }) {
     for (auto &obstacle: map.obstacles) {
         status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
     }
@@ -34,7 +31,7 @@ Game::Game(const Map &map, const Config &config, int _mode) : random(config.rand
     }
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
-    if(mode == 0) GenerateFood();
+    if (mode == 0) GenerateFood();
     else {
         while(Widget::GetCurrentAction() == 'F') {
             UpdateFood();
@@ -53,7 +50,7 @@ bool Game::ChangeDirection(Game::Direction direction) {
     return true;
 }
 
-void Game::Step(int mode) {
+void Game::Step() {
     auto &head = status.head;
     auto &tail = status.tail;
     auto &map = status.map;
@@ -141,7 +138,7 @@ void Game::Step(int mode) {
         status.score += map[nextHead.x][nextHead.y].y;
         status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
-        if(mode == 0) GenerateFood();
+        if (mode == 0) GenerateFood();
         else UpdateFood();
     }
 
@@ -250,4 +247,4 @@ string Game::GetStatisticsString() const {
 
 void Game::SetStatus(State state) {
     status.state = state;
-};
+}

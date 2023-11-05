@@ -23,8 +23,8 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = nullptr);
     ~Widget() override;
-    static void ResetRecord(Map, Config);
-    static void ResetRecord(Record);
+    static void ResetRecord(const Map&, Config);
+    static void ResetRecord(const Record&);
     static void UpdateRecordFood(int, int, int);
     static void UpdateRecordMovement(char);
     static void PrintFood();

@@ -1,7 +1,6 @@
 #include "recordmanager.h"
 #include <fstream>
 #include <sstream>
-#include <QDebug>
 #include <algorithm>
 
 /**
@@ -85,7 +84,7 @@ void RecordManager::SaveRecord(const string &path, const Record &record) {
     }
 }
 
-void Record::reset(Map _map, Config _config) {
+void Record::reset(const Map &_map, const Config &_config) {
     map = _map;
     config = _config;
     sequence = "";
@@ -93,7 +92,7 @@ void Record::reset(Map _map, Config _config) {
     moveSequence = "";
 }
 
-void Record::reset(Record record) {
+void Record::reset(const Record& record) {
     map = record.map;
     config = record.config;
     sequence = record.sequence;
