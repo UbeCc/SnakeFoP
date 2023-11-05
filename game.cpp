@@ -36,8 +36,9 @@ Game::Game(const Map &map, const Config &config, int _mode) : random(config.rand
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
     if(mode == 0) GenerateFood();
     else {
-        while((int)status.foods.size() != status.config.foodCount) {
+        while(Widget::GetCurrentAction() == 'F') {
             UpdateFood();
+            Widget::NextAction();
         }
     }
 }

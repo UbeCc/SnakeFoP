@@ -29,6 +29,10 @@ public:
     static void UpdateRecordMovement(char);
     static void PrintFood();
     static pair<Point, int> GetNextFood();
+    static char GetNextMovement();
+    static char NextAction();
+    static char GetCurrentAction();
+    static bool IsEnd();
     [[nodiscard]] static Record GetRecord();
     [[nodiscard]] static Map GetMap();
     [[nodiscard]] static Config GetConfig();
@@ -48,6 +52,8 @@ private:
     PlayPage *playPage;
     QFileInfo gameConfigPath, gameMapPath;
 public:
+    static int seqPtr;
+    static int movementPtr;
     static int foodPtr;
     static Record gameRecord;
 };

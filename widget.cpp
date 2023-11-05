@@ -51,11 +51,15 @@ QFileInfo Widget::GetGameMapPath() const {
 }
 
 void Widget::ResetRecord(Map map, Config config) {
+    seqPtr = 0;
+    movementPtr = 0;
     foodPtr = 0;
     gameRecord.reset(map, config);
 }
 
 void Widget::ResetRecord(Record record) {
+    seqPtr = 0;
+    movementPtr = 0;
     foodPtr = 0;
     gameRecord.reset(record);
 }
@@ -74,6 +78,8 @@ Record Widget::GetRecord() {
     return gameRecord;
 }
 
+int Widget::seqPtr = 0;
+int Widget::movementPtr = 0;
 int Widget::foodPtr = 0;
 Record Widget::gameRecord;
 
@@ -87,10 +93,26 @@ pair<Point, int> Widget::GetNextFood() {
     return gameRecord.foodSequence[foodPtr++];
 }
 
+char Widget::GetNextMovement() {
+    return gameRecord.moveSequence[movementPtr++];
+}
+
+char Widget::NextAction() {
+    return gameRecord.sequence[seqPtr++];
+}
+
+char Widget::GetCurrentAction() {
+    return gameRecord.sequence[seqPtr];
+}
+
 Map Widget::GetMap() {
     return gameRecord.map;
 }
 
 Config Widget::GetConfig() {
     return gameRecord.config;
+}
+
+bool Widget::IsEnd() {
+    return seqPtr == gameRecord.sequence.length();
 }

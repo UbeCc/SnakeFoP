@@ -84,16 +84,35 @@ void RePlayPage::gameOver() {
 }
 
 void RePlayPage::Step() {
-    game->Step(1);
-    const auto &status = game->GetStatus();
-
-    if (status.state == Game::Dead) {
-        gameOver();
+    auto status = game->GetStatus();
+    char curOp =Widget::NextAction();
+    if(curOp == 'M') {
+        Game::Direction direction = game->GetStatus().direction;
+        char dire =Widget::GetNextMovement();
+        switch (dire) {
+        case 'W':
+            if (direction != Game::Down) game->ChangeDirection(Game::Up);
+            break;
+        case 'S':
+            if (direction != Game::Up) game->ChangeDirection(Game::Down);
+            break;
+        case 'A':
+            if (direction != Game::Right) game->ChangeDirection(Game::Left);
+            break;
+        case 'D':
+            if (direction != Game::Left) game->ChangeDirection(Game::Right);
+            break;
+        default:
+            break;
+        }
+        game->Step(1);
+    } else {
+        // updatefood
     }
-
     ui->ScoreLabel->setText(QString::number(status.score));
     ui->LengthLabel->setText(QString::number(status.length));
     ui->GameCanvas->update();
+    if(Widget::IsEnd()) gameOver();
 }
 
 int RePlayPage::getScore() {
