@@ -13,6 +13,7 @@ struct Record {
     Map map;
     Config config;
     string sequence;
+    vector<int> timestamp;
     vector<pair<Point, int> > foodSequence;
     string moveSequence;
     void reset(const Map&, const Config&);

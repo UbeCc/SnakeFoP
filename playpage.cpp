@@ -123,19 +123,22 @@ void PlayPage::gameOver() {
 void PlayPage::initPlay() {
     auto map = MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString());
     auto config = ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString());
+    Widget::ResetRecord(map, config);
     game = new Game(map, config, 0);
     ui->ConfigLabel->setText(widget->GetGameConfigPath().fileName());
     ui->MapLabel->setText(widget->GetGameMapPath().fileName());
     ui->ScoreLabel->setText("0");
     ui->LengthLabel->setText("1");
-    Widget::ResetRecord(map, config);
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
     gameTimer->start((int) (1000 * (1. / status.config.level)));
+    gameElapsedTimer.start();
+    startTime = gameElapsedTimer.elapsed();
 }
 
 void PlayPage::Step() {
-    game->Step();
+    int tot = game->Step();
+    for(int i = 1; i <= tot; ++i) Widget::UpdateTime(gameElapsedTimer.elapsed() - startTime);
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead) {
@@ -182,6 +185,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         default:
             break;
     }
+    Widget::UpdateTime(gameElapsedTimer.elapsed() - startTime);
 }
 
 int PlayPage::getScore() {

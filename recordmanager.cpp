@@ -39,14 +39,17 @@ Record RecordManager::LoadRecord(const string &path) {
     char op;
     while (ifs >> op) {
         if (op == 'F') {
-            int x, y;
+            int tme, x, y;
             int value;
-            ifs >> x >> y >> value;
+            ifs >> tme >> x >> y >> value;
             record.foodSequence.emplace_back(Point{x, y}, value);
+            record.timestamp.push_back(tme);
         } else if (op == 'M') {
+            int tme;
             char dire;
-            ifs >> dire;
+            ifs >> tme >> dire;
             record.moveSequence += dire;
+            record.timestamp.push_back(tme);
         }
         record.sequence += op;
     }
@@ -72,13 +75,14 @@ void RecordManager::SaveRecord(const string &path, const Record &record) {
     while (seqPtr != seqLen) {
         char op = record.sequence[seqPtr];
         if (op == 'F') {
-            int x = record.foodSequence[foodPtr].first.x, y = record.foodSequence[foodPtr].first.y, v = record.foodSequence[foodPtr].second;
+            int tme = record.timestamp[seqPtr], x = record.foodSequence[foodPtr].first.x, y = record.foodSequence[foodPtr].first.y, v = record.foodSequence[foodPtr].second;
             foodPtr++;
-            ofs << "F " << x << " " << y << " " << v << "\n";
+            ofs << "F " << tme << " " << x << " " << y << " " << v << "\n";
         } else if (op == 'M') {
+            int tme = record.timestamp[seqPtr];
             char dire = record.moveSequence[movePtr];
             movePtr++;
-            ofs << "M " << dire << "\n";
+            ofs << "M " << tme << " " << dire << "\n";
         }
         seqPtr++;
     }

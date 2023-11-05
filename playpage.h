@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "resultpage.h"
 #include "game.h"
+#include <QElapsedTimer>
 #include "widget.h"
 #include "replaypage.h"
 
@@ -43,9 +44,11 @@ private slots:
     void Step();
 
 private:
+    long long startTime;
     Widget *widget;
     Game *game;
     Ui::PlayPage *ui;
+    QElapsedTimer gameElapsedTimer;
     QTimer *gameTimer;
     ResultPage *resultPage;
     GameCanvas *gameCanvas;

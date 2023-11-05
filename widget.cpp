@@ -23,6 +23,7 @@ void Widget::on_replayButton_clicked() {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     replayPage->initPlay(fileInfo);
+    PrintRecord();
     replayPage->show();
 }
 
@@ -50,14 +51,14 @@ QFileInfo Widget::GetGameMapPath() const {
     return gameMapPath;
 }
 
-void Widget::ResetRecord(Map map, Config config) {
+void Widget::ResetRecord(const Map &map, const Config &config) {
     seqPtr = 0;
     movementPtr = 0;
     foodPtr = 0;
     gameRecord.reset(map, config);
 }
 
-void Widget::ResetRecord(Record record) {
+void Widget::ResetRecord(const Record &record) {
     seqPtr = 0;
     movementPtr = 0;
     foodPtr = 0;
@@ -83,10 +84,17 @@ int Widget::movementPtr = 0;
 int Widget::foodPtr = 0;
 Record Widget::gameRecord;
 
-void Widget::PrintFood() {
+void Widget::PrintRecord() {
+    qDebug() << "TimeSize: " << gameRecord.timestamp.size() << "\n";
+    qDebug() << "Food: \n";
     for(const auto & i : gameRecord.foodSequence) {
         qDebug() << i.first.x << " " << i.first.y << "\n";
     }
+    qDebug() << "Movement: \n";
+    for(int i = 0; i < gameRecord.moveSequence.length(); ++i) {
+        qDebug() << gameRecord.moveSequence[i] << " ";
+    }
+    qDebug() << "\n";
 }
 
 pair<Point, int> Widget::GetNextFood() {
@@ -115,4 +123,8 @@ Config Widget::GetConfig() {
 
 bool Widget::IsEnd() {
     return seqPtr == gameRecord.sequence.length();
+}
+
+void Widget::UpdateTime(int tme) {
+    gameRecord.timestamp.push_back(tme);
 }

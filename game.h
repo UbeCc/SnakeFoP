@@ -69,14 +69,14 @@ public:
     bool ChangeDirection(Direction direction);
 
     /// @brief Move the snake one step forward.
-    void Step();
+    int Step();
 
     [[nodiscard]] const GameStatus &GetStatus() const;
     void SetStatus(State);
     [[nodiscard]] string GetStatisticsString() const;
 
 private:
-    void GenerateFood();
+    int GenerateFood();
     void UpdateFood();
 };
 

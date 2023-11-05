@@ -31,9 +31,13 @@ Game::Game(const Map &map, const Config &config, int _mode)
     }
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
-    if (mode == 0) GenerateFood();
+    if (mode == 0) {
+        int tot = GenerateFood();
+        for(int i = 1; i <= tot; ++i) Widget::UpdateTime(0);
+    }
     else {
         while(Widget::GetCurrentAction() == 'F') {
+            // qDebug() << "UpdateFood" << "\n";
             UpdateFood();
             Widget::NextAction();
         }
@@ -50,7 +54,8 @@ bool Game::ChangeDirection(Game::Direction direction) {
     return true;
 }
 
-void Game::Step() {
+int Game::Step() {
+    int tot = 0;
     auto &head = status.head;
     auto &tail = status.tail;
     auto &map = status.map;
@@ -88,7 +93,7 @@ void Game::Step() {
         // Hits the vertical wall
         if (mapDefinition.borderIsObstacle[2] || mapDefinition.borderIsObstacle[3]) {
             state = Dead;
-            return;
+            return 0;
         }
 
         // Teleport to the other side
@@ -103,7 +108,7 @@ void Game::Step() {
     if (nextHead.y < 0 || nextHead.y >= mapDefinition.height) {
         if (mapDefinition.borderIsObstacle[0] || mapDefinition.borderIsObstacle[1]) {
             state = Dead;
-            return;
+            return 0;
         }
 
         // Teleport to the other side
@@ -122,7 +127,7 @@ void Game::Step() {
     // Hits an obstacle
     if (map[nextHead.x][nextHead.y] == SpecialPoint::Obstacle) {
         state = Dead;
-        return;
+        return 0;
     }
 
     // Hits itself
@@ -130,7 +135,7 @@ void Game::Step() {
         && map[nextHead.x][nextHead.y].x != SpecialPoint::Food.x
         && !(nextHead == tail && status.desiredLength == status.length)) {
         state = Dead;
-        return;
+        return 0;
     }
 
     // Check if the snake eats a food
@@ -138,7 +143,7 @@ void Game::Step() {
         status.score += map[nextHead.x][nextHead.y].y;
         status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
-        if (mode == 0) GenerateFood();
+        if (mode == 0) tot = GenerateFood();
         else UpdateFood();
     }
 
@@ -159,13 +164,15 @@ void Game::Step() {
     map[head.x][head.y] = nextHead;
     head = nextHead;
     map[head.x][head.y] = SpecialPoint::Head;
+    return tot;
 }
 
 const Game::GameStatus &Game::GetStatus() const {
     return status;
 }
 
-void Game::GenerateFood() {
+int Game::GenerateFood() {
+    int cnt = 0;
     int retries = 100;
     while (retries-- && (int) status.foods.size() < status.config.foodCount) {
         int x = (int) (random() % status.mapDefinition.width);
@@ -182,6 +189,8 @@ void Game::GenerateFood() {
             } else {
                 status.map[x][y].y = 3;
             }
+            // qDebug() << "GenerateFood\n";
+            ++cnt;
             Widget::UpdateRecordFood(x, y, status.map[x][y].y);
             status.foods.push_back({x, y});
         }
@@ -193,13 +202,16 @@ void Game::GenerateFood() {
             for (int y = 0; y < status.mapDefinition.height; ++y) {
                 if (status.map[x][y] == SpecialPoint::Empty) {
                     status.map[x][y] = SpecialPoint::Food;
+                    ++cnt;
                     Widget::UpdateRecordFood(x, y, status.map[x][y].y);
                     status.foods.push_back({x, y});
-                    return;
+                    return cnt;
                 }
             }
         }
     }
+
+    return cnt;
 }
 
 void Game::UpdateFood() {

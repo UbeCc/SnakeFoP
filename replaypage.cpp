@@ -2,6 +2,7 @@
 #include "ui_replaypage.h"
 #include <QPainter>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QString>
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -28,9 +29,14 @@ void RePlayPage::playButton_clicked() {
     if(playFlag) {
         playFlag = false;
         gameTimer->stop();
+        gameIntervalTimer->stop();
+        res = Widget::GetRecord().timestamp[curStep] - Widget::GetRecord().timestamp[curStep - 1] - gameElapsedTimer->elapsed();
     } else {
         playFlag = true;
         gameTimer->start();
+        gameIntervalTimer->start(res);
+        gameElapsedTimer->restart();
+        res = 0;
     }
 }
 
@@ -40,22 +46,12 @@ RePlayPage::RePlayPage(QWidget *parent) :
     widget(dynamic_cast<Widget *>(parent)),
     game(nullptr),
     ui(new Ui::RePlayPage),
-    gameTimer(nullptr){
+    gameTimer(nullptr),
+    gameIntervalTimer(nullptr),
+    gameElapsedTimer(nullptr) {
     ui->setupUi(this);
     gameCanvas = new GameCanvas(this);
     ui->horizontalLayout_2->replaceWidget(ui->GameCanvas, gameCanvas);
-//    for(int row = 0; row < ui->gridView->rowCount(); ++row) {
-//        for (int col = 0; col < ui->gridView->columnCount(); ++col) {
-//            QLayoutItem* item = ui->gridView->itemAtPosition(row, col);
-//            if (item != nullptr) {
-//                QWidget* widget = item->widget();
-//                if (widget != nullptr) {
-//                    QString widgetName = widget->objectName();
-//                    qDebug() << "Widget name:" << widgetName;
-//                }
-//            }
-//        }
-//    }
     connect(dynamic_cast<QPushButton*>(ui->gridView->itemAtPosition(1, 1)->widget()), &QPushButton::clicked, this, &RePlayPage::recordButton_clicked);
     connect(dynamic_cast<QPushButton*>(ui->gridView->itemAtPosition(2, 1)->widget()), &QPushButton::clicked, this, &RePlayPage::playButton_clicked);
     connect(dynamic_cast<QPushButton*>(ui->gridView->itemAtPosition(3, 1)->widget()), &QPushButton::clicked, this, &RePlayPage::exitButton_clicked);
@@ -68,6 +64,7 @@ RePlayPage::~RePlayPage() {
 }
 
 void RePlayPage::initPlay(const QFileInfo& fileInfo) {
+    curStep = 0;
     ui->RecordLabel->setText(fileInfo.fileName());
     Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString()));
     game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
@@ -75,12 +72,28 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     auto &status = game->GetStatus();
     game->SetStatus(Game::Alive);
     gameTimer = new QTimer(this);
-    connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
+    connect(gameTimer, &QTimer::timeout, this, [&]() {
+        game->Step();
+        if(Widget::IsEnd()) gameOver();
+    });
+    gameIntervalTimer = new QTimer(this);
+    gameIntervalTimer->setSingleShot(true);
+    connect(gameIntervalTimer, &QTimer::timeout, this, [&]() {
+        Step();
+        ++curStep;
+        if(curStep == (int)Widget::GetRecord().timestamp.size()) return;
+        gameIntervalTimer->start(Widget::GetRecord().timestamp[curStep] - Widget::GetRecord().timestamp[curStep - 1]);
+        gameElapsedTimer->restart();
+    });
+
     gameTimer->start((int)(1000 * (1. / status.config.level)));
+    gameIntervalTimer->start(Widget::GetRecord().timestamp[0]);
+    gameElapsedTimer->start();
 }
 
 void RePlayPage::gameOver() {
     gameTimer->stop();
+    gameIntervalTimer->stop();
     this->done(0);
     widget->show();
 }
@@ -107,9 +120,11 @@ void RePlayPage::Step() {
         default:
             break;
         }
-        game->Step(1);
     } else {
-        // updatefood
+        auto food = Widget::GetNextFood();
+        int x = food.first.x, y = food.first.y;
+        status.map[x][y].y = food.second;
+        status.foods.push_back({x, y});
     }
     ui->ScoreLabel->setText(QString::number(status.score));
     ui->LengthLabel->setText(QString::number(status.length));
@@ -126,5 +141,5 @@ int RePlayPage::getLength() {
 }
 
 void RePlayPage::showEvent(QShowEvent *event) {
-    qDebug() << "QWQ";
+    // qDebug() << "QWQ";
 }

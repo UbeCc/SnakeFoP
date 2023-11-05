@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "playpage.h"
+#include <QElapsedTimer>
 #include "resultpage.h"
 #include "game.h"
 #include "widget.h"
@@ -21,7 +22,7 @@ class RePlayPage : public QDialog
 
 public:
     explicit RePlayPage(QWidget *parent = nullptr);
-    ~RePlayPage() override;
+    ~RePlayPage();
     void initPlay(const QFileInfo&);
     int getScore();
     int getLength();
@@ -36,9 +37,11 @@ private slots:
 private:
     bool initFlag, playFlag;
     Widget *widget;
+    int curStep, res;
     Game *game;
     Ui::RePlayPage *ui;
-    QTimer *gameTimer;
+    QTimer *gameTimer, *gameIntervalTimer;
+    QElapsedTimer *gameElapsedTimer;
     GameCanvas *gameCanvas;
     Record record;
     void gameOver();
