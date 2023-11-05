@@ -23,7 +23,7 @@ void Widget::on_replayButton_clicked() {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     replayPage->initPlay(fileInfo);
-    PrintRecord();
+    // PrintRecord();
     replayPage->show();
 }
 
@@ -82,6 +82,7 @@ Record Widget::GetRecord() {
 int Widget::seqPtr = 0;
 int Widget::movementPtr = 0;
 int Widget::foodPtr = 0;
+bool Widget::mode = false;
 Record Widget::gameRecord;
 
 void Widget::PrintRecord() {

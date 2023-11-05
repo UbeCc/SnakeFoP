@@ -121,6 +121,7 @@ void PlayPage::gameOver() {
 }
 
 void PlayPage::initPlay() {
+    Widget::mode = false;
     auto map = MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString());
     auto config = ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString());
     Widget::ResetRecord(map, config);
@@ -131,7 +132,7 @@ void PlayPage::initPlay() {
     ui->LengthLabel->setText("1");
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
-    gameTimer->start((int) (1000 * (1. / status.config.level)));
+    gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
     gameElapsedTimer.start();
     startTime = gameElapsedTimer.elapsed();
 }

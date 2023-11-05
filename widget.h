@@ -12,6 +12,8 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainPage; }
 QT_END_NAMESPACE
 
+const int TIME_INTERVAL = 2000;
+
 class PlayPage;
 class RePlayPage;
 class SettingPage;
@@ -34,6 +36,7 @@ public:
     static char NextAction();
     static char GetCurrentAction();
     static bool IsEnd();
+    static bool mode;
     [[nodiscard]] static Record GetRecord();
     [[nodiscard]] static Map GetMap();
     [[nodiscard]] static Config GetConfig();

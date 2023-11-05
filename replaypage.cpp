@@ -65,10 +65,9 @@ RePlayPage::~RePlayPage() {
 
 void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     curStep = 0;
+    Widget::mode = true;
     ui->RecordLabel->setText(fileInfo.fileName());
     Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord));
-    // qDebug() << Widget::gameRecord.timestamp.size() << "\n";
-    // Widget::PrintRecord();
     game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
     gameCanvas->SetGame(game);
     auto &status = game->GetStatus();
@@ -81,6 +80,7 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
         ui->GameCanvas->update();
         if(Widget::IsEnd()) gameOver();
     });
+    curStep = Widget::seqPtr;
     gameIntervalTimer = new QTimer(this);
     gameElapsedTimer = new QElapsedTimer();
     gameIntervalTimer->setSingleShot(true);
@@ -88,17 +88,20 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
         Step();
         ++curStep;
         if(curStep == (int)Widget::GetRecord().timestamp.size()) return;
-        gameIntervalTimer->start(Widget::GetRecord().timestamp[curStep] - Widget::GetRecord().timestamp[curStep - 1]);
+        int delta = Widget::GetRecord().timestamp[curStep] - Widget::GetRecord().timestamp[curStep - 1];
+        qDebug() << delta << " " << gameElapsedTimer->elapsed();
+        gameIntervalTimer->start(max(0, delta));
         gameElapsedTimer->restart();
     });
-    gameTimer->start((int)(1000 * (1. / status.config.level)));
+    gameTimer->start((int)(TIME_INTERVAL * (1. / status.config.level)));
     gameElapsedTimer->start();
-    gameIntervalTimer->start(Widget::GetRecord().timestamp[0]);
+    gameIntervalTimer->start(Widget::GetRecord().timestamp[curStep]);
 }
 
 void RePlayPage::gameOver() {
     gameTimer->stop();
     gameIntervalTimer->stop();
+    gameElapsedTimer->invalidate();
     this->done(0);
     widget->show();
 }
@@ -106,9 +109,11 @@ void RePlayPage::gameOver() {
 void RePlayPage::Step() {
     auto status = game->GetStatus();
     char curOp =Widget::NextAction();
+//    qDebug() << curOp << "\n";
     if(curOp == 'M') {
         Game::Direction direction = game->GetStatus().direction;
-        char dire =Widget::GetNextMovement();
+        char dire = Widget::GetNextMovement();
+        //DSAW
         switch (dire) {
         case 'W':
             if (direction != Game::Down) game->ChangeDirection(Game::Up);
@@ -125,16 +130,12 @@ void RePlayPage::Step() {
         default:
             break;
         }
-    } else {
+    } else if(curOp == 'F') {
         auto food = Widget::GetNextFood();
         int x = food.first.x, y = food.first.y;
         status.map[x][y].y = food.second;
         status.foods.push_back({x, y});
     }
-    ui->ScoreLabel->setText(QString::number(status.score));
-    ui->LengthLabel->setText(QString::number(status.length));
-    ui->GameCanvas->update();
-    if(Widget::IsEnd()) gameOver();
 }
 
 int RePlayPage::getScore() {

@@ -8,7 +8,11 @@
 class Game {
 public:
     enum Direction {
-        Right, Down, Left, Up
+        //DSAW
+        Right = 0,
+        Down = 1,
+        Left = 2,
+        Up = 3
     };
 
     enum State {
@@ -22,7 +26,7 @@ private:
         const Map mapDefinition;
         const Config config;
         Direction direction;
-        Direction nextDirection;
+//        Direction nextDirection;
         State state;
         int score;
         int length;

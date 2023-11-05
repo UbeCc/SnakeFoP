@@ -45,6 +45,7 @@ private slots:
 
 private:
     long long startTime;
+    int cnt;
     Widget *widget;
     Game *game;
     Ui::PlayPage *ui;
