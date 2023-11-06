@@ -89,7 +89,7 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
         ++curStep;
         if(curStep == (int)Widget::GetRecord().timestamp.size()) return;
         int delta = Widget::GetRecord().timestamp[curStep] - Widget::GetRecord().timestamp[curStep - 1];
-        qDebug() << delta << " " << gameElapsedTimer->elapsed();
+        qDebug() << delta << " " << gameElapsedTimer->elapsed() << "\n";
         gameIntervalTimer->start(max(0, delta));
         gameElapsedTimer->restart();
     });
@@ -109,7 +109,7 @@ void RePlayPage::gameOver() {
 void RePlayPage::Step() {
     auto status = game->GetStatus();
     char curOp =Widget::NextAction();
-//    qDebug() << curOp << "\n";
+    qDebug() << curOp << "\n";
     if(curOp == 'M') {
         Game::Direction direction = game->GetStatus().direction;
         char dire = Widget::GetNextMovement();

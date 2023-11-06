@@ -143,6 +143,9 @@ void PlayPage::Step() {
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead) {
+        // use UpdateRecordMovement to memorize `endtime`
+        Widget::UpdateTime(gameElapsedTimer.elapsed() - startTime);
+        Widget::UpdateRecordMovement('W');
         gameOver();
     }
 
@@ -173,14 +176,14 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_A:
             if (direction != Game::Right) {
                 game->ChangeDirection(Game::Left);
-                Widget::UpdateRecordMovement('D');
+                Widget::UpdateRecordMovement('A');
             }
             break;
         case Qt::Key_Right:
         case Qt::Key_D:
             if (direction != Game::Left) {
                 game->ChangeDirection(Game::Right);
-                Widget::UpdateRecordMovement('A');
+                Widget::UpdateRecordMovement('D');
             }
             break;
         default:
