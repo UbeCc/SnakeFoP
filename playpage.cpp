@@ -35,8 +35,8 @@ void PlayPage::gameOver() {
     QString currentDirectory = QDir::currentPath();
 //    qDebug() << "Current Working Directory: " << currentDirectory << " " << formattedDateTime << "\n";
     RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", Widget::GetRecord());
+    resultPage->exec();
     this->done(0);
-    resultPage->show();
 }
 
 void PlayPage::initPlay() {

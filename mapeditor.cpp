@@ -48,6 +48,8 @@ void MapEditor::OnNewMapButtonClicked() {
             {0, 0}
     };
 
+    ui->MapSizeLabel->setText(QString::number(map.width) + " x " + QString::number(map.height));
+
     UpdateCanvas();
 }
 
@@ -63,6 +65,8 @@ void MapEditor::OnLoadMapButtonClicked() {
         QMessageBox::warning(this, "打开地图错误", e.what());
         return;
     }
+
+    ui->MapSizeLabel->setText(QString::number(map.width) + " x " + QString::number(map.height));
 
     UpdateCanvas();
 }

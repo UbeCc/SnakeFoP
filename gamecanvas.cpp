@@ -116,7 +116,7 @@ void GameCanvas::paintEvent(QPaintEvent *event) {
 
     // draw portals
     auto portals = status.mapDefinition.portals;
-    for (int i = 0; i < portals.size(); ++i) {
+    for (int i = 0; i < (int)portals.size(); ++i) {
         const auto &portal = portals[i];
         Point start = portal[0], end = portal[1];
         painter.setBrush(portalColors[i % 10]);
