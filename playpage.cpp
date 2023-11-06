@@ -105,6 +105,11 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
                 Widget::UpdateRecordMovement('D');
             }
             break;
+        case Qt::Key_Space:
+            gameTimer->stop();
+            QMessageBox::information(this, "Paused", "Press OK to continue");
+            gameTimer->start();
+            break;
         default:
             break;
     }
