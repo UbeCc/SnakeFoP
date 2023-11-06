@@ -12,6 +12,8 @@ CONFIG += sdk_no_version_check
 SOURCES += \
     # for cli
     configmanager.cpp \
+    gamecanvas.cpp \
+    mapeditor.cpp \
     mapmanager.cpp \
     game.cpp \
     # for gui
@@ -26,6 +28,8 @@ SOURCES += \
 HEADERS += \
     # for cli
     configmanager.h \
+    gamecanvas.h \
+    mapeditor.h \
     mapmanager.h \
     game.h \
     # for gui
@@ -37,6 +41,8 @@ HEADERS += \
     widget.h
 
 FORMS += \
+    gamecanvas.ui \
+    mapeditor.ui \
     playpage.ui \
     replaypage.ui \
     resultpage.ui \

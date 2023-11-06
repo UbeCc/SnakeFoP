@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include "widget.h"
 #include "replaypage.h"
+#include "gamecanvas.h"
 
 namespace Ui {
 class PlayPage;
@@ -14,19 +15,6 @@ class PlayPage;
 
 class Widget;
 class ResultPage;
-class GameCanvas: public QWidget {
-private:
-    const Game *game{};
-
-public:
-    explicit GameCanvas(QWidget *parent = nullptr) : QWidget(parent) {
-        setFocusPolicy(Qt::StrongFocus);
-        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        setMinimumSize(300, 300);
-    }
-    void SetGame(const Game *_game);
-    void paintEvent(QPaintEvent *event) override;
-};
 
 class PlayPage : public QDialog
 {
