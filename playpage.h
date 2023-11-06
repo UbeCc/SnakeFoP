@@ -7,7 +7,6 @@
 #include <QElapsedTimer>
 #include "widget.h"
 #include "replaypage.h"
-#include "gamecanvas.h"
 
 namespace Ui {
 class PlayPage;
@@ -40,7 +39,6 @@ private:
     QElapsedTimer gameElapsedTimer;
     QTimer *gameTimer;
     ResultPage *resultPage;
-    GameCanvas *gameCanvas;
     void gameOver();
 };
 

@@ -18,7 +18,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
-    <widget class="QWidget" name="GameCanvas" native="true">
+    <widget class="GameCanvas" name="Canvas" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -35,7 +35,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
      <property name="leftMargin">
       <number>10</number>
      </property>
@@ -164,6 +164,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GameCanvas</class>
+   <extends>QWidget</extends>
+   <header>gamecanvas.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

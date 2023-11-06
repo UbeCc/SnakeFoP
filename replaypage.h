@@ -41,7 +41,6 @@ private:
     Ui::RePlayPage *ui;
     QTimer *gameTimer, *gameIntervalTimer;
     QElapsedTimer *gameElapsedTimer;
-    GameCanvas *gameCanvas;
     Record record;
     void gameOver();
 };

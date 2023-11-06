@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include "game.h"
 #include "recordmanager.h"
-#include "gamecanvas.h"
 #include <QDir>
 
 using namespace std;
@@ -19,10 +18,6 @@ PlayPage::PlayPage(QWidget *parent) :
         gameTimer(new QTimer(this)),
         resultPage(new ResultPage(this)) {
     ui->setupUi(this);
-    gameCanvas = new GameCanvas(this);
-    ui->horizontalLayout_2->replaceWidget(ui->GameCanvas, gameCanvas);
-    delete ui->GameCanvas;
-    ui->GameCanvas = gameCanvas;
     connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
 }
 
@@ -54,7 +49,7 @@ void PlayPage::initPlay() {
     ui->MapLabel->setText(widget->GetGameMapPath().fileName());
     ui->ScoreLabel->setText("0");
     ui->LengthLabel->setText("1");
-    gameCanvas->SetGame(game);
+    ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
     gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
     gameElapsedTimer.start();
@@ -73,7 +68,7 @@ void PlayPage::Step() {
     ui->ScoreLabel->setText(QString::number(status.score));
     ui->LengthLabel->setText(QString::number(status.length));
 
-    ui->GameCanvas->update();
+    ui->Canvas->update();
 }
 
 void PlayPage::keyPressEvent(QKeyEvent *event) {

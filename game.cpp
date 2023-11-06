@@ -61,7 +61,7 @@ int Game::Step() {
     auto &direction = status.direction;
     auto &state = status.state;
 
-    if (state == Dead && Widget::mode == false) {
+    if (state == Dead && !Widget::mode) {
         throw runtime_error("The snake is dead");
     }
 
