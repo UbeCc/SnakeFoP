@@ -136,3 +136,7 @@ bool Widget::IsEnd() {
 void Widget::UpdateTime(int tme) {
     gameRecord.timestamp.push_back(tme);
 }
+
+int Widget::GetCurrentStep() {
+    return gameRecord.timestamp[seqPtr];
+}

@@ -57,6 +57,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     config/* \
     maps/* \
+    record/*\
 
 copyconfig.commands = $(COPY_DIR) $$PWD/config $$OUT_PWD
 copymaps.commands = $(COPY_DIR) $$PWD/maps $$OUT_PWD

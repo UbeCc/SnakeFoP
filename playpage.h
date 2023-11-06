@@ -26,17 +26,13 @@ public:
     void keyPressEvent(QKeyEvent*) override;
     int getScore();
     int getLength();
-
-private slots:
     void Step();
 
 private:
-    long long startTime;
-    int cnt;
+    int cnt, steps;
     Widget *widget;
     Game *game;
     Ui::PlayPage *ui;
-    QElapsedTimer gameElapsedTimer;
     QTimer *gameTimer;
     ResultPage *resultPage;
     void gameOver();

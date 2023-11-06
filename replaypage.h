@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include "playpage.h"
-#include <QElapsedTimer>
 #include "resultpage.h"
 #include "game.h"
 #include "widget.h"
@@ -36,11 +35,10 @@ private slots:
 private:
     bool initFlag, playFlag;
     Widget *widget;
-    int curStep, res;
+    int curStep;
     Game *game;
     Ui::RePlayPage *ui;
-    QTimer *gameTimer, *gameIntervalTimer;
-    QElapsedTimer *gameElapsedTimer;
+    QTimer *gameTimer;
     Record record;
     void gameOver();
 };

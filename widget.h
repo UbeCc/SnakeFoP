@@ -36,6 +36,7 @@ public:
     static char GetNextMovement();
     static char NextAction();
     static char GetCurrentAction();
+    static int GetCurrentStep();
     static bool IsEnd();
     static bool mode;
     [[nodiscard]] static Record GetRecord();

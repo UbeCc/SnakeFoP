@@ -12,13 +12,17 @@
 using namespace std;
 
 PlayPage::PlayPage(QWidget *parent) :
+        steps(0),
+        gameTimer(new QTimer(this)),
         widget(dynamic_cast<Widget *>(parent)),
         game(nullptr),
         ui(new Ui::PlayPage),
-        gameTimer(new QTimer(this)),
         resultPage(new ResultPage(this)) {
-    ui->setupUi(this);
-    connect(gameTimer, SIGNAL(timeout()), this, SLOT(Step()));
+    ui->setupUi(this);    
+    connect(gameTimer, &QTimer::timeout, this, [&]() {
+        ++steps;
+        Step();
+    });
 }
 
 PlayPage::~PlayPage() {
@@ -26,14 +30,11 @@ PlayPage::~PlayPage() {
 }
 
 void PlayPage::gameOver() {
-    gameTimer->stop();
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     QDateTime dateTime;
     dateTime.setMSecsSinceEpoch(timestamp);
     QString format = "yyyy-MM-dd-hh-mm-ss";
     QString formattedDateTime = dateTime.toString(format);
-    QString currentDirectory = QDir::currentPath();
-//    qDebug() << "Current Working Directory: " << currentDirectory << " " << formattedDateTime << "\n";
     RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", Widget::GetRecord());
     resultPage->exec();
     this->done(0);
@@ -52,18 +53,17 @@ void PlayPage::initPlay() {
     ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
     gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
-    gameElapsedTimer.start();
-    startTime = gameElapsedTimer.elapsed();
 }
 
 void PlayPage::Step() {
     int tot = game->Step();
-    for(int i = 1; i <= tot; ++i) Widget::UpdateTime(gameElapsedTimer.elapsed() - startTime);
+    for(int i = 1; i <= tot; ++i) Widget::UpdateTime(steps), qDebug()<<steps;
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead) {
         // use UpdateRecordMovement to memorize `endtime`
-        Widget::UpdateTime(gameElapsedTimer.elapsed() - startTime);
+        Widget::UpdateTime(steps);
+        qDebug() << steps;
         Widget::UpdateRecordMovement('W');
         gameOver();
     }
@@ -81,6 +81,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_W:
             if (direction != Game::Down) {
                 game->ChangeDirection(Game::Up);
+                Widget::UpdateTime(steps);
+                qDebug() << steps;
                 Widget::UpdateRecordMovement('W');
             }
             break;
@@ -88,6 +90,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_S:
             if (direction != Game::Up) {
                 game->ChangeDirection(Game::Down);
+                Widget::UpdateTime(steps);
+                qDebug() << steps;
                 Widget::UpdateRecordMovement('S');
             }
             break;
@@ -95,6 +99,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_A:
             if (direction != Game::Right) {
                 game->ChangeDirection(Game::Left);
+                Widget::UpdateTime(steps);
+                qDebug() << steps;
                 Widget::UpdateRecordMovement('A');
             }
             break;
@@ -102,6 +108,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_D:
             if (direction != Game::Left) {
                 game->ChangeDirection(Game::Right);
+                Widget::UpdateTime(steps);
+                qDebug() << steps;
                 Widget::UpdateRecordMovement('D');
             }
             break;
@@ -113,7 +121,6 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         default:
             break;
     }
-    Widget::UpdateTime(gameElapsedTimer.elapsed() - startTime);
 }
 
 int PlayPage::getScore() {
