@@ -7,7 +7,6 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include "game.h"
-#include "playpage.h"
 #include "recordmanager.h"
 #include <QDir>
 #include <QFileDialog>
@@ -50,13 +49,9 @@ RePlayPage::RePlayPage(QWidget *parent) :
     gameIntervalTimer(nullptr),
     gameElapsedTimer(nullptr) {
     ui->setupUi(this);
-    gameCanvas = new GameCanvas(this);
-    ui->horizontalLayout_2->replaceWidget(ui->GameCanvas, gameCanvas);
     connect(dynamic_cast<QPushButton*>(ui->gridView->itemAtPosition(1, 1)->widget()), &QPushButton::clicked, this, &RePlayPage::recordButton_clicked);
     connect(dynamic_cast<QPushButton*>(ui->gridView->itemAtPosition(2, 1)->widget()), &QPushButton::clicked, this, &RePlayPage::playButton_clicked);
     connect(dynamic_cast<QPushButton*>(ui->gridView->itemAtPosition(3, 1)->widget()), &QPushButton::clicked, this, &RePlayPage::exitButton_clicked);
-    delete ui->GameCanvas;
-    ui->GameCanvas = gameCanvas;
 }
 
 RePlayPage::~RePlayPage() {
@@ -69,7 +64,7 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     ui->RecordLabel->setText(fileInfo.fileName());
     Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord));
     game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
-    gameCanvas->SetGame(game);
+    ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
     game->SetStatus(Game::Alive);
     gameTimer = new QTimer(this);
@@ -77,7 +72,7 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
         game->Step();
         ui->ScoreLabel->setText(QString::number(status.score));
         ui->LengthLabel->setText(QString::number(status.length));
-        ui->GameCanvas->update();
+        ui->Canvas->update();
         if(Widget::IsEnd()) gameOver();
     });
     curStep = Widget::seqPtr;

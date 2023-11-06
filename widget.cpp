@@ -8,8 +8,9 @@ Widget::Widget(QWidget *parent)
           settingPage(new SettingPage(this)),
           replayPage(new RePlayPage(this)),
           playPage(new PlayPage(this)),
-          gameConfigPath(QCoreApplication::applicationDirPath() + "config/default.txt"),
-          gameMapPath(QCoreApplication::applicationDirPath() + "maps/test_map.txt") {
+          gameConfigPath(QDir(QCoreApplication::applicationDirPath()).filePath("config/default.txt")),
+          gameMapPath(QDir(QCoreApplication::applicationDirPath()).filePath("maps/test_map.txt")),
+          mapEditor(new MapEditor(this)) {
     ui->setupUi(this);
     connect(ui->exitButton, &QPushButton::clicked, this, &QApplication::quit);
 }
@@ -34,6 +35,12 @@ void Widget::on_enterButton_clicked() {
         playPage->show();
     }
 }
+
+void Widget::on_MapEditorButton_clicked()
+{
+    mapEditor->exec();
+}
+
 
 void Widget::SetGameConfigPath(const QFileInfo &path) {
     gameConfigPath = path;
