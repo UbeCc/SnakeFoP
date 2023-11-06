@@ -9,6 +9,7 @@ class GameCanvas : public QWidget {
 
 private:
     const Game *game{};
+    std::function<void(int, int)> onMouseSelect;
 
 public:
     explicit GameCanvas(QWidget *parent = nullptr);
@@ -16,6 +17,11 @@ public:
     void SetGame(const Game *_game);
 
     void paintEvent(QPaintEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+
+    void SetOnMouseSelect(std::function<void(int, int)>);
 };
 
 #endif // GAMECANVAS_H

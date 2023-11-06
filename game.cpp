@@ -34,12 +34,13 @@ Game::Game(const Map &map, const Config &config, int _mode)
         int tot = GenerateFood();
         for(int i = 1; i <= tot; ++i) Widget::UpdateTime(0);
     }
-    else {
+    else if (mode == 1) {
         while(Widget::GetCurrentAction() == 'F') {
             UpdateFood();
             Widget::NextAction();
         }
     }
+    else {}
 }
 
 bool Game::ChangeDirection(Game::Direction direction) {

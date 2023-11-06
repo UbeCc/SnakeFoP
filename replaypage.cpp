@@ -7,7 +7,6 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include "game.h"
-#include "playpage.h"
 #include "recordmanager.h"
 #include <QDir>
 #include <QFileDialog>

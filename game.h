@@ -21,6 +21,8 @@ public:
 
 private:
     default_random_engine random;
+
+    /// Game mode, 0 for normal, 1 for replay, 2 for display only
     int mode;
     struct GameStatus {
         const Map mapDefinition;
