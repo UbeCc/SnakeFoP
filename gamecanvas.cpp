@@ -3,6 +3,19 @@
 #include <QPainter>
 #include <utility>
 
+const QColor GameCanvas::portalColors[] = {
+        QColor::fromString("#aa2e25"),
+        QColor::fromString("#a31545"),
+        QColor::fromString("#6d1b7b"),
+        QColor::fromString("#673ab7"),
+        QColor::fromString("#3f51b5"),
+        QColor::fromString("#1769aa"),
+        QColor::fromString("#03a9f4"),
+        QColor::fromString("#00695f"),
+        QColor::fromString("#357a38"),
+        QColor::fromString("#b26a00"),
+};
+
 GameCanvas::GameCanvas(QWidget *parent) : QWidget(parent) {
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -83,7 +96,6 @@ void GameCanvas::paintEvent(QPaintEvent *event) {
     }
 
     // draw foods
-
     painter.setBrush(Qt::white);
     painter.setPen(Qt::transparent);
     auto &foods = status.foods;
@@ -104,9 +116,10 @@ void GameCanvas::paintEvent(QPaintEvent *event) {
 
     // draw portals
     auto portals = status.mapDefinition.portals;
-    for (const auto &portal: portals) {
+    for (int i = 0; i < portals.size(); ++i) {
+        const auto &portal = portals[i];
         Point start = portal[0], end = portal[1];
-        painter.setBrush(QColorConstants::Svg::darkblue);
+        painter.setBrush(portalColors[i % 10]);
         painter.drawRect(xOffset + 6 * margin + start.x * blockSize, yOffset + 6 * margin + start.y * blockSize,
                          blockSize - 12 * margin, blockSize - 12 * margin);
         painter.drawRect(xOffset + 6 * margin + end.x * blockSize, yOffset + 6 * margin + end.y * blockSize,

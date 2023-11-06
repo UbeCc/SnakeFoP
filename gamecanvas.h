@@ -8,6 +8,7 @@ class GameCanvas : public QWidget {
     Q_OBJECT
 
 private:
+    const static QColor portalColors[];
     const Game *game{};
     std::function<void(int, int)> onMouseSelect;
 
