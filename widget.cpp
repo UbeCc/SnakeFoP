@@ -8,8 +8,8 @@ Widget::Widget(QWidget *parent)
           settingPage(new SettingPage(this)),
           replayPage(new RePlayPage(this)),
           playPage(new PlayPage(this)),
-          gameConfigPath("./config/default.txt"),
-          gameMapPath("./maps/test_map.txt") {
+          gameConfigPath(QCoreApplication::applicationDirPath() + "config/default.txt"),
+          gameMapPath(QCoreApplication::applicationDirPath() + "maps/test_map.txt") {
     ui->setupUi(this);
     connect(ui->exitButton, &QPushButton::clicked, this, &QApplication::quit);
 }
@@ -20,7 +20,7 @@ Widget::~Widget() {
 
 void Widget::on_replayButton_clicked() {
     this->hide();
-    QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
+    QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QCoreApplication::applicationDirPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     replayPage->initPlay(fileInfo);
     // PrintRecord();
