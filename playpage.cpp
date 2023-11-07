@@ -29,6 +29,7 @@ PlayPage::~PlayPage() {
 }
 
 void PlayPage::gameOver() {
+    gameTimer->stop();
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     QDateTime dateTime;
     dateTime.setMSecsSinceEpoch(timestamp);
