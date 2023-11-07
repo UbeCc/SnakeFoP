@@ -13,7 +13,9 @@
 using std::exception;
 
 void RePlayPage::exitButton_clicked() {
-    gameOver();
+    if(gameTimer != nullptr && gameTimer->isActive()) gameTimer->stop();
+    this->done(0);
+    widget->show();
 }
 
 void RePlayPage::recordButton_clicked() {
