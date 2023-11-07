@@ -6,7 +6,6 @@
 #include "game.h"
 #include <QElapsedTimer>
 #include "widget.h"
-#include "replaypage.h"
 
 namespace Ui {
 class PlayPage;

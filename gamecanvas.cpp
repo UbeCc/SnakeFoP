@@ -19,11 +19,7 @@ const QColor GameCanvas::portalColors[] = {
         QColor::fromString("#b26a00"),
 };
 
-GameCanvas::GameCanvas(QWidget *parent) : QWidget(parent) {
-    setFocusPolicy(Qt::StrongFocus);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(300, 300);
-}
+GameCanvas::GameCanvas(QWidget *parent) : QWidget(parent) {}
 
 void GameCanvas::SetGame(const Game *_game) {
     this->game = _game;
