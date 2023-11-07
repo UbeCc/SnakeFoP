@@ -10,6 +10,8 @@
 #include <QDir>
 #include <QFileDialog>
 
+using std::exception;
+
 void RePlayPage::exitButton_clicked() {
     gameOver();
 }
@@ -17,8 +19,7 @@ void RePlayPage::exitButton_clicked() {
 void RePlayPage::recordButton_clicked() {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
-    ui->RecordLabel->setText(fileInfo.fileName());
-    record = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord);
+    initPlay(fileInfo);
 }
 
 void RePlayPage::playButton_clicked() {
@@ -52,7 +53,14 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     curStep = 0;
     Widget::mode = true;
     ui->RecordLabel->setText(fileInfo.fileName());
-    Widget::ResetRecord(RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord));
+    Record tmp;
+    try {
+        tmp = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord);
+    } catch (exception &e) {
+        QMessageBox::warning(this, "打开地图错误", e.what());
+        return;
+    }
+    Widget::ResetRecord(tmp);
     game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
     ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
@@ -80,7 +88,7 @@ void RePlayPage::gameOver() {
 void RePlayPage::Step() {
     auto status = game->GetStatus();
     char curOp =Widget::NextAction();
-    qDebug() << curOp << " " << curStep;
+    // qDebug() << curOp << " " << curStep;
     if(curOp == 'M') {
         Game::Direction direction = game->GetStatus().direction;
         char dire = Widget::GetNextMovement();

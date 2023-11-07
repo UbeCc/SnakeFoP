@@ -9,6 +9,8 @@
 #include "recordmanager.h"
 #include <QDir>
 
+using std::exception;
+
 PlayPage::PlayPage(QWidget *parent) :
     steps(0),
     widget(dynamic_cast<Widget *>(parent)),
@@ -35,15 +37,27 @@ void PlayPage::gameOver() {
     dateTime.setMSecsSinceEpoch(timestamp);
     QString format = "yyyy-MM-dd-hh-mm-ss";
     QString formattedDateTime = dateTime.toString(format);
-    RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", Widget::GetRecord());
+    try {
+        RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", Widget::GetRecord());
+    } catch (exception &e) {
+        QMessageBox::warning(this, "保存地图错误", e.what());
+        return;
+    }
     resultPage->exec();
     this->done(0);
 }
 
 void PlayPage::initPlay() {
+    Map map;
+    Config config;
     Widget::mode = false;
-    auto map = MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString());
-    auto config = ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString());
+    try {
+        map = MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString());
+        config = ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString());
+    } catch (exception &e) {
+        QMessageBox::warning(this, "打开地图错误", e.what());
+        return;
+    }
     Widget::ResetRecord(map, config);
     game = new Game(map, config, 0);
     ui->ConfigLabel->setText(widget->GetGameConfigPath().fileName());
@@ -115,7 +129,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event) {
         break;
     case Qt::Key_Space:
         gameTimer->stop();
-        QMessageBox::information(this, "Paused", "Press OK to continue");
+        QMessageBox::information(this, "暂停", "按下OK键以继续...");
         gameTimer->start();
         break;
     default:
