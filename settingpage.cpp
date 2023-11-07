@@ -2,10 +2,7 @@
 #include "ui_settingpage.h"
 #include <QFileDialog>
 #include <QFileInfo>
-#include "configmanager.h"
 #include <QCoreApplication>
-
-using namespace std;
 
 SettingPage::SettingPage(QWidget *parent) :
     QDialog(parent),

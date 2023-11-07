@@ -5,7 +5,10 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::array;
+using std::istream;
 
 struct Point {
     int x, y;

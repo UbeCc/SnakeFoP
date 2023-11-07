@@ -10,8 +10,6 @@
 #include <QDir>
 #include <QFileDialog>
 
-using namespace std;
-
 void RePlayPage::exitButton_clicked() {
     gameOver();
 }

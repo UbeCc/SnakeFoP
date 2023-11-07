@@ -2,6 +2,15 @@
 #include <fstream>
 #include <sstream>
 
+using std::istream;
+using std::ostream;
+using std::ifstream;
+using std::ofstream;
+using std::stringstream;
+using std::endl;
+using std::to_string;
+using std::runtime_error;
+
 Map MapManager::LoadMapFromStream(std::istream &stream) {
 
     Map map;

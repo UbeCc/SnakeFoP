@@ -4,6 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 CONFIG += sdk_no_version_check
+CONFIG += warn_on
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -59,8 +60,8 @@ DISTFILES += \
     maps/* \
     record/*\
 
-copyconfig.commands = $(COPY_DIR) $$PWD/config $$OUT_PWD
-copymaps.commands = $(COPY_DIR) $$PWD/maps $$OUT_PWD
+copyconfig.commands = $(COPY_DIR) $$shell_path("$$PWD/config") $$shell_path("$$OUT_PWD/config")
+copymaps.commands = $(COPY_DIR) $$shell_path("$$PWD/maps") $$shell_path("$$OUT_PWD/maps")
 first.depends = $(first) copymaps copyconfig
 export(first.depends)
 export(copyconfig.commands)

@@ -4,6 +4,10 @@
 #include "game.h"
 #include "widget.h"
 
+using std::runtime_error;
+using std::stringstream;
+using std::endl;
+
 Game::Game(const Map &map, const Config &config, int _mode)
         : random(config.randomSeed),
           mode(_mode),

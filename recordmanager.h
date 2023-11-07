@@ -6,7 +6,8 @@
 #include <vector>
 #include <utility>
 
-using namespace std;
+using std::vector;
+using std::pair;
 
 struct Record {
     string name;

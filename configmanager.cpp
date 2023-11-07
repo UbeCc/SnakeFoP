@@ -3,7 +3,15 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
+using std::string;
+using std::array;
+using std::runtime_error;
+using std::ofstream;
+using std::ifstream;
+using std::ostream;
+using std::istream;
+using std::stringstream;
+using std::endl;
 
 Config ConfigManager::LoadConfigFromStream(istream &stream) {
     Config config{};

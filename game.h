@@ -5,6 +5,8 @@
 #include "mapmanager.h"
 #include <random>
 
+using std::default_random_engine;
+
 class Game {
 public:
     enum Direction {

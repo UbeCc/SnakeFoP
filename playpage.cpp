@@ -9,15 +9,13 @@
 #include "recordmanager.h"
 #include <QDir>
 
-using namespace std;
-
 PlayPage::PlayPage(QWidget *parent) :
-        steps(0),
-        widget(dynamic_cast<Widget *>(parent)),
-        game(nullptr),
-        ui(new Ui::PlayPage),
-        gameTimer(new QTimer(this)),
-        resultPage(new ResultPage(this)) {
+    steps(0),
+    widget(dynamic_cast<Widget *>(parent)),
+    game(nullptr),
+    ui(new Ui::PlayPage),
+    gameTimer(new QTimer(this)),
+    resultPage(new ResultPage(this)) {
     ui->setupUi(this);    
     connect(gameTimer, &QTimer::timeout, this, [&]() {
         ++steps;
@@ -79,49 +77,49 @@ void PlayPage::Step() {
 void PlayPage::keyPressEvent(QKeyEvent *event) {
     Game::Direction direction = game->GetStatus().preDirection;
     switch (event->key()) {
-        case Qt::Key_Up:
-        case Qt::Key_W:
-            if (direction != Game::Down) {
-                game->ChangeDirection(Game::Up);
-                Widget::UpdateTime(steps);
-                qDebug() << steps;
-                Widget::UpdateRecordMovement('W');
-            }
-            break;
-        case Qt::Key_Down:
-        case Qt::Key_S:
-            if (direction != Game::Up) {
-                game->ChangeDirection(Game::Down);
-                Widget::UpdateTime(steps);
-                qDebug() << steps;
-                Widget::UpdateRecordMovement('S');
-            }
-            break;
-        case Qt::Key_Left:
-        case Qt::Key_A:
-            if (direction != Game::Right) {
-                game->ChangeDirection(Game::Left);
-                Widget::UpdateTime(steps);
-                qDebug() << steps;
-                Widget::UpdateRecordMovement('A');
-            }
-            break;
-        case Qt::Key_Right:
-        case Qt::Key_D:
-            if (direction != Game::Left) {
-                game->ChangeDirection(Game::Right);
-                Widget::UpdateTime(steps);
-                qDebug() << steps;
-                Widget::UpdateRecordMovement('D');
-            }
-            break;
-        case Qt::Key_Space:
-            gameTimer->stop();
-            QMessageBox::information(this, "Paused", "Press OK to continue");
-            gameTimer->start();
-            break;
-        default:
-            break;
+    case Qt::Key_Up:
+    case Qt::Key_W:
+        if (direction != Game::Down) {
+            game->ChangeDirection(Game::Up);
+            Widget::UpdateTime(steps);
+            qDebug() << steps;
+            Widget::UpdateRecordMovement('W');
+        }
+        break;
+    case Qt::Key_Down:
+    case Qt::Key_S:
+        if (direction != Game::Up) {
+            game->ChangeDirection(Game::Down);
+            Widget::UpdateTime(steps);
+            qDebug() << steps;
+            Widget::UpdateRecordMovement('S');
+        }
+        break;
+    case Qt::Key_Left:
+    case Qt::Key_A:
+        if (direction != Game::Right) {
+            game->ChangeDirection(Game::Left);
+            Widget::UpdateTime(steps);
+            qDebug() << steps;
+            Widget::UpdateRecordMovement('A');
+        }
+        break;
+    case Qt::Key_Right:
+    case Qt::Key_D:
+        if (direction != Game::Left) {
+            game->ChangeDirection(Game::Right);
+            Widget::UpdateTime(steps);
+            qDebug() << steps;
+            Widget::UpdateRecordMovement('D');
+        }
+        break;
+    case Qt::Key_Space:
+        gameTimer->stop();
+        QMessageBox::information(this, "Paused", "Press OK to continue");
+        gameTimer->start();
+        break;
+    default:
+        break;
     }
 }
 
