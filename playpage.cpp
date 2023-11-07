@@ -21,6 +21,7 @@ PlayPage::PlayPage(QWidget *parent) :
     ui->setupUi(this);    
     connect(gameTimer, &QTimer::timeout, this, [&]() {
         ++steps;
+        game->SetPreDirection(game->GetStatus().direction);
         Step();
     });
 }
@@ -75,7 +76,7 @@ void PlayPage::Step() {
 }
 
 void PlayPage::keyPressEvent(QKeyEvent *event) {
-    Game::Direction direction = game->GetStatus().direction;
+    Game::Direction direction = game->GetStatus().preDirection;
     switch (event->key()) {
         case Qt::Key_Up:
         case Qt::Key_W:

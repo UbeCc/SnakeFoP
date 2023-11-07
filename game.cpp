@@ -10,6 +10,7 @@ Game::Game(const Map &map, const Config &config, int _mode)
           status({map,
                   config,
                   Right,
+                  Right,
                   Alive,
                   0,
                   1,
@@ -163,6 +164,10 @@ int Game::Step() {
     head = nextHead;
     map[head.x][head.y] = SpecialPoint::Head;
     return tot;
+}
+
+void Game::SetPreDirection(Direction direc) {
+    status.preDirection = direc;
 }
 
 const Game::GameStatus &Game::GetStatus() const {

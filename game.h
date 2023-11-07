@@ -28,7 +28,7 @@ private:
         const Map mapDefinition;
         const Config config;
         Direction direction;
-//        Direction nextDirection;
+        Direction preDirection;
         State state;
         int score;
         int length;
@@ -80,6 +80,8 @@ public:
     [[nodiscard]] const GameStatus &GetStatus() const;
     void SetStatus(State);
     [[nodiscard]] string GetStatisticsString() const;
+    void SetPreDirection(Direction direc);
+
 
 private:
     int GenerateFood();
