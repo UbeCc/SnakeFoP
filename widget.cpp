@@ -99,7 +99,7 @@ void Widget::PrintRecord() {
         qDebug() << i.first.x << " " << i.first.y << "\n";
     }
     qDebug() << "Movement: \n";
-    for(int i = 0; i < gameRecord.moveSequence.length(); ++i) {
+    for(int i = 0; i < (int)gameRecord.moveSequence.length(); ++i) {
         qDebug() << gameRecord.moveSequence[i] << " ";
     }
     qDebug() << "\n";
@@ -130,7 +130,7 @@ Config Widget::GetConfig() {
 }
 
 bool Widget::IsEnd() {
-    return seqPtr == gameRecord.sequence.length();
+    return seqPtr == (int)gameRecord.sequence.length();
 }
 
 void Widget::UpdateTime(int tme) {

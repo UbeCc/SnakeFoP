@@ -13,10 +13,10 @@ using namespace std;
 
 PlayPage::PlayPage(QWidget *parent) :
         steps(0),
-        gameTimer(new QTimer(this)),
         widget(dynamic_cast<Widget *>(parent)),
         game(nullptr),
         ui(new Ui::PlayPage),
+        gameTimer(new QTimer(this)),
         resultPage(new ResultPage(this)) {
     ui->setupUi(this);    
     connect(gameTimer, &QTimer::timeout, this, [&]() {
@@ -31,6 +31,7 @@ PlayPage::~PlayPage() {
 }
 
 void PlayPage::gameOver() {
+    gameTimer->stop();
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     QDateTime dateTime;
     dateTime.setMSecsSinceEpoch(timestamp);
