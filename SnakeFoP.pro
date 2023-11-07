@@ -59,8 +59,8 @@ DISTFILES += \
     maps/* \
     record/*\
 
-copyconfig.commands = $(COPY_DIR) $$PWD/config $$OUT_PWD
-copymaps.commands = $(COPY_DIR) $$PWD/maps $$OUT_PWD
+copyconfig.commands = $(COPY_DIR) $$shell_path($$PWD/config) $$shell_path($$OUT_PWD)
+copymaps.commands = $(COPY_DIR) $$shell_path($$PWD/maps) $$shell_path($$OUT_PWD)
 first.depends = $(first) copymaps copyconfig
 export(first.depends)
 export(copyconfig.commands)

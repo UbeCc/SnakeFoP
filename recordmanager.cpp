@@ -4,6 +4,11 @@
 #include <QDebug>
 #include <algorithm>
 
+using std::ifstream;
+using std::ofstream;
+using std::runtime_error;
+using std::endl;
+
 /**
  * @brief Load record from given path.
  *

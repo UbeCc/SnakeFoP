@@ -3,6 +3,9 @@
 #include <QPainter>
 #include <utility>
 
+using std::min;
+using std::max;
+
 const QColor GameCanvas::portalColors[] = {
         QColor::fromString("#aa2e25"),
         QColor::fromString("#a31545"),

@@ -3,6 +3,8 @@
 #include "mapeditor.h"
 #include "ui_mapeditor.h"
 
+using std::exception;
+
 const Config MapEditor::dummy_config = {
         1,
         0,

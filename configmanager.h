@@ -4,7 +4,9 @@
 #include <array>
 #include <string>
 
-using namespace std;
+using std::array;
+using std::string;
+using std::istream;
 
 struct Config {
     int level;
