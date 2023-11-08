@@ -2,14 +2,12 @@
 #define REPLAYPAGE_H
 
 #include <QDialog>
-#include "playpage.h"
-#include "resultpage.h"
 #include "game.h"
 #include "widget.h"
 
 namespace Ui
 {
-    class RePlayPage;
+    class ReplayPage;
 }
 
 class Widget;
@@ -18,41 +16,41 @@ class ResultPage;
 
 class GameCanvas;
 
-class RePlayPage : public QDialog
+class ReplayPage : public QDialog
 {
 Q_OBJECT
 
 public:
-    explicit RePlayPage(QWidget *parent = nullptr);
+    explicit ReplayPage(QWidget *parent = nullptr);
 
-    ~RePlayPage() override;
+    ~ReplayPage() override;
 
-    bool initPlay(const QFileInfo &);
+    bool InitPlay(const QFileInfo &);
 
-    int getScore();
+    int GetScore();
 
-    int getLength();
+    int GetLength();
 
 private slots:
 
     void Step();
 
-    void recordButton_clicked();
+    void OnRecordButtonClicked();
 
-    void playButton_clicked();
+    void OnPlayButtonClicked();
 
-    void exitButton_clicked();
+    void OnExitButtonClicked();
 
 private:
     bool initFlag, playFlag;
     Widget *widget;
     int curStep;
     Game *game;
-    Ui::RePlayPage *ui;
+    Ui::ReplayPage *ui;
     QTimer *gameTimer;
     Record record;
 
-    void gameOver();
+    void GameOver();
 };
 
 #endif // REPLAYPAGE_H

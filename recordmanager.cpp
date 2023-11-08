@@ -98,7 +98,7 @@ void RecordManager::SaveRecord(const string &path, const Record &record) {
     }
 }
 
-void Record::reset(const Map &_map, const Config &_config) {
+void Record::Reset(const Map &_map, const Config &_config) {
     map = _map;
     config = _config;
     sequence = "";
@@ -106,7 +106,7 @@ void Record::reset(const Map &_map, const Config &_config) {
     moveSequence = "";
 }
 
-void Record::reset(const Record& record) {
+void Record::Reset(const Record& record) {
     map = record.map;
     config = record.config;
     sequence = record.sequence;

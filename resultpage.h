@@ -24,7 +24,7 @@ public:
 
 private slots:
 
-    void on_replayButton_clicked();
+    void OnReplayButtonClicked();
 
 private:
     PlayPage *playPage;

@@ -22,11 +22,11 @@ public:
 
 private slots:
 
-    void on_configButton_clicked();
+    void OnConfigButtonClicked();
 
-    void on_mapButton_clicked();
+    void OnMapButtonClicked();
 
-    void on_confirmButton_clicked();
+    void OnConfirmButtonClicked();
 
 private:
     Ui::SettingPage *ui;

@@ -21,7 +21,7 @@ Config ConfigManager::LoadConfigFromStream(istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read level");
+        throw runtime_error("Failed to read Level");
     }
 
     stream >> config.randomSeed;
@@ -62,7 +62,7 @@ Config ConfigManager::LoadConfigFromStream(istream &stream)
         throw runtime_error("Food probabilities should be within range [0, 1]");
     }
 
-    if (abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > 1e-6)
+    if (std::abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > 1e-6)
     {
         throw runtime_error("Sum of food probabilities should be 1");
     }

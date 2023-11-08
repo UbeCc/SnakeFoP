@@ -14,6 +14,7 @@ private:
     std::function<void(int, int)> onMouseSelect;
 
 public:
+    explicit GameCanvas(QWidget *parent = nullptr) : QWidget(parent) {};
     void SetGame(const Game *_game);
 
     void SetOnMouseSelect(std::function<void(int, int)>);

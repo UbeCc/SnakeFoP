@@ -19,9 +19,9 @@ struct Record
     vector<pair<Point, int> > foodSequence;
     string moveSequence;
 
-    void reset(const Map &, const Config &);
+    void Reset(const Map &_map, const Config &_config);
 
-    void reset(const Record &);
+    void Reset(const Record &record);
 };
 
 class RecordManager

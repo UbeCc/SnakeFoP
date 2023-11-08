@@ -10,6 +10,9 @@ SettingPage::SettingPage(QWidget *parent) :
     widget(dynamic_cast<Widget *>(parent))
 {
     ui->setupUi(this);
+    connect(ui->configButton, &QPushButton::clicked, this, &SettingPage::OnConfigButtonClicked);
+    connect(ui->mapButton, &QPushButton::clicked, this, &SettingPage::OnMapButtonClicked);
+    connect(ui->confirmButton, &QPushButton::clicked, this, &SettingPage::OnConfirmButtonClicked);
 }
 
 SettingPage::~SettingPage()
@@ -17,7 +20,7 @@ SettingPage::~SettingPage()
     delete ui;
 }
 
-void SettingPage::on_configButton_clicked()
+void SettingPage::OnConfigButtonClicked()
 {
     QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QCoreApplication::applicationDirPath(),
         tr("所有文件 (*)"));
@@ -26,7 +29,7 @@ void SettingPage::on_configButton_clicked()
     widget->SetGameConfigPath(fileInfo);
 }
 
-void SettingPage::on_mapButton_clicked()
+void SettingPage::OnMapButtonClicked()
 {
     QString mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QCoreApplication::applicationDirPath(),
         tr("所有文件 (*)"));
@@ -35,7 +38,7 @@ void SettingPage::on_mapButton_clicked()
     widget->SetGameMapPath(fileInfo);
 }
 
-void SettingPage::on_confirmButton_clicked()
+void SettingPage::OnConfirmButtonClicked()
 {
     this->accept();
 }

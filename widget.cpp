@@ -6,7 +6,7 @@ Widget::Widget(QWidget *parent)
     : QWidget(parent),
     ui(new Ui::MainPage),
     settingPage(new SettingPage(this)),
-    replayPage(new RePlayPage(this)),
+    replayPage(new ReplayPage(this)),
     playPage(new PlayPage(this)),
     gameConfigPath(QDir(QCoreApplication::applicationDirPath()).filePath("config/default.txt")),
     gameMapPath(QDir(QCoreApplication::applicationDirPath()).filePath("maps/test_map.txt")),
@@ -14,6 +14,9 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->exitButton, &QPushButton::clicked, this, &QApplication::quit);
+    connect(ui->replayButton, &QPushButton::clicked, this, &Widget::OnReplayButtonClicked);
+    connect(ui->enterButton, &QPushButton::clicked, this, &Widget::OnEnterButtonClicked);
+    connect(ui->MapEditorButton, &QPushButton::clicked, this, &Widget::OnMapEditorButtonClicked);
 }
 
 Widget::~Widget()
@@ -21,20 +24,20 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::on_replayButton_clicked()
+void Widget::OnReplayButtonClicked()
 {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
         QDir(QCoreApplication::applicationDirPath()).filePath("records/"),
         tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
-    if (replayPage->initPlay(fileInfo))
+    if (replayPage->InitPlay(fileInfo))
     {
         this->hide();
         replayPage->show();
     }
 }
 
-void Widget::on_enterButton_clicked()
+void Widget::OnEnterButtonClicked()
 {
     if (settingPage->exec() == QDialog::Accepted)
     {
@@ -46,7 +49,7 @@ void Widget::on_enterButton_clicked()
     }
 }
 
-void Widget::on_MapEditorButton_clicked()
+void Widget::OnMapEditorButtonClicked()
 {
     mapEditor->exec();
 }
@@ -77,7 +80,7 @@ void Widget::ResetRecord(const Map &map, const Config &config)
     seqPtr = 0;
     movementPtr = 0;
     foodPtr = 0;
-    gameRecord.reset(map, config);
+    gameRecord.Reset(map, config);
 }
 
 void Widget::ResetRecord(const Record &record)
@@ -85,7 +88,7 @@ void Widget::ResetRecord(const Record &record)
     seqPtr = 0;
     movementPtr = 0;
     foodPtr = 0;
-    gameRecord.reset(record);
+    gameRecord.Reset(record);
 }
 
 void Widget::UpdateRecordFood(int x, int y, int v)

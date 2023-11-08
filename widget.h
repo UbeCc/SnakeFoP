@@ -20,7 +20,7 @@ const int TIME_INTERVAL = 2000;
 
 class PlayPage;
 
-class RePlayPage;
+class ReplayPage;
 
 class SettingPage;
 
@@ -43,7 +43,7 @@ public:
 
     static void UpdateTime(int);
 
-    static void PrintRecord();
+    [[maybe_unused]] static void PrintRecord();
 
     static pair<Point, int> GetNextFood();
 
@@ -75,16 +75,16 @@ public:
 
 private slots:
 
-    void on_enterButton_clicked();
+    void OnEnterButtonClicked();
 
-    void on_replayButton_clicked();
+    void OnReplayButtonClicked();
 
-    void on_MapEditorButton_clicked();
+    void OnMapEditorButtonClicked();
 
 private:
     Ui::MainPage *ui;
     SettingPage *settingPage;
-    RePlayPage *replayPage;
+    ReplayPage *replayPage;
     PlayPage *playPage;
     QFileInfo gameConfigPath, gameMapPath;
     MapEditor *mapEditor;

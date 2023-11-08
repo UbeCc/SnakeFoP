@@ -9,6 +9,7 @@ ResultPage::ResultPage(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->exitButton, &QPushButton::clicked, this, &QApplication::quit);
+    connect(ui->replayButton, &QPushButton::clicked, this, &ResultPage::OnReplayButtonClicked);
 }
 
 ResultPage::~ResultPage()
@@ -16,7 +17,7 @@ ResultPage::~ResultPage()
     delete ui;
 }
 
-void ResultPage::on_replayButton_clicked()
+void ResultPage::OnReplayButtonClicked()
 {
         foreach(QWidget *widget, QApplication::topLevelWidgets())
         {

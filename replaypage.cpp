@@ -12,22 +12,22 @@
 
 using std::exception;
 
-void RePlayPage::exitButton_clicked()
+void ReplayPage::OnExitButtonClicked()
 {
     if (gameTimer != nullptr && gameTimer->isActive()) gameTimer->stop();
     this->hide();
     widget->show();
 }
 
-void RePlayPage::recordButton_clicked()
+void ReplayPage::OnRecordButtonClicked()
 {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(),
         tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
-    initPlay(fileInfo);
+    InitPlay(fileInfo);
 }
 
-void RePlayPage::playButton_clicked()
+void ReplayPage::OnPlayButtonClicked()
 {
     if (playFlag)
     {
@@ -41,27 +41,27 @@ void RePlayPage::playButton_clicked()
     }
 }
 
-RePlayPage::RePlayPage(QWidget *parent) :
+ReplayPage::ReplayPage(QWidget *parent) :
     initFlag(false),
     playFlag(true),
     widget(dynamic_cast<Widget *>(parent)),
     curStep(0),
     game(nullptr),
-    ui(new Ui::RePlayPage),
+    ui(new Ui::ReplayPage),
     gameTimer(nullptr)
 {
     ui->setupUi(this);
-    connect(ui->recordButton, &QPushButton::clicked, this, &RePlayPage::recordButton_clicked);
-    connect(ui->playButton, &QPushButton::clicked, this, &RePlayPage::playButton_clicked);
-    connect(ui->exitButton, &QPushButton::clicked, this, &RePlayPage::exitButton_clicked);
+    connect(ui->recordButton, &QPushButton::clicked, this, &ReplayPage::OnRecordButtonClicked);
+    connect(ui->playButton, &QPushButton::clicked, this, &ReplayPage::OnPlayButtonClicked);
+    connect(ui->exitButton, &QPushButton::clicked, this, &ReplayPage::OnExitButtonClicked);
 }
 
-RePlayPage::~RePlayPage()
+ReplayPage::~ReplayPage()
 {
     delete ui;
 }
 
-bool RePlayPage::initPlay(const QFileInfo &fileInfo)
+bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
 {
     curStep = 0;
     Widget::mode = true;
@@ -91,21 +91,21 @@ bool RePlayPage::initPlay(const QFileInfo &fileInfo)
         ui->ScoreLabel->setText(QString::number(status.score));
         ui->LengthLabel->setText(QString::number(status.length));
         ui->Canvas->update();
-        if (Widget::IsEnd()) gameOver();
+        if (Widget::IsEnd()) GameOver();
     });
     gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
 
     return true;
 }
 
-void RePlayPage::gameOver()
+void ReplayPage::GameOver()
 {
     gameTimer->stop();
     this->hide();
     widget->show();
 }
 
-void RePlayPage::Step()
+void ReplayPage::Step()
 {
     auto status = game->GetStatus();
     char curOp = Widget::NextAction();
@@ -141,12 +141,12 @@ void RePlayPage::Step()
     }
 }
 
-int RePlayPage::getScore()
+int ReplayPage::GetScore()
 {
     return game->GetStatus().score;
 }
 
-int RePlayPage::getLength()
+int ReplayPage::GetLength()
 {
     return game->GetStatus().length;
 }

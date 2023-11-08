@@ -78,7 +78,7 @@ public:
 
     Game(const Game &) = delete;
 
-    Game(const Map &map, const Config &config, int _mode);
+    Game(const Map &map, const Config &config, int mode);
 
     /// @returns false if the direction is invalid
     bool ChangeDirection(Direction direction);
