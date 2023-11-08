@@ -129,6 +129,7 @@ void ReplayPage::Step()
                 break;
             case 'Q':
                 GameOver();
+                break;
             default:
                 break;
         }
