@@ -32,7 +32,8 @@ Game::Game(const Map &map, const Config &config, int mode)
         status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
     }
 
-    for (auto portal: map.portals) {
+    for (auto portal: map.portals)
+    {
         // QUESTION
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
@@ -65,7 +66,8 @@ Game::Game(const Map &map, const Config &config, int mode, Widget *widget)
         status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
     }
 
-    for (auto portal: map.portals) {
+    for (auto portal: map.portals)
+    {
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
     }
@@ -112,7 +114,7 @@ int Game::Step(Widget *widget)
     auto &direction = status.direction;
     auto &state = status.state;
 
-    if (state == Dead && !widget->GetMode())
+    if (state == Dead)
     {
         throw runtime_error("The snake is dead");
     }
@@ -190,7 +192,8 @@ int Game::Step(Widget *widget)
     }
 
     // Hits an obstacle
-    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Obstacle.x) {
+    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Obstacle.x)
+    {
         state = Dead;
         return 0;
     }
@@ -205,7 +208,7 @@ int Game::Step(Widget *widget)
     }
 
     // Check if the snake eats a food
-    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) 
+    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x)
     {
         status.score += map[nextHead.x][nextHead.y].y;
         status.desiredLength += map[nextHead.x][nextHead.y].y;

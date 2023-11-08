@@ -103,7 +103,7 @@ void Widget::UpdateRecordMovement(char movement)
     gameRecord.moveSequence += movement;
 }
 
-Record Widget::GetRecord()
+Record Widget::GetRecord() const
 {
     return gameRecord;
 }
@@ -117,7 +117,7 @@ void Widget::PrintRecord()
         qDebug() << i.first.x << " " << i.first.y << "\n";
     }
     qDebug() << "Movement: \n";
-    for (char i : gameRecord.moveSequence)
+    for (char i: gameRecord.moveSequence)
     {
         qDebug() << i << " ";
     }
@@ -126,37 +126,57 @@ void Widget::PrintRecord()
 
 pair<Point, int> Widget::GetNextFood()
 {
+    if (foodPtr >= (int) gameRecord.foodSequence.size())
+    {
+        throw std::runtime_error("No more foods");
+    }
+
     return gameRecord.foodSequence[foodPtr++];
 }
 
 char Widget::GetNextMovement()
 {
+    if (movementPtr >= (int) gameRecord.moveSequence.length())
+    {
+        throw std::runtime_error("No more movements");
+    }
+
     return gameRecord.moveSequence[movementPtr++];
 }
 
 char Widget::NextAction()
 {
+    if (seqPtr >= (int) gameRecord.sequence.length())
+    {
+        throw std::runtime_error("No more actions");
+    }
+
     return gameRecord.sequence[seqPtr++];
 }
 
 char Widget::GetCurrentAction()
 {
+    if (seqPtr >= (int) gameRecord.sequence.length())
+    {
+        throw std::runtime_error("Current action not found");
+    }
+
     return gameRecord.sequence[seqPtr];
 }
 
-Map Widget::GetMap()
+Map Widget::GetMap() const
 {
     return gameRecord.map;
 }
 
-Config Widget::GetConfig()
+const Config& Widget::GetConfig() const
 {
     return gameRecord.config;
 }
 
-bool Widget::IsEnd()
+bool Widget::IsEnd() const
 {
-    return seqPtr == (int) gameRecord.sequence.length();
+    return seqPtr >= (int) gameRecord.sequence.length();
 }
 
 void Widget::UpdateTime(int tme)
@@ -166,6 +186,11 @@ void Widget::UpdateTime(int tme)
 
 int Widget::GetCurrentStep()
 {
+    if (seqPtr >= (int) gameRecord.sequence.length())
+    {
+        throw std::runtime_error("Current step not found");
+    }
+
     return gameRecord.timestamp[seqPtr];
 }
 
@@ -179,12 +204,13 @@ Record &Widget::GetGameRecord()
     return gameRecord;
 }
 
-bool Widget::GetMode()
+bool Widget::GetMode() const
 {
     return mode;
 }
 
-void Widget::ResetRecord() {
+void Widget::ResetRecord()
+{
     seqPtr = 0;
     movementPtr = 0;
     foodPtr = 0;

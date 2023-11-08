@@ -51,7 +51,7 @@ public:
 
     char GetNextMovement();
 
-    bool GetMode();
+    bool GetMode() const;
 
     Record &GetGameRecord();
 
@@ -61,21 +61,21 @@ public:
 
     int GetCurrentStep();
 
-    bool IsEnd();
+    [[nodiscard]] bool IsEnd() const;
 
     bool mode;
 
-    [[nodiscard]] Record GetRecord();
+    [[nodiscard]] Record GetRecord() const;
 
-    [[nodiscard]] Map GetMap();
+    [[nodiscard]] Map GetMap() const;
 
-    [[nodiscard]] Config GetConfig();
+    [[nodiscard]] const Config &GetConfig() const;
 
     void SetGameConfigPath(const QFileInfo &path);
 
     void SetGameMapPath(const QFileInfo &path);
 
-    void SetMode(const bool _mode);
+    void SetMode(bool _mode);
 
     [[nodiscard]] QFileInfo GetGameConfigPath() const;
 
