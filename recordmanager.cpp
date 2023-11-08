@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <QDebug>
 
 using std::ifstream;
 using std::ofstream;

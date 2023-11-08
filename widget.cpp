@@ -103,7 +103,7 @@ void Widget::UpdateRecordMovement(char movement)
     gameRecord.moveSequence += movement;
 }
 
-Record Widget::GetRecord()
+Record Widget::GetRecord() const
 {
     return gameRecord;
 }
@@ -164,17 +164,17 @@ char Widget::GetCurrentAction()
     return gameRecord.sequence[seqPtr];
 }
 
-Map Widget::GetMap()
+Map Widget::GetMap() const
 {
     return gameRecord.map;
 }
 
-Config Widget::GetConfig()
+const Config& Widget::GetConfig() const
 {
     return gameRecord.config;
 }
 
-bool Widget::IsEnd()
+bool Widget::IsEnd() const
 {
     return seqPtr >= (int) gameRecord.sequence.length();
 }
@@ -204,12 +204,13 @@ Record &Widget::GetGameRecord()
     return gameRecord;
 }
 
-bool Widget::GetMode()
+bool Widget::GetMode() const
 {
     return mode;
 }
 
-void Widget::ResetRecord() {
+void Widget::ResetRecord()
+{
     seqPtr = 0;
     movementPtr = 0;
     foodPtr = 0;
