@@ -30,6 +30,7 @@ Game::Game(const Map &map, const Config &config, int mode)
     }
 
     for (auto portal: map.portals) {
+        // QUESTION
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
     }
@@ -92,6 +93,8 @@ int Game::Step() {
         case Up:
             nextHead.y--;
             break;
+        default:
+            break;
     }
     // Check if the snake hits the vertical border
     if (nextHead.x < 0 || nextHead.x >= mapDefinition.width) {
@@ -130,7 +133,7 @@ int Game::Step() {
     }
 
     // Hits an obstacle
-    if (map[nextHead.x][nextHead.y] == SpecialPoint::Obstacle) {
+    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Obstacle.x) {
         state = Dead;
         return 0;
     }
@@ -142,13 +145,15 @@ int Game::Step() {
         state = Dead;
         return 0;
     }
+    
     // Check if the snake eats a food
-    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) {
+    if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) 
+    {
         status.score += map[nextHead.x][nextHead.y].y;
         status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
         if (mode == 0) tot = GenerateFood();
-        else UpdateFood();
+        // else UpdateFood();
     }
 
     // Move the snake
