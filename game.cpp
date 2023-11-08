@@ -82,7 +82,7 @@ Game::Game(const Map &map, const Config &config, int mode, Widget *widget)
     }
     else if (mode == 1)
     {
-        while (widget->GetCurrentAction() == 'F')
+        while (widget->GetCurrentAction() == 'F' && widget->GetCurrentStep() == 0)
         {
             UpdateFood(widget);
             widget->NextAction();
