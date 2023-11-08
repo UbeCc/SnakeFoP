@@ -82,16 +82,24 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
     ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
     game->SetStatus(Game::Alive);
+
+    delete gameTimer;
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, [&]()
     {
-        while (widget->GetCurrentStep() == curStep) Step();
-        ++curStep;
-        game->Step(widget);
-        ui->ScoreLabel->setText(QString::number(status.score));
-        ui->LengthLabel->setText(QString::number(status.length));
-        ui->Canvas->update();
-        if (widget->IsEnd()) GameOver();
+        if (widget->IsEnd()) {
+            return;
+        }
+
+        while (!widget->IsEnd() && widget->GetCurrentStep() == curStep) Step();
+        if (!widget->IsEnd())
+        {
+            ++curStep;
+            game->Step(widget);
+            ui->ScoreLabel->setText(QString::number(status.score));
+            ui->LengthLabel->setText(QString::number(status.length));
+            ui->Canvas->update();
+        }
     });
     gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
 
