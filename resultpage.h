@@ -4,22 +4,26 @@
 #include <QDialog>
 #include "playpage.h"
 
-namespace Ui {
-class ResultPage;
+namespace Ui
+{
+    class ResultPage;
 }
 
 class PlayPage;
 
 class ResultPage : public QDialog
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit ResultPage(QWidget *parent = nullptr);
-    void showEvent(QShowEvent*) override;
+
+    void showEvent(QShowEvent *) override;
+
     ~ResultPage() override;
 
 private slots:
+
     void on_replayButton_clicked();
 
 private:

@@ -7,29 +7,40 @@
 #include "game.h"
 #include "widget.h"
 
-namespace Ui {
-class RePlayPage;
+namespace Ui
+{
+    class RePlayPage;
 }
 
 class Widget;
+
 class ResultPage;
+
 class GameCanvas;
 
 class RePlayPage : public QDialog
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit RePlayPage(QWidget *parent = nullptr);
-    ~RePlayPage();
-    void initPlay(const QFileInfo&);
+
+    ~RePlayPage() override;
+
+    bool initPlay(const QFileInfo &);
+
     int getScore();
+
     int getLength();
 
 private slots:
+
     void Step();
+
     void recordButton_clicked();
+
     void playButton_clicked();
+
     void exitButton_clicked();
 
 private:
@@ -40,6 +51,7 @@ private:
     Ui::RePlayPage *ui;
     QTimer *gameTimer;
     Record record;
+
     void gameOver();
 };
 

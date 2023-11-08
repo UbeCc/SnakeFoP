@@ -8,21 +8,26 @@ using std::array;
 using std::string;
 using std::istream;
 
-struct Config {
+struct Config
+{
     int level;
     int randomSeed;
     int foodCount;
     array<float, 3> foodProbabilities;
 };
 
-class ConfigManager {
+class ConfigManager
+{
 private:
     static Config LoadConfigFromStream(istream &stream);
 
 public:
     static Config LoadConfig(const string &path);
+
     static Config LoadConfigFromString(const string &configString);
+
     static void SaveConfig(const string &path, const Config &config);
+
     [[nodiscard]] static string GetConfigString(const Config &config);
 };
 

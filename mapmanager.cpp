@@ -11,7 +11,8 @@ using std::endl;
 using std::to_string;
 using std::runtime_error;
 
-Map MapManager::LoadMapFromStream(std::istream &stream) {
+Map MapManager::LoadMapFromStream(std::istream &stream)
+{
 
     Map map;
 
@@ -61,7 +62,8 @@ Map MapManager::LoadMapFromStream(std::istream &stream) {
             throw runtime_error("Failed to read obstacle " + to_string(i));
         }
 
-        if (obstacle.x < 0 || obstacle.x >= map.width || obstacle.y < 0 || obstacle.y >= map.height) {
+        if (obstacle.x < 0 || obstacle.x >= map.width || obstacle.y < 0 || obstacle.y >= map.height)
+        {
             throw runtime_error("Obstacle out of map");
         }
     }
@@ -100,7 +102,8 @@ Map MapManager::LoadMapFromStream(std::istream &stream) {
             throw runtime_error("Failed to read portal " + to_string(i));
         }
 
-        if (portal1.x < 0 || portal1.x >= map.width || portal1.y < 0 || portal1.y >= map.height) {
+        if (portal1.x < 0 || portal1.x >= map.width || portal1.y < 0 || portal1.y >= map.height)
+        {
             throw runtime_error("Portal out of map");
         }
     }
@@ -117,17 +120,22 @@ Map MapManager::LoadMapFromStream(std::istream &stream) {
         throw runtime_error("Spawn point out of map");
     }
 
-    for (auto &o : map.obstacles) {
-        if (o.x == map.spawnPoint.x && o.y == map.spawnPoint.y) {
+    for (auto &o: map.obstacles)
+    {
+        if (o.x == map.spawnPoint.x && o.y == map.spawnPoint.y)
+        {
             throw runtime_error("Spawn point is an obstacle");
         }
     }
 
-    for (auto &p : map.portals) {
-        if (p[0].x == map.spawnPoint.x && p[0].y == map.spawnPoint.y) {
+    for (auto &p: map.portals)
+    {
+        if (p[0].x == map.spawnPoint.x && p[0].y == map.spawnPoint.y)
+        {
             throw runtime_error("Spawn point is a portal");
         }
-        if (p[1].x == map.spawnPoint.x && p[1].y == map.spawnPoint.y) {
+        if (p[1].x == map.spawnPoint.x && p[1].y == map.spawnPoint.y)
+        {
             throw runtime_error("Spawn point is a portal");
         }
     }
@@ -190,14 +198,14 @@ string MapManager::GetMapString(const Map &map)
 
     ss << map.obstacles.size() << endl;
 
-    for (auto obstacle : map.obstacles)
+    for (auto obstacle: map.obstacles)
     {
         ss << obstacle.x << " " << obstacle.y << endl;
     }
 
     ss << map.portals.size() << endl;
 
-    for (auto portal : map.portals)
+    for (auto portal: map.portals)
     {
         ss << portal[0].x << " " << portal[0].y << " " << portal[1].x << " " << portal[1].y << endl;
     }

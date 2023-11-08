@@ -17,29 +17,36 @@ PlayPage::PlayPage(QWidget *parent) :
     game(nullptr),
     ui(new Ui::PlayPage),
     gameTimer(new QTimer(this)),
-    resultPage(new ResultPage(this)) {
-    ui->setupUi(this);    
-    connect(gameTimer, &QTimer::timeout, this, [&]() {
+    resultPage(new ResultPage(this))
+{
+    ui->setupUi(this);
+    connect(gameTimer, &QTimer::timeout, this, [&]()
+    {
         ++steps;
         game->SetPreDirection(game->GetStatus().direction);
         Step();
     });
 }
 
-PlayPage::~PlayPage() {
+PlayPage::~PlayPage()
+{
     delete ui;
 }
 
-void PlayPage::gameOver() {
+void PlayPage::gameOver()
+{
     gameTimer->stop();
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     QDateTime dateTime;
     dateTime.setMSecsSinceEpoch(timestamp);
     QString format = "yyyy-MM-dd-hh-mm-ss";
     QString formattedDateTime = dateTime.toString(format);
-    try {
+    try
+    {
         RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", Widget::GetRecord());
-    } catch (exception &e) {
+    }
+    catch (exception &e)
+    {
         QMessageBox::warning(this, "保存地图错误", e.what());
         this->hide();
         widget->show();
@@ -49,14 +56,18 @@ void PlayPage::gameOver() {
     this->hide();
 }
 
-bool PlayPage::initPlay() {
+bool PlayPage::initPlay()
+{
     Map map{};
     Config config{};
     Widget::mode = false;
-    try {
+    try
+    {
         map = MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString());
         config = ConfigManager::LoadConfig(widget->GetGameConfigPath().filePath().toStdString());
-    } catch (exception &e) {
+    }
+    catch (exception &e)
+    {
         QMessageBox::warning(this, "打开地图或配置文件错误", e.what());
         return false;
     }
@@ -74,12 +85,14 @@ bool PlayPage::initPlay() {
     return true;
 }
 
-void PlayPage::Step() {
+void PlayPage::Step()
+{
     int tot = game->Step();
-    for(int i = 1; i <= tot; ++i) Widget::UpdateTime(steps);
+    for (int i = 1; i <= tot; ++i) Widget::UpdateTime(steps);
     const auto &status = game->GetStatus();
 
-    if (status.state == Game::Dead) {
+    if (status.state == Game::Dead)
+    {
         // use UpdateRecordMovement to memorize `endtime`
         Widget::UpdateTime(steps);
         Widget::UpdateRecordMovement('W');
@@ -92,55 +105,63 @@ void PlayPage::Step() {
     ui->Canvas->update();
 }
 
-void PlayPage::keyPressEvent(QKeyEvent *event) {
+void PlayPage::keyPressEvent(QKeyEvent *event)
+{
     Game::Direction direction = game->GetStatus().preDirection;
-    switch (event->key()) {
-    case Qt::Key_Up:
-    case Qt::Key_W:
-        if (direction != Game::Down) {
-            game->ChangeDirection(Game::Up);
-            Widget::UpdateTime(steps);
-            Widget::UpdateRecordMovement('W');
-        }
-        break;
-    case Qt::Key_Down:
-    case Qt::Key_S:
-        if (direction != Game::Up) {
-            game->ChangeDirection(Game::Down);
-            Widget::UpdateTime(steps);
-            Widget::UpdateRecordMovement('S');
-        }
-        break;
-    case Qt::Key_Left:
-    case Qt::Key_A:
-        if (direction != Game::Right) {
-            game->ChangeDirection(Game::Left);
-            Widget::UpdateTime(steps);
-            Widget::UpdateRecordMovement('A');
-        }
-        break;
-    case Qt::Key_Right:
-    case Qt::Key_D:
-        if (direction != Game::Left) {
-            game->ChangeDirection(Game::Right);
-            Widget::UpdateTime(steps);
-            Widget::UpdateRecordMovement('D');
-        }
-        break;
-    case Qt::Key_Space:
-        gameTimer->stop();
-        QMessageBox::information(this, "暂停", "按下OK键以继续...");
-        gameTimer->start();
-        break;
-    default:
-        break;
+    switch (event->key())
+    {
+        case Qt::Key_Up:
+        case Qt::Key_W:
+            if (direction != Game::Down)
+            {
+                game->ChangeDirection(Game::Up);
+                Widget::UpdateTime(steps);
+                Widget::UpdateRecordMovement('W');
+            }
+            break;
+        case Qt::Key_Down:
+        case Qt::Key_S:
+            if (direction != Game::Up)
+            {
+                game->ChangeDirection(Game::Down);
+                Widget::UpdateTime(steps);
+                Widget::UpdateRecordMovement('S');
+            }
+            break;
+        case Qt::Key_Left:
+        case Qt::Key_A:
+            if (direction != Game::Right)
+            {
+                game->ChangeDirection(Game::Left);
+                Widget::UpdateTime(steps);
+                Widget::UpdateRecordMovement('A');
+            }
+            break;
+        case Qt::Key_Right:
+        case Qt::Key_D:
+            if (direction != Game::Left)
+            {
+                game->ChangeDirection(Game::Right);
+                Widget::UpdateTime(steps);
+                Widget::UpdateRecordMovement('D');
+            }
+            break;
+        case Qt::Key_Space:
+            gameTimer->stop();
+            QMessageBox::information(this, "暂停", "按下OK键以继续...");
+            gameTimer->start();
+            break;
+        default:
+            break;
     }
 }
 
-int PlayPage::getScore() {
+int PlayPage::getScore()
+{
     return game->GetStatus().score;
 }
 
-int PlayPage::getLength() {
+int PlayPage::getLength()
+{
     return game->GetStatus().length;
 }

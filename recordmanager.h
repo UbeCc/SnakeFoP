@@ -9,7 +9,8 @@
 using std::vector;
 using std::pair;
 
-struct Record {
+struct Record
+{
     string name;
     Map map;
     Config config;
@@ -17,14 +18,17 @@ struct Record {
     vector<int> timestamp;
     vector<pair<Point, int> > foodSequence;
     string moveSequence;
-    void reset(const Map&, const Config&);
-    void reset(const Record&);
+
+    void reset(const Map &, const Config &);
+
+    void reset(const Record &);
 };
 
 class RecordManager
 {
 public:
     static Record LoadRecord(const string &path, Record &);
+
     static void SaveRecord(const string &path, const Record &record);
 };
 

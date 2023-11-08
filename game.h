@@ -7,9 +7,11 @@
 
 using std::default_random_engine;
 
-class Game {
+class Game
+{
 public:
-    enum Direction {
+    enum Direction
+    {
         //DSAW
         Right = 0,
         Down = 1,
@@ -17,7 +19,8 @@ public:
         Up = 3
     };
 
-    enum State {
+    enum State
+    {
         Alive, Dead
     };
 
@@ -26,7 +29,8 @@ private:
 
     /// Game mode, 0 for normal, 1 for replay, 2 for display only
     int mode;
-    struct GameStatus {
+    struct GameStatus
+    {
         const Map mapDefinition;
         const Config config;
         Direction direction;
@@ -60,17 +64,20 @@ private:
         Point tail;
     } status;
 
-    class SpecialPoint {
+    class SpecialPoint
+    {
     public:
-        constexpr static Point Empty {-4, 0};
-        constexpr static Point Obstacle {-1, 0};
-        constexpr static Point Head {-3, 0};
-        constexpr static Point Food {-5, 0};
+        constexpr static Point Empty{-4, 0};
+        constexpr static Point Obstacle{-1, 0};
+        constexpr static Point Head{-3, 0};
+        constexpr static Point Food{-5, 0};
     };
 
 public:
     Game() = delete;
+
     Game(const Game &) = delete;
+
     Game(const Map &map, const Config &config, int _mode);
 
     /// @returns false if the direction is invalid
@@ -80,13 +87,17 @@ public:
     int Step();
 
     [[nodiscard]] const GameStatus &GetStatus() const;
+
     void SetStatus(State);
+
     [[nodiscard]] string GetStatisticsString() const;
+
     void SetPreDirection(Direction direc);
 
 
 private:
     int GenerateFood();
+
     void UpdateFood();
 };
 

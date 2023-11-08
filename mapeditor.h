@@ -4,19 +4,22 @@
 #include <QDialog>
 #include "game.h"
 
-namespace Ui {
-class MapEditor;
+namespace Ui
+{
+    class MapEditor;
 }
 
 class MapEditor : public QDialog
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit MapEditor(QWidget *parent = nullptr);
+
     ~MapEditor() override;
 
 private slots:
+
     void OnNewMapButtonClicked();
 
     void OnLoadMapButtonClicked();

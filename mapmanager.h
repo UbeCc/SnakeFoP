@@ -10,19 +10,23 @@ using std::vector;
 using std::array;
 using std::istream;
 
-struct Point {
+struct Point
+{
     int x, y;
 
-    bool operator==(const Point &rhs) const {
+    bool operator==(const Point &rhs) const
+    {
         return x == rhs.x && y == rhs.y;
     }
 
-    bool operator!=(const Point &rhs) const {
+    bool operator!=(const Point &rhs) const
+    {
         return !(rhs == *this);
     }
 };
 
-struct Map {
+struct Map
+{
     int width, height;
 
     // Top, bottom, left, right
@@ -32,7 +36,8 @@ struct Map {
     Point spawnPoint;
 };
 
-class MapManager {
+class MapManager
+{
 private:
     static Map LoadMapFromStream(istream &stream);
 

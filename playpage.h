@@ -7,24 +7,32 @@
 #include <QElapsedTimer>
 #include "widget.h"
 
-namespace Ui {
-class PlayPage;
+namespace Ui
+{
+    class PlayPage;
 }
 
 class Widget;
+
 class ResultPage;
 
 class PlayPage : public QDialog
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit PlayPage(QWidget *parent = nullptr);
+
     ~PlayPage() override;
+
     bool initPlay();
-    void keyPressEvent(QKeyEvent*) override;
+
+    void keyPressEvent(QKeyEvent *) override;
+
     int getScore();
+
     int getLength();
+
     void Step();
 
 private:
@@ -34,6 +42,7 @@ private:
     Ui::PlayPage *ui;
     QTimer *gameTimer;
     ResultPage *resultPage;
+
     void gameOver();
 };
 
