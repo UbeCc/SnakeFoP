@@ -15,17 +15,18 @@ const Config MapEditor::dummy_config = {
 MapEditor::MapEditor(QWidget *parent) :
         QDialog(parent),
         ui(new Ui::MapEditor),
-        game(nullptr) {
+        game(nullptr),
+        firstPortalPoint({-1, -1}) {
     ui->setupUi(this);
-    connect(ui->NewMapButton, SIGNAL(clicked()), this, SLOT(OnNewMapButtonClicked()));
-    connect(ui->LoadMapButton, SIGNAL(clicked()), this, SLOT(OnLoadMapButtonClicked()));
-    connect(ui->SaveMapButton, SIGNAL(clicked()), this, SLOT(OnSaveMapButtonClicked()));
-    connect(ui->MapXBorder, SIGNAL(clicked(bool)), this, SLOT(OnMapXBorderChanged(bool)));
-    connect(ui->MapYBorder, SIGNAL(clicked(bool)), this, SLOT(OnMapYBorderChanged(bool)));
-    connect(ui->ObstaclePainterButton, SIGNAL(toggled(bool)), this, SLOT(OnObstaclePainterButtonToggled(bool)));
-    connect(ui->EraserButton, SIGNAL(toggled(bool)), this, SLOT(OnEraseButtonToggled(bool)));
-    connect(ui->AddPortalButton, SIGNAL(toggled(bool)), this, SLOT(OnAddPortalButtonToggled(bool)));
-    connect(ui->SpawnPointButton, SIGNAL(toggled(bool)), this, SLOT(OnSetSpawnPointButtonToggled(bool)));
+    connect(ui->NewMapButton, &QPushButton::clicked, this, &MapEditor::OnNewMapButtonClicked);
+    connect(ui->LoadMapButton, &QPushButton::clicked, this, &MapEditor::OnLoadMapButtonClicked);
+    connect(ui->SaveMapButton, &QPushButton::clicked, this, &MapEditor::OnSaveMapButtonClicked);
+    connect(ui->MapXBorder, &QCheckBox::toggled, this, &MapEditor::OnMapXBorderChanged);
+    connect(ui->MapYBorder, &QCheckBox::toggled, this, &MapEditor::OnMapYBorderChanged);
+    connect(ui->ObstaclePainterButton, &QPushButton::toggled, this, &MapEditor::OnObstaclePainterButtonToggled);
+    connect(ui->EraserButton, &QPushButton::toggled, this, &MapEditor::OnEraseButtonToggled);
+    connect(ui->AddPortalButton, &QPushButton::toggled, this, &MapEditor::OnAddPortalButtonToggled);
+    connect(ui->SpawnPointButton, &QPushButton::toggled, this, &MapEditor::OnSetSpawnPointButtonToggled);
 
     OnNewMapButtonClicked();
 }
@@ -199,7 +200,7 @@ void MapEditor::OnAddPortalMouseSelect(int x, int y) {
         return;
     }
 
-    for (const auto &portal : map.portals) {
+    for (const auto &portal: map.portals) {
         if (portal[0] == Point({x, y}) || portal[1] == Point({x, y})) {
             QMessageBox::warning(this, "添加传送门错误", "传送门不允许放置在传送门上");
             ui->AddPortalButton->setChecked(false);
@@ -244,7 +245,7 @@ void MapEditor::OnSetSpawnPointMouseSelect(int x, int y) {
         return;
     }
 
-    for (const auto &portal : map.portals) {
+    for (const auto &portal: map.portals) {
         if (portal[0] == Point({x, y}) || portal[1] == Point({x, y})) {
             QMessageBox::warning(this, "设置出生点错误", "出生点不允许放置在传送门上");
             ui->SpawnPointButton->setChecked(false);

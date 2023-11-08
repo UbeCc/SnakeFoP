@@ -21,7 +21,10 @@ Widget::~Widget() {
 
 void Widget::on_replayButton_clicked() {
     this->hide();
-    QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QCoreApplication::applicationDirPath(), tr("所有文件 (*)"));
+    QString recordFilePath =
+            QFileDialog::getOpenFileName(this, tr("选择文件"),
+                                         QDir(QCoreApplication::applicationDirPath()).filePath("records/"),
+                                         tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     replayPage->initPlay(fileInfo);
     // PrintRecord();
@@ -30,14 +33,14 @@ void Widget::on_replayButton_clicked() {
 
 void Widget::on_enterButton_clicked() {
     if (settingPage->exec() == QDialog::Accepted) {
-        this->hide();
-        playPage->initPlay();
-        playPage->show();
+        if (playPage->initPlay()) {
+            playPage->show();
+            this->hide();
+        }
     }
 }
 
-void Widget::on_MapEditorButton_clicked()
-{
+void Widget::on_MapEditorButton_clicked() {
     mapEditor->exec();
 }
 
@@ -95,11 +98,11 @@ Record Widget::gameRecord;
 void Widget::PrintRecord() {
     qDebug() << "TimeSize: " << gameRecord.timestamp.size() << "\n";
     qDebug() << "Food: \n";
-    for(const auto & i : gameRecord.foodSequence) {
+    for (const auto &i: gameRecord.foodSequence) {
         qDebug() << i.first.x << " " << i.first.y << "\n";
     }
     qDebug() << "Movement: \n";
-    for(int i = 0; i < (int)gameRecord.moveSequence.length(); ++i) {
+    for (int i = 0; i < (int) gameRecord.moveSequence.length(); ++i) {
         qDebug() << gameRecord.moveSequence[i] << " ";
     }
     qDebug() << "\n";
@@ -130,7 +133,7 @@ Config Widget::GetConfig() {
 }
 
 bool Widget::IsEnd() {
-    return seqPtr == (int)gameRecord.sequence.length();
+    return seqPtr == (int) gameRecord.sequence.length();
 }
 
 void Widget::UpdateTime(int tme) {

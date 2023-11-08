@@ -21,14 +21,14 @@ class PlayPage : public QDialog
 public:
     explicit PlayPage(QWidget *parent = nullptr);
     ~PlayPage() override;
-    void initPlay();
+    bool initPlay();
     void keyPressEvent(QKeyEvent*) override;
     int getScore();
     int getLength();
     void Step();
 
 private:
-    int cnt, steps;
+    int steps;
     Widget *widget;
     Game *game;
     Ui::PlayPage *ui;

@@ -1,7 +1,6 @@
 #include "recordmanager.h"
 #include <fstream>
 #include <sstream>
-#include <QDebug>
 #include <algorithm>
 
 using std::ifstream;

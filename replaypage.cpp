@@ -14,7 +14,7 @@ using std::exception;
 
 void RePlayPage::exitButton_clicked() {
     if(gameTimer != nullptr && gameTimer->isActive()) gameTimer->stop();
-    this->done(0);
+    this->hide();
     widget->show();
 }
 
@@ -38,6 +38,7 @@ RePlayPage::RePlayPage(QWidget *parent) :
     initFlag(false),
     playFlag(true),
     widget(dynamic_cast<Widget *>(parent)),
+    curStep(0),
     game(nullptr),
     ui(new Ui::RePlayPage),
     gameTimer(nullptr) {
@@ -70,7 +71,6 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, [&]() {
         ++curStep;
-        qDebug() << curStep << Widget::GetCurrentStep();
         game->Step();
         while(Widget::GetCurrentStep() == curStep) Step();
         ui->ScoreLabel->setText(QString::number(status.score));
@@ -83,14 +83,13 @@ void RePlayPage::initPlay(const QFileInfo& fileInfo) {
 
 void RePlayPage::gameOver() {
     gameTimer->stop();
-    this->done(0);
+    this->hide();
     widget->show();
 }
 
 void RePlayPage::Step() {
     auto status = game->GetStatus();
     char curOp =Widget::NextAction();
-    // qDebug() << curOp << " " << curStep;
     if(curOp == 'M') {
         Game::Direction direction = game->GetStatus().direction;
         char dire = Widget::GetNextMovement();
