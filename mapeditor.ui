@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Map Editor</string>
+   <string>地图编辑器</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -38,7 +38,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Map Control</string>
+        <string>编辑地图</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -46,7 +46,7 @@
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Size: </string>
+             <string>大小：</string>
             </property>
            </widget>
           </item>
@@ -106,7 +106,7 @@
         <item>
          <widget class="QPushButton" name="NewMapButton">
           <property name="text">
-           <string>New Map</string>
+           <string>创建地图</string>
           </property>
          </widget>
         </item>
@@ -129,14 +129,14 @@
         <item>
          <widget class="QPushButton" name="LoadMapButton">
           <property name="text">
-           <string>Load Map</string>
+           <string>加载地图</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="SaveMapButton">
           <property name="text">
-           <string>Save Map</string>
+           <string>保存地图</string>
           </property>
          </widget>
         </item>
@@ -152,7 +152,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Current Map</string>
+        <string>当前地图</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
@@ -166,7 +166,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Size: </string>
+             <string>大小：</string>
             </property>
            </widget>
           </item>
@@ -194,7 +194,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Border Hitbox:</string>
+           <string>边界阻碍：</string>
           </property>
          </widget>
         </item>
@@ -203,14 +203,14 @@
           <item>
            <widget class="QCheckBox" name="MapXBorder">
             <property name="text">
-             <string>Horizontal</string>
+             <string>水平</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="MapYBorder">
             <property name="text">
-             <string>Vertical</string>
+             <string>垂直</string>
             </property>
            </widget>
           </item>
@@ -234,7 +234,7 @@
           <item>
            <widget class="QPushButton" name="ObstaclePainterButton">
             <property name="text">
-             <string>Paint Obstacles</string>
+             <string>障碍</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -244,7 +244,7 @@
           <item>
            <widget class="QPushButton" name="AddPortalButton">
             <property name="text">
-             <string>Add portal</string>
+             <string>增加传送点</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -254,7 +254,7 @@
           <item>
            <widget class="QPushButton" name="SpawnPointButton">
             <property name="text">
-             <string>Set Spawnpoint</string>
+             <string>出生点</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -264,7 +264,7 @@
           <item>
            <widget class="QPushButton" name="EraserButton">
             <property name="text">
-             <string>Eraser</string>
+             <string>清除</string>
             </property>
             <property name="checkable">
              <bool>true</bool>

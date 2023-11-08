@@ -183,3 +183,9 @@ bool Widget::GetMode()
 {
     return mode;
 }
+
+void Widget::ResetRecord() {
+    seqPtr = 0;
+    movementPtr = 0;
+    foodPtr = 0;
+}

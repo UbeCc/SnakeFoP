@@ -16,7 +16,7 @@ namespace Ui
 }
 QT_END_NAMESPACE
 
-const int TIME_INTERVAL = 2000;
+const int TIME_INTERVAL = 1000;
 
 class PlayPage;
 
@@ -36,6 +36,8 @@ public:
     void ResetRecord(const Map &, const Config &);
 
     void ResetRecord(const Record &);
+
+    void ResetRecord();
 
     void UpdateRecordFood(int, int, int);
 

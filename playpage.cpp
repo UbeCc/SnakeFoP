@@ -58,6 +58,8 @@ void PlayPage::gameOver()
 
 bool PlayPage::initPlay()
 {
+    steps = 0;
+    widget->ResetRecord();
     Map map{};
     Config config{};
     widget->mode = false;
@@ -95,7 +97,7 @@ void PlayPage::Step()
     {
         // use UpdateRecordMovement to memorize `endtime`
         widget->UpdateTime(steps);
-        widget->UpdateRecordMovement('W');
+        widget->UpdateRecordMovement('Q');
         gameOver();
     }
 
@@ -115,6 +117,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Down)
             {
                 game->ChangeDirection(Game::Up);
+                        qDebug() << steps;
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('W');
             }
@@ -124,6 +127,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Up)
             {
                 game->ChangeDirection(Game::Down);
+                        qDebug() << steps;
+
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('S');
             }
@@ -133,6 +138,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Right)
             {
                 game->ChangeDirection(Game::Left);
+                        qDebug() << steps;
+
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('A');
             }
@@ -142,6 +149,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Left)
             {
                 game->ChangeDirection(Game::Right);
+                        qDebug() << steps;
+
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('D');
             }

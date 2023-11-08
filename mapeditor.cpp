@@ -65,7 +65,6 @@ void MapEditor::OnLoadMapButtonClicked()
     QString mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
     QCoreApplication::applicationDirPath() + "/maps", tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(mapFilePath);
-
     try
     {
         map = MapManager::LoadMap(fileInfo.filePath().toStdString());
@@ -87,7 +86,6 @@ void MapEditor::OnSaveMapButtonClicked()
     QCoreApplication::applicationDirPath() + "/maps",
         tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(mapFilePath);
-
     try
     {
         MapManager::SaveMap(fileInfo.filePath().toStdString(), map);

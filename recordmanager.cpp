@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <QDebug>
 
 using std::ifstream;
 using std::ofstream;
@@ -28,19 +29,19 @@ Record RecordManager::LoadRecord(const string &path, Record &record) {
     ifstream ifs(path);
 
     if (!ifs.is_open()) {
-        throw runtime_error("Failed to open file " + path);
+        throw runtime_error("打开文件失败：" + path);
     }
     char buffer[1048576];
     ifs.getline(buffer, 1048576);
     if (!ifs.good()) {
-        throw runtime_error("Failed to load config");
+        throw runtime_error("打开配置失败");
     }
 
     record.config = ConfigManager::LoadConfigFromString(buffer);
 
     ifs.getline(buffer, 1048576);
     if (!ifs.good()) {
-        throw runtime_error("Failed to load map");
+        throw runtime_error("打开地图失败");
     }
 
     record.map = MapManager::LoadMapFromString(buffer);
@@ -60,7 +61,6 @@ Record RecordManager::LoadRecord(const string &path, Record &record) {
             record.moveSequence += dire;
             record.timestamp.emplace_back(tme);
         }
-//        qDebug() << "size: " << record.timestamp.size() << "\n";
         record.sequence += op;
     }
 
@@ -70,7 +70,7 @@ Record RecordManager::LoadRecord(const string &path, Record &record) {
 void RecordManager::SaveRecord(const string &path, const Record &record) {
     ofstream ofs(path);
     if (!ofs.is_open()) {
-        throw runtime_error("Failed to open file " + path);
+        throw runtime_error("打开文件失败：" + path);
     }
 
     string config = ConfigManager::GetConfigString(record.config);
@@ -102,6 +102,7 @@ void Record::Reset(const Map &_map, const Config &_config) {
     map = _map;
     config = _config;
     sequence = "";
+    while(!timestamp.empty()) timestamp.pop_back();
     while(!foodSequence.empty()) foodSequence.pop_back();
     moveSequence = "";
 }
@@ -110,6 +111,7 @@ void Record::Reset(const Record& record) {
     map = record.map;
     config = record.config;
     sequence = record.sequence;
+    timestamp = record.timestamp;
     foodSequence = record.foodSequence;
     moveSequence = record.moveSequence;
 }

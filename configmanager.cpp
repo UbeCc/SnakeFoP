@@ -64,7 +64,7 @@ Config ConfigManager::LoadConfigFromStream(istream &stream)
 
     if (std::abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > 1e-6)
     {
-        throw runtime_error("Sum of food probabilities should be 1");
+        throw runtime_error("食物的概率和应为1");
     }
 
     return config;
@@ -82,7 +82,7 @@ Config ConfigManager::LoadConfig(const std::string &path)
 
     if (!ifs.is_open())
     {
-        throw runtime_error("Failed to open file " + path);
+        throw runtime_error("打开文件失败：" + path);
     }
 
     return LoadConfigFromStream(ifs);
@@ -94,7 +94,7 @@ void ConfigManager::SaveConfig(const std::string &path, const Config &config)
 
     if (!ofs.is_open())
     {
-        throw runtime_error("Failed to open file " + path);
+        throw runtime_error("打开文件失败：" + path);
     }
 
     ofs << GetConfigString(config);

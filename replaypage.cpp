@@ -76,7 +76,7 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
         QMessageBox::warning(this, "打开地图错误", e.what());
         return false;
     }
-
+    widget->ResetRecord();
     widget->ResetRecord(tmp);
     game = new Game(widget->GetMap(), widget->GetConfig(), 1, widget);
     ui->Canvas->SetGame(game);
@@ -85,9 +85,10 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, [&]()
     {
+        while (widget->GetCurrentStep() == curStep) Step();
         ++curStep;
         game->Step(widget);
-        while (widget->GetCurrentStep() == curStep) Step();
+        qDebug() << widget->GetCurrentStep() << curStep << widget->seqPtr << (int) widget->gameRecord.sequence.length() << widget->IsEnd();
         ui->ScoreLabel->setText(QString::number(status.score));
         ui->LengthLabel->setText(QString::number(status.length));
         ui->Canvas->update();
@@ -101,6 +102,7 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
 void ReplayPage::GameOver()
 {
     gameTimer->stop();
+    QMessageBox::information(this, "回放", "本场回放已结束");
 }
 
 void ReplayPage::Step()
@@ -126,16 +128,15 @@ void ReplayPage::Step()
             case 'D':
                 if (direction != Game::Left) game->ChangeDirection(Game::Right);
                 break;
+            case 'Q':
+                GameOver();
             default:
                 break;
         }
     }
     else if (curOp == 'F')
     {
-        auto food = widget->GetNextFood();
-        int x = food.first.x, y = food.first.y;
-        status.map[x][y].y = food.second;
-        status.foods.push_back({x, y});
+        game->UpdateFood(widget);
     }
 }
 

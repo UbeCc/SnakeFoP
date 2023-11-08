@@ -66,12 +66,13 @@ Game::Game(const Map &map, const Config &config, int mode, Widget *widget)
     }
 
     for (auto portal: map.portals) {
-        // QUESTION
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
     }
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
+
+    widget->ResetRecord();
     if (mode == 0)
     {
         int tot = GenerateFood(widget);
@@ -210,7 +211,6 @@ int Game::Step(Widget *widget)
         status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
         if (mode == 0) tot = GenerateFood(widget);
-        // else UpdateFood();
     }
 
     // Move the snake

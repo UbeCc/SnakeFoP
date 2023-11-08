@@ -65,7 +65,7 @@ private:
         Point head;
         Point tail;
     } status;
-
+public:
     class SpecialPoint
     {
     public:
@@ -99,7 +99,7 @@ public:
     void SetPreDirection(Direction direc);
 
 
-private:
+public:
     int GenerateFood(Widget *widget);
 
     void UpdateFood(Widget *widget);
