@@ -8,8 +8,8 @@ Widget::Widget(QWidget *parent)
     settingPage(new SettingPage(this)),
     replayPage(new ReplayPage(this)),
     playPage(new PlayPage(this)),
-    gameConfigPath(QDir(QCoreApplication::applicationDirPath()).filePath("config/default.txt")),
-    gameMapPath(QDir(QCoreApplication::applicationDirPath()).filePath("maps/test_map.txt")),
+    gameConfigPath(QDir(QCoreApplication::applicationDirPath()).filePath("config/default.cfg")),
+    gameMapPath(QDir(QCoreApplication::applicationDirPath()).filePath("maps/default.map")),
     mapEditor(new MapEditor(this))
 {
     ui->setupUi(this);

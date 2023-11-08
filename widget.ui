@@ -119,14 +119,14 @@
        <item>
         <widget class="QPushButton" name="MapEditorButton">
          <property name="text">
-          <string>Map Editor</string>
+          <string>创建地图</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="ConfigEditorButton">
          <property name="text">
-          <string>Config Editor</string>
+          <string>创建配置</string>
          </property>
         </widget>
        </item>
