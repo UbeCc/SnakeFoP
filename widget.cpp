@@ -117,7 +117,7 @@ void Widget::PrintRecord()
         qDebug() << i.first.x << " " << i.first.y << "\n";
     }
     qDebug() << "Movement: \n";
-    for (char i : gameRecord.moveSequence)
+    for (char i: gameRecord.moveSequence)
     {
         qDebug() << i << " ";
     }
@@ -126,21 +126,41 @@ void Widget::PrintRecord()
 
 pair<Point, int> Widget::GetNextFood()
 {
+    if (foodPtr >= (int) gameRecord.foodSequence.size())
+    {
+        throw std::runtime_error("No more foods");
+    }
+
     return gameRecord.foodSequence[foodPtr++];
 }
 
 char Widget::GetNextMovement()
 {
+    if (movementPtr >= (int) gameRecord.moveSequence.length())
+    {
+        throw std::runtime_error("No more movements");
+    }
+
     return gameRecord.moveSequence[movementPtr++];
 }
 
 char Widget::NextAction()
 {
+    if (seqPtr >= (int) gameRecord.sequence.length())
+    {
+        throw std::runtime_error("No more actions");
+    }
+
     return gameRecord.sequence[seqPtr++];
 }
 
 char Widget::GetCurrentAction()
 {
+    if (seqPtr >= (int) gameRecord.sequence.length())
+    {
+        throw std::runtime_error("Current action not found");
+    }
+
     return gameRecord.sequence[seqPtr];
 }
 
@@ -156,7 +176,7 @@ Config Widget::GetConfig()
 
 bool Widget::IsEnd()
 {
-    return seqPtr == (int) gameRecord.sequence.length();
+    return seqPtr >= (int) gameRecord.sequence.length();
 }
 
 void Widget::UpdateTime(int tme)
@@ -166,6 +186,11 @@ void Widget::UpdateTime(int tme)
 
 int Widget::GetCurrentStep()
 {
+    if (seqPtr >= (int) gameRecord.sequence.length())
+    {
+        throw std::runtime_error("Current step not found");
+    }
+
     return gameRecord.timestamp[seqPtr];
 }
 
