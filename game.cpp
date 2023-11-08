@@ -161,10 +161,10 @@ int Game::Step()
         return 0;
     }
 
-    // Hits itself
+    // Hits itself, NOTE that when the snake is lengthening, the tail cannot be the next head
     if (map[nextHead.x][nextHead.y].x != SpecialPoint::Empty.x
         && map[nextHead.x][nextHead.y].x != SpecialPoint::Food.x
-        && !(nextHead == tail))
+        && !(nextHead == tail && status.desiredLength == status.length))
     {
         state = Dead;
         return 0;
