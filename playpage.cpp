@@ -117,7 +117,6 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Down)
             {
                 game->ChangeDirection(Game::Up);
-                        qDebug() << steps;
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('W');
             }
@@ -127,8 +126,6 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Up)
             {
                 game->ChangeDirection(Game::Down);
-                        qDebug() << steps;
-
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('S');
             }
@@ -138,8 +135,6 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Right)
             {
                 game->ChangeDirection(Game::Left);
-                        qDebug() << steps;
-
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('A');
             }
@@ -149,8 +144,6 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Left)
             {
                 game->ChangeDirection(Game::Right);
-                        qDebug() << steps;
-
                 widget->UpdateTime(steps);
                 widget->UpdateRecordMovement('D');
             }

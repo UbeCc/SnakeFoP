@@ -88,7 +88,6 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
         while (widget->GetCurrentStep() == curStep) Step();
         ++curStep;
         game->Step(widget);
-        qDebug() << widget->GetCurrentStep() << curStep << widget->seqPtr << (int) widget->gameRecord.sequence.length() << widget->IsEnd();
         ui->ScoreLabel->setText(QString::number(status.score));
         ui->LengthLabel->setText(QString::number(status.length));
         ui->Canvas->update();
