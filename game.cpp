@@ -39,17 +39,50 @@ Game::Game(const Map &map, const Config &config, int mode)
     }
 
     status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
+}
+
+Game::Game(const Map &map, const Config &config, int mode, Widget *widget)
+    : random(config.randomSeed),
+    mode(mode),
+    status({
+        map,
+        config,
+        Right,
+        Right,
+        Alive,
+        0,
+        1,
+        2,
+        vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+        vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+        vector<Point>(),
+        map.spawnPoint,
+        map.spawnPoint
+    })
+{
+    for (auto &obstacle: map.obstacles)
+    {
+        status.map[obstacle.x][obstacle.y] = SpecialPoint::Obstacle;
+    }
+
+    for (auto portal: map.portals) {
+        // QUESTION
+        status.portal[portal[0].x][portal[0].y] = portal[1];
+        status.portal[portal[1].x][portal[1].y] = portal[0];
+    }
+
+    status.map[map.spawnPoint.x][map.spawnPoint.y] = SpecialPoint::Head;
     if (mode == 0)
     {
-        int tot = GenerateFood();
-        for (int i = 1; i <= tot; ++i) Widget::UpdateTime(0);
+        int tot = GenerateFood(widget);
+        for (int i = 1; i <= tot; ++i) widget->UpdateTime(0);
     }
     else if (mode == 1)
     {
-        while (Widget::GetCurrentAction() == 'F')
+        while (widget->GetCurrentAction() == 'F')
         {
-            UpdateFood();
-            Widget::NextAction();
+            UpdateFood(widget);
+            widget->NextAction();
         }
     }
     else
@@ -67,7 +100,7 @@ bool Game::ChangeDirection(Game::Direction direction)
     return true;
 }
 
-int Game::Step()
+int Game::Step(Widget *widget)
 {
     int tot = 0;
     auto &head = status.head;
@@ -78,7 +111,7 @@ int Game::Step()
     auto &direction = status.direction;
     auto &state = status.state;
 
-    if (state == Dead && !Widget::mode)
+    if (state == Dead && !widget->GetMode())
     {
         throw runtime_error("The snake is dead");
     }
@@ -176,7 +209,7 @@ int Game::Step()
         status.score += map[nextHead.x][nextHead.y].y;
         status.desiredLength += map[nextHead.x][nextHead.y].y;
         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
-        if (mode == 0) tot = GenerateFood();
+        if (mode == 0) tot = GenerateFood(widget);
         // else UpdateFood();
     }
 
@@ -211,7 +244,7 @@ const Game::GameStatus &Game::GetStatus() const
     return status;
 }
 
-int Game::GenerateFood()
+int Game::GenerateFood(Widget *widget)
 {
     int cnt = 0;
     int retries = 100;
@@ -237,7 +270,7 @@ int Game::GenerateFood()
             {
                 status.map[x][y].y = 3;
             }
-            Widget::UpdateRecordFood(x, y, status.map[x][y].y);
+            widget->UpdateRecordFood(x, y, status.map[x][y].y);
             ++cnt;
             status.foods.push_back({x, y});
         }
@@ -253,7 +286,7 @@ int Game::GenerateFood()
                 if (status.map[x][y] == SpecialPoint::Empty)
                 {
                     status.map[x][y] = SpecialPoint::Food;
-                    Widget::UpdateRecordFood(x, y, status.map[x][y].y);
+                    widget->UpdateRecordFood(x, y, status.map[x][y].y);
                     ++cnt;
                     status.foods.push_back({x, y});
                     return cnt;
@@ -265,9 +298,9 @@ int Game::GenerateFood()
     return cnt;
 }
 
-void Game::UpdateFood()
+void Game::UpdateFood(Widget *widget)
 {
-    auto food = Widget::GetNextFood();
+    auto food = widget->GetNextFood();
     int x = food.first.x, y = food.first.y;
     status.map[x][y].x = Game::SpecialPoint::Food.x;
     status.map[x][y].y = food.second;

@@ -33,41 +33,47 @@ public:
 
     ~Widget() override;
 
-    static void ResetRecord(const Map &, const Config &);
+    void ResetRecord(const Map &, const Config &);
 
-    static void ResetRecord(const Record &);
+    void ResetRecord(const Record &);
 
-    static void UpdateRecordFood(int, int, int);
+    void UpdateRecordFood(int, int, int);
 
-    static void UpdateRecordMovement(char);
+    void UpdateRecordMovement(char);
 
-    static void UpdateTime(int);
+    void UpdateTime(int);
 
-    [[maybe_unused]] static void PrintRecord();
+    [[maybe_unused]] void PrintRecord();
 
-    static pair<Point, int> GetNextFood();
+    pair<Point, int> GetNextFood();
 
-    static char GetNextMovement();
+    char GetNextMovement();
 
-    static char NextAction();
+    bool GetMode();
 
-    static char GetCurrentAction();
+    Record &GetGameRecord();
 
-    static int GetCurrentStep();
+    char NextAction();
 
-    static bool IsEnd();
+    char GetCurrentAction();
 
-    static bool mode;
+    int GetCurrentStep();
 
-    [[nodiscard]] static Record GetRecord();
+    bool IsEnd();
 
-    [[nodiscard]] static Map GetMap();
+    bool mode;
 
-    [[nodiscard]] static Config GetConfig();
+    [[nodiscard]] Record GetRecord();
+
+    [[nodiscard]] Map GetMap();
+
+    [[nodiscard]] Config GetConfig();
 
     void SetGameConfigPath(const QFileInfo &path);
 
     void SetGameMapPath(const QFileInfo &path);
+
+    void SetMode(const bool _mode);
 
     [[nodiscard]] QFileInfo GetGameConfigPath() const;
 
@@ -89,10 +95,10 @@ private:
     QFileInfo gameConfigPath, gameMapPath;
     MapEditor *mapEditor;
 public:
-    static int seqPtr;
-    static int movementPtr;
-    static int foodPtr;
-    static Record gameRecord;
+    int seqPtr;
+    int movementPtr;
+    int foodPtr;
+    Record gameRecord;
 };
 
 #endif // WIDGET_H

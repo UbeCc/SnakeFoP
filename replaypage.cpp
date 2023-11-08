@@ -64,12 +64,12 @@ ReplayPage::~ReplayPage()
 bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
 {
     curStep = 0;
-    Widget::mode = true;
+    widget->SetMode(true);
     ui->RecordLabel->setText(fileInfo.fileName());
     Record tmp;
     try
     {
-        tmp = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), Widget::gameRecord);
+        tmp = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), widget->GetGameRecord());
     }
     catch (exception &e)
     {
@@ -77,8 +77,8 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
         return false;
     }
 
-    Widget::ResetRecord(tmp);
-    game = new Game(Widget::GetMap(), Widget::GetConfig(), 1);
+    widget->ResetRecord(tmp);
+    game = new Game(widget->GetMap(), widget->GetConfig(), 1, widget);
     ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
     game->SetStatus(Game::Alive);
@@ -86,12 +86,12 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
     connect(gameTimer, &QTimer::timeout, this, [&]()
     {
         ++curStep;
-        game->Step();
-        while (Widget::GetCurrentStep() == curStep) Step();
+        game->Step(widget);
+        while (widget->GetCurrentStep() == curStep) Step();
         ui->ScoreLabel->setText(QString::number(status.score));
         ui->LengthLabel->setText(QString::number(status.length));
         ui->Canvas->update();
-        if (Widget::IsEnd()) GameOver();
+        if (widget->IsEnd()) GameOver();
     });
     gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
 
@@ -106,11 +106,11 @@ void ReplayPage::GameOver()
 void ReplayPage::Step()
 {
     auto status = game->GetStatus();
-    char curOp = Widget::NextAction();
+    char curOp = widget->NextAction();
     if (curOp == 'M')
     {
         Game::Direction direction = game->GetStatus().direction;
-        char dire = Widget::GetNextMovement();
+        char dire = widget->GetNextMovement();
         //DSAW
         switch (dire)
         {
@@ -132,7 +132,7 @@ void ReplayPage::Step()
     }
     else if (curOp == 'F')
     {
-        auto food = Widget::GetNextFood();
+        auto food = widget->GetNextFood();
         int x = food.first.x, y = food.first.y;
         status.map[x][y].y = food.second;
         status.foods.push_back({x, y});

@@ -108,12 +108,6 @@ Record Widget::GetRecord()
     return gameRecord;
 }
 
-int Widget::seqPtr = 0;
-int Widget::movementPtr = 0;
-int Widget::foodPtr = 0;
-bool Widget::mode = false;
-Record Widget::gameRecord;
-
 void Widget::PrintRecord()
 {
     qDebug() << "TimeSize: " << gameRecord.timestamp.size() << "\n";
@@ -173,4 +167,19 @@ void Widget::UpdateTime(int tme)
 int Widget::GetCurrentStep()
 {
     return gameRecord.timestamp[seqPtr];
+}
+
+void Widget::SetMode(const bool _mode)
+{
+    mode = _mode;
+}
+
+Record &Widget::GetGameRecord()
+{
+    return gameRecord;
+}
+
+bool Widget::GetMode()
+{
+    return mode;
 }

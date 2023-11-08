@@ -43,7 +43,7 @@ void PlayPage::gameOver()
     QString formattedDateTime = dateTime.toString(format);
     try
     {
-        RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", Widget::GetRecord());
+        RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", widget->GetRecord());
     }
     catch (exception &e)
     {
@@ -60,7 +60,7 @@ bool PlayPage::initPlay()
 {
     Map map{};
     Config config{};
-    Widget::mode = false;
+    widget->mode = false;
     try
     {
         map = MapManager::LoadMap(widget->GetGameMapPath().filePath().toStdString());
@@ -72,8 +72,8 @@ bool PlayPage::initPlay()
         return false;
     }
 
-    Widget::ResetRecord(map, config);
-    game = new Game(map, config, 0);
+    widget->ResetRecord(map, config);
+    game = new Game(map, config, 0, widget);
     ui->ConfigLabel->setText(widget->GetGameConfigPath().fileName());
     ui->MapLabel->setText(widget->GetGameMapPath().fileName());
     ui->ScoreLabel->setText("0");
@@ -87,15 +87,15 @@ bool PlayPage::initPlay()
 
 void PlayPage::Step()
 {
-    int tot = game->Step();
-    for (int i = 1; i <= tot; ++i) Widget::UpdateTime(steps);
+    int tot = game->Step(widget);
+    for (int i = 1; i <= tot; ++i) widget->UpdateTime(steps);
     const auto &status = game->GetStatus();
 
     if (status.state == Game::Dead)
     {
         // use UpdateRecordMovement to memorize `endtime`
-        Widget::UpdateTime(steps);
-        Widget::UpdateRecordMovement('W');
+        widget->UpdateTime(steps);
+        widget->UpdateRecordMovement('W');
         gameOver();
     }
 
@@ -115,8 +115,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Down)
             {
                 game->ChangeDirection(Game::Up);
-                Widget::UpdateTime(steps);
-                Widget::UpdateRecordMovement('W');
+                widget->UpdateTime(steps);
+                widget->UpdateRecordMovement('W');
             }
             break;
         case Qt::Key_Down:
@@ -124,8 +124,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Up)
             {
                 game->ChangeDirection(Game::Down);
-                Widget::UpdateTime(steps);
-                Widget::UpdateRecordMovement('S');
+                widget->UpdateTime(steps);
+                widget->UpdateRecordMovement('S');
             }
             break;
         case Qt::Key_Left:
@@ -133,8 +133,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Right)
             {
                 game->ChangeDirection(Game::Left);
-                Widget::UpdateTime(steps);
-                Widget::UpdateRecordMovement('A');
+                widget->UpdateTime(steps);
+                widget->UpdateRecordMovement('A');
             }
             break;
         case Qt::Key_Right:
@@ -142,8 +142,8 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             if (direction != Game::Left)
             {
                 game->ChangeDirection(Game::Right);
-                Widget::UpdateTime(steps);
-                Widget::UpdateRecordMovement('D');
+                widget->UpdateTime(steps);
+                widget->UpdateRecordMovement('D');
             }
             break;
         case Qt::Key_Space:

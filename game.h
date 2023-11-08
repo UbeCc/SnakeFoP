@@ -7,6 +7,8 @@
 
 using std::default_random_engine;
 
+class Widget;
+
 class Game
 {
 public:
@@ -80,11 +82,13 @@ public:
 
     Game(const Map &map, const Config &config, int mode);
 
+    Game(const Map &map, const Config &config, int mode, Widget *widget);
+
     /// @returns false if the direction is invalid
     bool ChangeDirection(Direction direction);
 
     /// @brief Move the snake one step forward.
-    int Step();
+    int Step(Widget *widget);
 
     [[nodiscard]] const GameStatus &GetStatus() const;
 
@@ -96,9 +100,9 @@ public:
 
 
 private:
-    int GenerateFood();
+    int GenerateFood(Widget *widget);
 
-    void UpdateFood();
+    void UpdateFood(Widget *widget);
 };
 
 #endif //SNAKEFOP_GAME_H
