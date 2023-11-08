@@ -101,8 +101,6 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
 void ReplayPage::GameOver()
 {
     gameTimer->stop();
-    this->hide();
-    widget->show();
 }
 
 void ReplayPage::Step()
