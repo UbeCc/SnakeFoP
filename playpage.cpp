@@ -31,6 +31,8 @@ PlayPage::PlayPage(QWidget *parent) :
 PlayPage::~PlayPage()
 {
     delete ui;
+    delete gameTimer;
+    delete game;
 }
 
 void PlayPage::gameOver()

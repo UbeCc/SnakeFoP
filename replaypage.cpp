@@ -59,6 +59,8 @@ ReplayPage::ReplayPage(QWidget *parent) :
 ReplayPage::~ReplayPage()
 {
     delete ui;
+    delete game;
+    delete gameTimer;
 }
 
 bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
