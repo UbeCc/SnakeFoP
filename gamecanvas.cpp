@@ -136,14 +136,14 @@ void GameCanvas::paintEvent(QPaintEvent *event)
             // Draw a rhombus
             painter.drawPolygon(
                 QPolygonF({
-                    QPointF(xOffset + p.x * blockSize + margin,
+                    QPointF(xOffset + p.x * blockSize + 3 * margin,
                         yOffset + p.y * blockSize + blockSize / 2.),
                     QPointF(xOffset + p.x * blockSize + blockSize / 2.,
-                        yOffset + p.y * blockSize + margin),
-                    QPointF(xOffset + (p.x + 1) * blockSize - margin,
+                        yOffset + p.y * blockSize + 3 * margin),
+                    QPointF(xOffset + (p.x + 1) * blockSize - 3 * margin,
                         yOffset + p.y * blockSize + blockSize / 2.),
                     QPointF(xOffset + p.x * blockSize + blockSize / 2.,
-                        yOffset + (p.y + 1) * blockSize - margin),
+                        yOffset + (p.y + 1) * blockSize - 3 * margin),
                 }));
         }
     }
