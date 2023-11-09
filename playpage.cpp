@@ -43,7 +43,7 @@ void PlayPage::gameOver()
     QString formattedDateTime = dateTime.toString(format);
     try
     {
-        RecordManager::SaveRecord(formattedDateTime.toStdString() + ".rec", widget->GetRecord());
+        RecordManager::SaveRecord(QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec").toStdString(), widget->GetRecord());
     }
     catch (exception &e)
     {

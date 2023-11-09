@@ -17,6 +17,12 @@ Widget::Widget(QWidget *parent)
     connect(ui->replayButton, &QPushButton::clicked, this, &Widget::OnReplayButtonClicked);
     connect(ui->enterButton, &QPushButton::clicked, this, &Widget::OnEnterButtonClicked);
     connect(ui->MapEditorButton, &QPushButton::clicked, this, &Widget::OnMapEditorButtonClicked);
+
+    const auto appDir = QDir(QCoreApplication::applicationDirPath());
+    QDir::setCurrent(appDir.absolutePath());
+    appDir.mkpath("maps/");
+    appDir.mkpath("records/");
+    appDir.mkpath("config/");
 }
 
 Widget::~Widget()
@@ -27,8 +33,7 @@ Widget::~Widget()
 void Widget::OnReplayButtonClicked()
 {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("records/"),
-        tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("records/"), tr("所有文件 (*)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     if (replayPage->InitPlay(fileInfo))
     {
