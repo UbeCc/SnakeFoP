@@ -38,10 +38,10 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     auto size = event->rect().size();
     int width = size.width(), height = size.height();
 
-    const int blockSize = min(width / col, height / row);
+    const int blockSize = min(width / row, height / col);
 
-    width = blockSize * col;
-    height = blockSize * row;
+    width = blockSize * row;
+    height = blockSize * col;
 
     const int xOffset = (size.width() - width) / 2;
     const int yOffset = (size.height() - height) / 2;
@@ -54,32 +54,32 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     // draw playground
     painter.setBrush(Qt::gray);
     painter.setPen(Qt::transparent);
-    painter.drawRect(xOffset, yOffset, col * blockSize, row * blockSize);
+    painter.drawRect(xOffset, yOffset, row * blockSize, col * blockSize);
 
     // draw border
     const static QPen borderPen(Qt::red, 3);
     if (status.mapDefinition.borderIsObstacle[0])
     {
         painter.setPen(borderPen);
-        painter.drawLine(xOffset, yOffset, xOffset + col * blockSize, yOffset);
+        painter.drawLine(xOffset, yOffset, xOffset + row * blockSize, yOffset);
     }
 
     if (status.mapDefinition.borderIsObstacle[1])
     {
         painter.setPen(borderPen);
-        painter.drawLine(xOffset + col * blockSize, yOffset + row * blockSize, xOffset, yOffset + row * blockSize);
+        painter.drawLine(xOffset + row * blockSize, yOffset + col * blockSize, xOffset, yOffset + col * blockSize);
     }
 
     if (status.mapDefinition.borderIsObstacle[2])
     {
         painter.setPen(borderPen);
-        painter.drawLine(xOffset + col * blockSize, yOffset, xOffset + col * blockSize, yOffset + row * blockSize);
+        painter.drawLine(xOffset + row * blockSize, yOffset, xOffset + row * blockSize, yOffset + col * blockSize);
     }
 
     if (status.mapDefinition.borderIsObstacle[3])
     {
         painter.setPen(borderPen);
-        painter.drawLine(xOffset, yOffset + row * blockSize, xOffset, yOffset);
+        painter.drawLine(xOffset, yOffset + col * blockSize, xOffset, yOffset);
     }
 
     // draw snake
@@ -160,7 +160,7 @@ void GameCanvas::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
 
-    if (!(event->buttons() & Qt::LeftButton))
+    if (!(event->buttons() & (Qt::LeftButton | Qt::RightButton)))
     {
         return;
     }
@@ -176,26 +176,26 @@ void GameCanvas::mouseMoveEvent(QMouseEvent *event)
     auto size = this->rect().size();
     int width = size.width(), height = size.height();
 
-    const int blockSize = min(width / col, height / row);
+    const int blockSize = min(width / row, height / col);
 
-    width = blockSize * col;
-    height = blockSize * row;
+    width = blockSize * row;
+    height = blockSize * col;
 
     const int xOffset = (size.width() - width) / 2;
     const int yOffset = (size.height() - height) / 2;
 
-    const int x = ((int) event->position().x() - xOffset) / blockSize, y =
-        ((int) event->position().y() - yOffset) / blockSize;
+    const int x = ((int) event->position().x() - xOffset) / blockSize,
+        y = ((int) event->position().y() - yOffset) / blockSize;
 
-    if (x < 0 || x >= col || y < 0 || y >= row)
+    if (x < 0 || x >= row || y < 0 || y >= col)
     {
         return;
     }
 
-    onMouseSelect(x, y);
+    onMouseSelect(x, y, (bool) (event->buttons() & Qt::RightButton));
 }
 
-void GameCanvas::SetOnMouseSelect(std::function<void(int, int)> select)
+void GameCanvas::SetOnMouseSelect(std::function<void(int, int, bool)> select)
 {
     this->onMouseSelect = std::move(select);
 }

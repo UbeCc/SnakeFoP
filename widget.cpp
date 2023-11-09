@@ -37,7 +37,7 @@ Widget::~Widget()
 void Widget::OnReplayButtonClicked()
 {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("records/"), tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("records/"), tr("回放文件 (*.rec)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     if (replayPage->InitPlay(fileInfo))
     {

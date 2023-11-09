@@ -23,7 +23,7 @@ SettingPage::~SettingPage()
 void SettingPage::OnConfigButtonClicked()
 {
     QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("config/"), tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("config/"), tr("配置文件 (*.cfg)"));
     QFileInfo fileInfo = QFileInfo(configFilePath);
     ui->configLabel->setText(fileInfo.fileName());
     widget->SetGameConfigPath(fileInfo);
@@ -32,7 +32,7 @@ void SettingPage::OnConfigButtonClicked()
 void SettingPage::OnMapButtonClicked()
 {
     QString mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("maps/"), tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("maps/"), tr("地图文件 (*.map)"));
     QFileInfo fileInfo = QFileInfo(mapFilePath);
     ui->mapLabel->setText(fileInfo.fileName());
     widget->SetGameMapPath(fileInfo);

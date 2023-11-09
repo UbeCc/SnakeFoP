@@ -64,7 +64,7 @@ void MapEditor::OnNewMapButtonClicked()
 void MapEditor::OnLoadMapButtonClicked()
 {
     QString mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("maps/"), tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("maps/"), tr("地图文件 (*.map)"));
     QFileInfo fileInfo = QFileInfo(mapFilePath);
     try
     {
@@ -84,7 +84,7 @@ void MapEditor::OnLoadMapButtonClicked()
 void MapEditor::OnSaveMapButtonClicked()
 {
     QString mapFilePath = QFileDialog::getSaveFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("maps"), tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("maps"), tr("地图文件 (*.map)"));
     QFileInfo fileInfo = QFileInfo(mapFilePath);
     try
     {
@@ -121,9 +121,9 @@ void MapEditor::OnObstaclePainterButtonToggled(bool checked)
         ui->AddPortalButton->setChecked(false);
         ui->SpawnPointButton->setChecked(false);
 
-        std::function<void(int, int)> select = [this](auto &&PH1, auto &&PH2)
+        std::function<void(int, int, bool)> select = [this](auto &&PH1, auto &&PH2, auto &&PH3)
         {
-            OnObstaclePainterMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+            OnObstaclePainterMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), std::forward<decltype(PH3)>(PH3));
         };
 
         ui->Canvas->SetOnMouseSelect(select);
@@ -134,7 +134,7 @@ void MapEditor::OnObstaclePainterButtonToggled(bool checked)
     }
 }
 
-void MapEditor::OnObstaclePainterMouseSelect(int x, int y)
+void MapEditor::OnObstaclePainterMouseSelect(int x, int y, bool rightButton)
 {
     if (map.spawnPoint == Point({x, y}))
     {
@@ -149,9 +149,17 @@ void MapEditor::OnObstaclePainterMouseSelect(int x, int y)
         }
     }
 
-    if (std::find(map.obstacles.cbegin(), map.obstacles.cend(), Point({x, y})) == map.obstacles.cend())
+    auto it = std::find(map.obstacles.cbegin(), map.obstacles.cend(), Point({x, y}));
+
+    if (!rightButton && it == map.obstacles.cend())
     {
         map.obstacles.push_back({x, y});
+        UpdateCanvas();
+    }
+
+    else if (rightButton && it != map.obstacles.cend())
+    {
+        map.obstacles.erase(it);
         UpdateCanvas();
     }
 }
@@ -164,9 +172,9 @@ void MapEditor::OnEraseButtonToggled(bool checked)
         ui->AddPortalButton->setChecked(false);
         ui->SpawnPointButton->setChecked(false);
 
-        std::function<void(int, int)> select = [this](auto &&PH1, auto &&PH2)
+        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
         {
-            OnEraseMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+            OnEraseMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
         };
 
         ui->Canvas->SetOnMouseSelect(select);
@@ -209,9 +217,9 @@ void MapEditor::OnAddPortalButtonToggled(bool checked)
 
         firstPortalPoint = {-1, -1};
 
-        std::function<void(int, int)> select = [this](auto &&PH1, auto &&PH2)
+        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
         {
-            OnAddPortalMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+            OnAddPortalMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
         };
 
         ui->Canvas->SetOnMouseSelect(select);
@@ -272,9 +280,9 @@ void MapEditor::OnSetSpawnPointButtonToggled(bool checked)
         ui->EraserButton->setChecked(false);
         ui->AddPortalButton->setChecked(false);
 
-        std::function<void(int, int)> select = [this](auto &&PH1, auto &&PH2)
+        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
         {
-            OnSetSpawnPointMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+            OnSetSpawnPointMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
         };
 
         ui->Canvas->SetOnMouseSelect(select);

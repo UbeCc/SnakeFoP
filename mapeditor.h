@@ -32,16 +32,16 @@ private slots:
 
     void OnObstaclePainterButtonToggled(bool checked);
 
-    void OnEraseButtonToggled(bool checked);
+    void OnEraseButtonToggled(bool x);
 
-    void OnAddPortalButtonToggled(bool checked);
+    void OnAddPortalButtonToggled(bool x);
 
-    void OnSetSpawnPointButtonToggled(bool checked);
+    void OnSetSpawnPointButtonToggled(bool x);
 
 private:
     void UpdateCanvas();
 
-    void OnObstaclePainterMouseSelect(int x, int y);
+    void OnObstaclePainterMouseSelect(int x, int y, bool rightButton);
 
     void OnEraseMouseSelect(int x, int y);
 

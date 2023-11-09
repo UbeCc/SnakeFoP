@@ -22,7 +22,7 @@ void ReplayPage::OnExitButtonClicked()
 void ReplayPage::OnRecordButtonClicked()
 {
     QString recordFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-        QDir(QCoreApplication::applicationDirPath()).filePath("records/"), tr("所有文件 (*)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("records/"), tr("回放文件 (*.rec)"));
     QFileInfo fileInfo = QFileInfo(recordFilePath);
     InitPlay(fileInfo);
 }
