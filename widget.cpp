@@ -28,6 +28,10 @@ Widget::Widget(QWidget *parent)
 Widget::~Widget()
 {
     delete ui;
+    delete settingPage;
+    delete replayPage;
+    delete playPage;
+    delete mapEditor;
 }
 
 void Widget::OnReplayButtonClicked()
@@ -46,7 +50,7 @@ void Widget::OnEnterButtonClicked()
 {
     if (settingPage->exec() == QDialog::Accepted)
     {
-        if (playPage->initPlay())
+        if (playPage->InitPlay())
         {
             playPage->show();
             this->hide();

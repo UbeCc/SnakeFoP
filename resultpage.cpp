@@ -19,21 +19,13 @@ ResultPage::~ResultPage()
 
 void ResultPage::OnReplayButtonClicked()
 {
-        foreach(QWidget *widget, QApplication::topLevelWidgets())
-        {
-            if (dynamic_cast<Widget *>(widget) != nullptr)
-            {
-                this->close();
-                widget->show();
-                return;
-            }
-        }
+    this->accept();
 }
 
 
 void ResultPage::showEvent(QShowEvent *event)
 {
     QDialog::showEvent(event);
-    ui->scoreLabel->setText("您的最终得分是: " + QString::number(playPage->getScore()));
-    ui->lengthLabel->setText("您的最终长度是: " + QString::number(playPage->getLength()));
+    ui->scoreLabel->setText("您的最终得分是: " + QString::number(playPage->GetScore()));
+    ui->lengthLabel->setText("您的最终长度是: " + QString::number(playPage->GetLength()));
 }

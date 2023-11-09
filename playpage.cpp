@@ -33,9 +33,10 @@ PlayPage::~PlayPage()
     delete ui;
     delete gameTimer;
     delete game;
+    delete resultPage;
 }
 
-void PlayPage::gameOver()
+void PlayPage::GameOver()
 {
     gameTimer->stop();
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -45,20 +46,30 @@ void PlayPage::gameOver()
     QString formattedDateTime = dateTime.toString(format);
     try
     {
-        RecordManager::SaveRecord(QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec").toStdString(), widget->GetRecord());
+        RecordManager::SaveRecord(
+            QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec")
+                .toStdString(), widget->GetRecord());
     }
     catch (exception &e)
     {
-        QMessageBox::warning(this, "保存地图错误", e.what());
+        QMessageBox::warning(this, "保存回放错误", e.what());
         this->hide();
         widget->show();
         return;
     }
-    resultPage->exec();
-    this->hide();
+
+    if (resultPage->exec() == QDialog::Accepted)
+    {
+        widget->show();
+        this->hide();
+    }
+    else {
+        this->done(0);
+        widget->close();
+    }
 }
 
-bool PlayPage::initPlay()
+bool PlayPage::InitPlay()
 {
     steps = 0;
     widget->ResetRecord();
@@ -100,7 +111,7 @@ void PlayPage::Step()
         // use UpdateRecordMovement to memorize `endtime`
         widget->UpdateTime(steps);
         widget->UpdateRecordMovement('Q');
-        gameOver();
+        GameOver();
     }
 
     ui->ScoreLabel->setText(QString::number(status.score));
@@ -160,12 +171,12 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
     }
 }
 
-int PlayPage::getScore()
+int PlayPage::GetScore()
 {
     return game->GetStatus().score;
 }
 
-int PlayPage::getLength()
+int PlayPage::GetLength()
 {
     return game->GetStatus().length;
 }

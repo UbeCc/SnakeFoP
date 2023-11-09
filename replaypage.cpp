@@ -80,6 +80,7 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
     }
     widget->ResetRecord();
     widget->ResetRecord(tmp);
+    delete game;
     game = new Game(widget->GetMap(), widget->GetConfig(), 1, widget);
     ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();

@@ -25,13 +25,13 @@ public:
 
     ~PlayPage() override;
 
-    bool initPlay();
+    bool InitPlay();
 
     void keyPressEvent(QKeyEvent *) override;
 
-    int getScore();
+    int GetScore();
 
-    int getLength();
+    int GetLength();
 
     void Step();
 
@@ -43,7 +43,7 @@ private:
     QTimer *gameTimer;
     ResultPage *resultPage;
 
-    void gameOver();
+    void GameOver();
 };
 
 #endif // PLAYPAGE_H

@@ -53,7 +53,7 @@ private:
     Ui::MapEditor *ui;
     Map map;
     Game *game;
-    const static Config dummy_config;
+    const static Config dummyConfig;
     Point firstPortalPoint;
 };
 

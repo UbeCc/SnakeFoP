@@ -5,7 +5,7 @@
 
 using std::exception;
 
-const Config MapEditor::dummy_config = {
+const Config MapEditor::dummyConfig = {
     1,
     0,
     0,
@@ -34,13 +34,14 @@ MapEditor::MapEditor(QWidget *parent) :
 
 MapEditor::~MapEditor()
 {
+    delete game;
     delete ui;
 }
 
 void MapEditor::UpdateCanvas()
 {
     delete game;
-    game = new Game(map, dummy_config, 2);
+    game = new Game(map, dummyConfig, 2);
     ui->Canvas->SetGame(game);
 }
 
