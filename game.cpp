@@ -249,6 +249,25 @@ const Game::GameStatus &Game::GetStatus() const
 
 int Game::GenerateFood(Widget *widget)
 {
+    const static
+    auto &getFoodValue = [&](const array<float, 3> &probabilities)
+    {
+        float s = (float) (random() % 10000) / 10000.0f;
+        if ((s -= probabilities[0]) < 0)
+        {
+            return 1;
+        }
+        else if (s < probabilities[1])
+        {
+            return 2;
+        }
+        else
+        {
+            return 3;
+        }
+    };
+
+
     int cnt = 0;
     int retries = 100;
     while (retries-- && (int) status.foods.size() < status.config.foodCount)
@@ -260,19 +279,7 @@ int Game::GenerateFood(Widget *widget)
         {
             status.map[x][y] = SpecialPoint::Food;
 
-            float s = (float) (random() % 10000) / 10000.0f;
-            if ((s -= status.config.foodProbabilities[0]) < 0)
-            {
-                status.map[x][y].y = 1;
-            }
-            else if (s < status.config.foodProbabilities[1])
-            {
-                status.map[x][y].y = 2;
-            }
-            else
-            {
-                status.map[x][y].y = 3;
-            }
+            status.map[x][y].y = getFoodValue(status.config.foodProbabilities);
             widget->UpdateRecordFood(x, y, status.map[x][y].y);
             ++cnt;
             status.foods.push_back({x, y});
@@ -289,6 +296,7 @@ int Game::GenerateFood(Widget *widget)
                 if (status.map[x][y] == SpecialPoint::Empty)
                 {
                     status.map[x][y] = SpecialPoint::Food;
+                    status.map[x][y].y = getFoodValue(status.config.foodProbabilities);
                     widget->UpdateRecordFood(x, y, status.map[x][y].y);
                     ++cnt;
                     status.foods.push_back({x, y});
