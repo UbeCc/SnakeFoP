@@ -12,6 +12,7 @@ CONFIG += warn_on
 
 SOURCES += \
     # for cli
+    configeditor.cpp \
     configmanager.cpp \
     gamecanvas.cpp \
     mapeditor.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 
 HEADERS += \
     # for cli
+    configeditor.h \
     configmanager.h \
     gamecanvas.h \
     mapeditor.h \
@@ -42,6 +44,7 @@ HEADERS += \
     widget.h
 
 FORMS += \
+    configeditor.ui \
     gamecanvas.ui \
     mapeditor.ui \
     playpage.ui \
