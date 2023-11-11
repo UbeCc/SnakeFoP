@@ -31,4 +31,6 @@ public:
     [[nodiscard]] static string GetConfigString(const Config &config);
 };
 
+constexpr float EPSILON = 1e-6;
+
 #endif //SNAKEFOP_CONFIGMANAGER_H

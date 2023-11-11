@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using std::string;
 using std::array;
@@ -62,7 +63,7 @@ Config ConfigManager::LoadConfigFromStream(istream &stream)
         throw runtime_error("Food probabilities should be within range [0, 1]");
     }
 
-    if (std::abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > 1e-6)
+    if (std::abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > EPSILON)
     {
         throw runtime_error("食物的概率和应为1");
     }
@@ -106,7 +107,7 @@ string ConfigManager::GetConfigString(const Config &config)
     ss << config.level << endl;
     ss << config.randomSeed << endl;
     ss << config.foodCount << endl;
-    ss << config.foodProbabilities[0] << " " << config.foodProbabilities[1] << " " << config.foodProbabilities[2]
-        << endl;
+    ss << std::fixed << std::setprecision(2) << config.foodProbabilities[0] << " " << config.foodProbabilities[1] << " "
+        << config.foodProbabilities[2] << endl;
     return ss.str();
 }

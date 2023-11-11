@@ -5,8 +5,6 @@
 
 using std::exception;
 
-const float eps = 1e-5;
-
 ConfigEditor::ConfigEditor(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfigEditor)
@@ -15,6 +13,8 @@ ConfigEditor::ConfigEditor(QWidget *parent) :
     connect(ui->CreateButton, &QPushButton::clicked, this, &ConfigEditor::OnNewConfigButtonClicked);
     connect(ui->LoadButton, &QPushButton::clicked, this, &ConfigEditor::OnLoadConfigButtonClicked);
     connect(ui->SaveButton, &QPushButton::clicked, this, &ConfigEditor::OnSaveConfigButtonClicked);
+    connect(ui->FoodProbability1, &QSlider::valueChanged, this, &ConfigEditor::OnFoodProbability1ValueChanged);
+    connect(ui->FoodProbability2, &QSlider::valueChanged, this, &ConfigEditor::OnFoodProbability2ValueChanged);
 }
 
 ConfigEditor::~ConfigEditor()
@@ -24,42 +24,21 @@ ConfigEditor::~ConfigEditor()
 
 void ConfigEditor::OnNewConfigButtonClicked()
 {
-    QString errorText = "";
-    int level = ui->LevelText->toPlainText().toInt();
-    if(level < 1 || level > 10 ) errorText += "难度错误，应为1~10的正整数\n";
-
-    int seed = ui->SeedText->toPlainText().toInt();
-
-    int foodCount = ui->FoodNumText->toPlainText().toInt();
-    if(foodCount < 1 || foodCount > 5) errorText += "食物数量错误，应为1~5的正整数\n";
-
-    float foodPossibility1 = ui->Food1Text->toPlainText().toFloat();
-    if(foodPossibility1 < 0 || foodPossibility1 > 1) errorText += "食物概率1错误，应为0~1的浮点数\n";
-    float foodPossibility2 = ui->Food2Text->toPlainText().toFloat();
-    if(foodPossibility2 < 0 || foodPossibility2 > 1) errorText += "食物概率2错误，应为0~1的浮点数\n";
-    float foodPossibility3 = ui->Food3Text->toPlainText().toFloat();
-    if(foodPossibility3 < 0 || foodPossibility3 > 1) errorText += "食物概率3错误，应为0~1的浮点数\n";
-    if(abs(foodPossibility1 + foodPossibility2 + foodPossibility3 - 1) > eps)
-        errorText += "食物概率错误，三种食物概率和应为1\n";
-
-    if(errorText != "")
-    {
-        QMessageBox::warning(this, "配置错误", errorText);
-        return;
-    }
-
-    config = {
-        level,
-        seed,
-        foodCount,
-        {foodPossibility1, foodPossibility2, foodPossibility3}
-    };
+    ui->Level->setValue(1);
+    ui->RandomSeed->setValue(-1);
+    ui->FoodCount->setValue(5);
+    ui->FoodProbability1->setValue(40);
+    ui->FoodProbability2->setMaximum(60);
+    ui->FoodProbability2->setValue(30);
 }
 
-void ConfigEditor::OnLoadConfigButtonClicked() {
+void ConfigEditor::OnLoadConfigButtonClicked()
+{
     QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"));
     QDir(QCoreApplication::applicationFilePath()).filePath("config/"), tr("配置文件 (*.cfg)");
     QFileInfo fileInfo = QFileInfo(configFilePath);
+    Config config{};
+
     try
     {
         config = ConfigManager::LoadConfig(fileInfo.filePath().toStdString());
@@ -70,19 +49,31 @@ void ConfigEditor::OnLoadConfigButtonClicked() {
         return;
     }
 
-    ui->LevelText->setText(QString::number(config.level));
-    ui->SeedText->setText(QString::number(config.randomSeed));
-    ui->FoodNumText->setText(QString::number(config.foodCount));
-    ui->Food1Text->setText(QString::number(config.foodProbabilities[0]));
-    ui->Food2Text->setText(QString::number(config.foodProbabilities[1]));
-    ui->Food3Text->setText(QString::number(config.foodProbabilities[2]));
+    ui->Level->setValue(config.level);
+    ui->RandomSeed->setValue(config.randomSeed);
+    ui->FoodCount->setValue(config.foodCount);
+    ui->FoodProbability1->setValue((int) (config.foodProbabilities[0] * 100));
+    ui->FoodProbability2->setMaximum(100 - ui->FoodProbability1->value());
+    ui->FoodProbability2->setValue((int) (config.foodProbabilities[1] * 100));
 }
 
 void ConfigEditor::OnSaveConfigButtonClicked()
 {
     QString configFilePath = QFileDialog::getSaveFileName(this, tr("选择文件"),
-    QDir(QCoreApplication::applicationDirPath()).filePath("config/"), tr("配置文件 (*.cfg)"));
+        QDir(QCoreApplication::applicationDirPath()).filePath("config/"), tr("配置文件 (*.cfg)"));
     QFileInfo fileInfo = QFileInfo(configFilePath);
+
+    Config config{
+        ui->Level->value(),
+        ui->RandomSeed->value(),
+        ui->FoodCount->value(),
+        {
+            (float) ui->FoodProbability1->value() / 100.0f,
+            (float) ui->FoodProbability2->value() / 100.0f,
+            1.0f - (float) ui->FoodProbability1->value() / 100.0f - (float) ui->FoodProbability2->value() / 100.0f
+        }
+    };
+
     try
     {
         ConfigManager::SaveConfig(fileInfo.filePath().toStdString(), config);
@@ -92,4 +83,19 @@ void ConfigEditor::OnSaveConfigButtonClicked()
         QMessageBox::warning(this, "保存配置错误", e.what());
         return;
     }
+}
+
+void ConfigEditor::OnFoodProbability1ValueChanged(int value)
+{
+    ui->FoodProbability1Label->setText(QString::number(value) + "%");
+    ui->FoodProbability2->setMaximum(100 - value);
+    if (ui->FoodProbability2->value() > ui->FoodProbability2->maximum())
+    {
+        ui->FoodProbability2->setValue(ui->FoodProbability2->maximum());
+    }
+}
+
+void ConfigEditor::OnFoodProbability2ValueChanged(int value)
+{
+    ui->FoodProbability2Label->setText(QString::number(value) + "%");
 }
