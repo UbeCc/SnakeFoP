@@ -20,12 +20,12 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read map width and height");
+        throw runtime_error("无法读取地图宽度或高度");
     }
 
     if (map.width <= 1 || map.height <= 1 || map.width > 100 || map.height > 100)
     {
-        throw runtime_error("Invalid map width or height");
+        throw runtime_error("地图宽度或高度不合法");
     }
 
     for (int i = 0; i < 4; i++)
@@ -35,7 +35,7 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read border");
+        throw runtime_error("无法读取地图边界情况");
     }
 
     int obstacleCount;
@@ -43,12 +43,12 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read obstacles count");
+        throw runtime_error("无法读取障碍物数量");
     }
 
     if (obstacleCount < 0)
     {
-        throw runtime_error("Negative obstacles count");
+        throw runtime_error("障碍物数量不能为负数");
     }
 
     for (int i = 0; i < obstacleCount; i++)
@@ -59,12 +59,12 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
         if (!stream.good())
         {
-            throw runtime_error("Failed to read obstacle " + to_string(i));
+            throw runtime_error("无法读取障碍物" + to_string(i) + "的坐标");
         }
 
         if (obstacle.x < 0 || obstacle.x >= map.width || obstacle.y < 0 || obstacle.y >= map.height)
         {
-            throw runtime_error("Obstacle out of map");
+            throw runtime_error("障碍物" + to_string(i) + "的坐标超出地图范围");
         }
     }
 
@@ -82,13 +82,13 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
         else
         {
-            throw runtime_error("Failed to read portals count");
+            throw runtime_error("无法读取传送门数量");
         }
     }
 
     if (portalCount < 0)
     {
-        throw runtime_error("Negative portals count");
+        throw runtime_error("传送门数量不能为负数");
     }
 
     for (int i = 0; i < portalCount; i++)
@@ -99,12 +99,26 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
         if (!stream.good())
         {
-            throw runtime_error("Failed to read portal " + to_string(i));
+            throw runtime_error("无法读取传送门" + to_string(i) + "的坐标");
         }
 
-        if (portal1.x < 0 || portal1.x >= map.width || portal1.y < 0 || portal1.y >= map.height)
+        if (portal1.x < 0 || portal1.x >= map.width || portal1.y < 0 || portal1.y >= map.height
+            || portal2.x < 0 || portal2.x >= map.width || portal2.y < 0 || portal2.y >= map.height)
         {
-            throw runtime_error("Portal out of map");
+            throw runtime_error("传送门" + to_string(i) + "的坐标超出地图范围");
+        }
+
+        if (portal1 == portal2)
+        {
+            throw runtime_error("传送门" + to_string(i) + "的两个端点重合");
+        }
+
+        for (const auto &o: map.obstacles)
+        {
+            if (o == portal1 || o == portal2)
+            {
+                throw runtime_error("传送门" + to_string(i) + "的端点是障碍物");
+            }
         }
     }
 
@@ -112,31 +126,27 @@ Map MapManager::LoadMapFromStream(std::istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read spawn point");
+        throw runtime_error("无法读取出生点坐标");
     }
 
     if (map.spawnPoint.x < 0 || map.spawnPoint.x >= map.width || map.spawnPoint.y < 0 || map.spawnPoint.y >= map.height)
     {
-        throw runtime_error("Spawn point out of map");
+        throw runtime_error("出生点坐标超出地图范围");
     }
 
     for (auto &o: map.obstacles)
     {
-        if (o.x == map.spawnPoint.x && o.y == map.spawnPoint.y)
+        if (o == map.spawnPoint)
         {
-            throw runtime_error("Spawn point is an obstacle");
+            throw runtime_error("出生点不能是障碍物");
         }
     }
 
     for (auto &p: map.portals)
     {
-        if (p[0].x == map.spawnPoint.x && p[0].y == map.spawnPoint.y)
+        if (p[0] == map.spawnPoint || p[1] == map.spawnPoint)
         {
-            throw runtime_error("Spawn point is a portal");
-        }
-        if (p[1].x == map.spawnPoint.x && p[1].y == map.spawnPoint.y)
-        {
-            throw runtime_error("Spawn point is a portal");
+            throw runtime_error("出生点不能是传送门");
         }
     }
 
@@ -160,7 +170,7 @@ Map MapManager::LoadMap(const string &path)
 
     if (!ifs.is_open())
     {
-        throw runtime_error("Failed to open file " + path);
+        throw runtime_error("无法打开文件");
     }
 
     return LoadMapFromStream(ifs);
@@ -178,7 +188,7 @@ void MapManager::SaveMap(const string &path, const Map &map)
 
     if (!ofs.is_open())
     {
-        throw runtime_error("Failed to open file " + path);
+        throw runtime_error("无法打开文件");
     }
 
     ofs << GetMapString(map);

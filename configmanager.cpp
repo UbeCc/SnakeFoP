@@ -22,14 +22,19 @@ Config ConfigManager::LoadConfigFromStream(istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read Level");
+        throw runtime_error("无法读取难度");
+    }
+
+    if (config.level < 1 || config.level > 30)
+    {
+        throw runtime_error("难度应该在1到30之间");
     }
 
     stream >> config.randomSeed;
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read random seed");
+        throw runtime_error("无法读取随机种子");
     }
 
     if (config.randomSeed == -1)
@@ -41,26 +46,26 @@ Config ConfigManager::LoadConfigFromStream(istream &stream)
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read food count");
+        throw runtime_error("无法读取食物数量");
     }
 
     if (config.foodCount <= 0 || config.foodCount > 20)
     {
-        throw runtime_error("Food count should be within range [1, 20]");
+        throw runtime_error("食物数量应该在1到20之间");
     }
 
     stream >> config.foodProbabilities[0] >> config.foodProbabilities[1] >> config.foodProbabilities[2];
 
     if (!stream.good())
     {
-        throw runtime_error("Failed to read food probabilities");
+        throw runtime_error("无法读取食物生成概率");
     }
 
     if (config.foodProbabilities[0] < 0 || config.foodProbabilities[0] > 1 ||
         config.foodProbabilities[1] < 0 || config.foodProbabilities[1] > 1 ||
         config.foodProbabilities[2] < 0 || config.foodProbabilities[2] > 1)
     {
-        throw runtime_error("Food probabilities should be within range [0, 1]");
+        throw runtime_error("食物的概率应该在0到1之间");
     }
 
     if (std::abs(config.foodProbabilities[0] + config.foodProbabilities[1] + config.foodProbabilities[2] - 1) > EPSILON)
@@ -83,7 +88,7 @@ Config ConfigManager::LoadConfig(const std::string &path)
 
     if (!ifs.is_open())
     {
-        throw runtime_error("文件操作异常");
+        throw runtime_error("无法打开文件");
     }
 
     return LoadConfigFromStream(ifs);
@@ -95,7 +100,7 @@ void ConfigManager::SaveConfig(const std::string &path, const Config &config)
 
     if (!ofs.is_open())
     {
-        throw runtime_error("文件操作异常");
+        throw runtime_error("无法打开文件");
     }
 
     ofs << GetConfigString(config);
