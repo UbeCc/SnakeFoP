@@ -82,7 +82,7 @@ Config ConfigManager::LoadConfig(const std::string &path)
 
     if (!ifs.is_open())
     {
-        throw runtime_error("打开文件失败：" + path);
+        throw runtime_error("文件操作异常");
     }
 
     return LoadConfigFromStream(ifs);
@@ -94,7 +94,7 @@ void ConfigManager::SaveConfig(const std::string &path, const Config &config)
 
     if (!ofs.is_open())
     {
-        throw runtime_error("打开文件失败：" + path);
+        throw runtime_error("文件操作异常");
     }
 
     ofs << GetConfigString(config);

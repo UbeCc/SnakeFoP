@@ -28,7 +28,7 @@ Record RecordManager::LoadRecord(const string &path, Record &record) {
     ifstream ifs(path);
 
     if (!ifs.is_open()) {
-        throw runtime_error("打开文件失败：" + path);
+        throw runtime_error("文件操作异常");
     }
     char buffer[1048576];
     ifs.getline(buffer, 1048576);
@@ -69,7 +69,7 @@ Record RecordManager::LoadRecord(const string &path, Record &record) {
 void RecordManager::SaveRecord(const string &path, const Record &record) {
     ofstream ofs(path);
     if (!ofs.is_open()) {
-        throw runtime_error("打开文件失败：" + path);
+        throw runtime_error("文件操作异常");
     }
 
     string config = ConfigManager::GetConfigString(record.config);

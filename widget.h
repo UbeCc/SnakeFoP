@@ -8,6 +8,7 @@
 #include "settingpage.h"
 #include "replaypage.h"
 #include "mapeditor.h"
+#include "configeditor.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -89,6 +90,8 @@ private slots:
 
     void OnMapEditorButtonClicked();
 
+    void OnConfigEditorButtonClicked();
+
 private:
     Ui::MainPage *ui;
     SettingPage *settingPage;
@@ -96,6 +99,7 @@ private:
     PlayPage *playPage;
     QFileInfo gameConfigPath, gameMapPath;
     MapEditor *mapEditor;
+    ConfigEditor *configEditor;
 public:
     int seqPtr;
     int movementPtr;

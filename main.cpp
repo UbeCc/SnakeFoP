@@ -1,10 +1,6 @@
 #include "widget.h"
 
 #include <QApplication>
-#include <QElapsedTimer>
-#include <QTimer>
-#include <QDir>
-#include <QThread>
 
 int main(int argc, char *argv[])
 {

@@ -1,349 +1,95 @@
-//#include <QFileDialog>
-//#include <QMessageBox>
-//#include "configeditor.h"
-//#include "ui_configeditor.h"
+#include <QFileDialog>
+#include <QMessageBox>
+#include "configeditor.h"
+#include "ui_configeditor.h"
 
-//using std::exception;
+using std::exception;
 
-//const Map ConfigEditor::dummyMap = {
-//    10,
-//    10,
-//    {false, false, false, false},
-//    {},
-//    {Point{2, 2}, Point{4, 4}, Point{6, 6}, Point{8, 8}},
-//    Point{1, 1},
-//}
+const float eps = 1e-5;
 
-//ConfigEditor::ConfigEditor(QWidget *parent) :
-//    QDialog(parent),
-//    ui(new Ui::ConfigEditor)
-//{
-//    ui->setupUi(this);
-//}
+ConfigEditor::ConfigEditor(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::ConfigEditor)
+{
+    ui->setupUi(this);
+    connect(ui->CreateButton, &QPushButton::clicked, this, &ConfigEditor::OnNewConfigButtonClicked);
+    connect(ui->LoadButton, &QPushButton::clicked, this, &ConfigEditor::OnLoadConfigButtonClicked);
+    connect(ui->SaveButton, &QPushButton::clicked, this, &ConfigEditor::OnSaveConfigButtonClicked);
+}
 
-//ConfigEditor::~ConfigEditor()
-//{
-//    delete ui;
-//}
+ConfigEditor::~ConfigEditor()
+{
+    delete ui;
+}
 
+void ConfigEditor::OnNewConfigButtonClicked()
+{
+    QString errorText = "";
+    int level = ui->LevelText->toPlainText().toInt();
+    if(level < 1 || level > 10 ) errorText += "难度错误，应为1~10的正整数\n";
 
+    int seed = ui->SeedText->toPlainText().toInt();
 
-//#include <QFileDialog>
-//#include <QMessageBox>
-//#include "mapeditor.h"
-//#include "ui_mapeditor.h"
+    int foodCount = ui->FoodNumText->toPlainText().toInt();
+    if(foodCount < 1 || foodCount > 5) errorText += "食物数量错误，应为1~5的正整数\n";
 
-//using std::exception;
+    float foodPossibility1 = ui->Food1Text->toPlainText().toFloat();
+    if(foodPossibility1 < 0 || foodPossibility1 > 1) errorText += "食物概率1错误，应为0~1的浮点数\n";
+    float foodPossibility2 = ui->Food2Text->toPlainText().toFloat();
+    if(foodPossibility2 < 0 || foodPossibility2 > 1) errorText += "食物概率2错误，应为0~1的浮点数\n";
+    float foodPossibility3 = ui->Food3Text->toPlainText().toFloat();
+    if(foodPossibility3 < 0 || foodPossibility3 > 1) errorText += "食物概率3错误，应为0~1的浮点数\n";
+    if(abs(foodPossibility1 + foodPossibility2 + foodPossibility3 - 1) > eps)
+        errorText += "食物概率错误，三种食物概率和应为1\n";
 
-//const Config MapEditor::dummyConfig = {
-//    1,
-//    0,
-//    0,
-//    {1, 0, 0}
-//};
+    if(errorText != "")
+    {
+        QMessageBox::warning(this, "配置错误", errorText);
+        return;
+    }
 
-//MapEditor::MapEditor(QWidget *parent) :
-//    QDialog(parent),
-//    ui(new Ui::MapEditor),
-//    game(nullptr),
-//    firstPortalPoint({-1, -1})
-//{
-//    ui->setupUi(this);
-//    connect(ui->NewMapButton, &QPushButton::clicked, this, &MapEditor::OnNewMapButtonClicked);
-//    connect(ui->LoadMapButton, &QPushButton::clicked, this, &MapEditor::OnLoadMapButtonClicked);
-//    connect(ui->SaveMapButton, &QPushButton::clicked, this, &MapEditor::OnSaveMapButtonClicked);
-//    connect(ui->MapXBorder, &QCheckBox::toggled, this, &MapEditor::OnMapXBorderChanged);
-//    connect(ui->MapYBorder, &QCheckBox::toggled, this, &MapEditor::OnMapYBorderChanged);
-//    connect(ui->ObstaclePainterButton, &QPushButton::toggled, this, &MapEditor::OnObstaclePainterButtonToggled);
-//    connect(ui->EraserButton, &QPushButton::toggled, this, &MapEditor::OnEraseButtonToggled);
-//    connect(ui->AddPortalButton, &QPushButton::toggled, this, &MapEditor::OnAddPortalButtonToggled);
-//    connect(ui->SpawnPointButton, &QPushButton::toggled, this, &MapEditor::OnSetSpawnPointButtonToggled);
+    config = {
+        level,
+        seed,
+        foodCount,
+        {foodPossibility1, foodPossibility2, foodPossibility3}
+    };
+}
 
-//    OnNewMapButtonClicked();
-//}
+void ConfigEditor::OnLoadConfigButtonClicked() {
+    QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"));
+    QDir(QCoreApplication::applicationFilePath()).filePath("config/"), tr("配置文件 (*.cfg)");
+    QFileInfo fileInfo = QFileInfo(configFilePath);
+    try
+    {
+        config = ConfigManager::LoadConfig(fileInfo.filePath().toStdString());
+    }
+    catch (exception &e)
+    {
+        QMessageBox::warning(this, "打开配置错误", e.what());
+        return;
+    }
 
-//MapEditor::~MapEditor()
-//{
-//    delete game;
-//    delete ui;
-//}
+    ui->LevelText->setText(QString::number(config.level));
+    ui->SeedText->setText(QString::number(config.randomSeed));
+    ui->FoodNumText->setText(QString::number(config.foodCount));
+    ui->Food1Text->setText(QString::number(config.foodProbabilities[0]));
+    ui->Food2Text->setText(QString::number(config.foodProbabilities[1]));
+    ui->Food3Text->setText(QString::number(config.foodProbabilities[2]));
+}
 
-//void MapEditor::UpdateCanvas()
-//{
-//    delete game;
-//    game = new Game(map, dummyConfig, 2);
-//    ui->Canvas->SetGame(game);
-//}
-
-//void MapEditor::OnNewMapButtonClicked()
-//{
-//    map = {
-//        ui->MapXSize->value(),
-//        ui->MapYSize->value(),
-//        {false, false, false, false},
-//        vector<Point>(),
-//        vector<array<Point, 2>>(),
-//        {0, 0}
-//    };
-
-//    ui->MapSizeLabel->setText(QString::number(map.width) + " x " + QString::number(map.height));
-
-//    UpdateCanvas();
-//}
-
-//void MapEditor::OnLoadMapButtonClicked()
-//{
-//    QString mapFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
-//        QDir(QCoreApplication::applicationDirPath()).filePath("maps/"), tr("地图文件 (*.map)"));
-//    QFileInfo fileInfo = QFileInfo(mapFilePath);
-//    try
-//    {
-//        map = MapManager::LoadMap(fileInfo.filePath().toStdString());
-//    }
-//    catch (exception &e)
-//    {
-//        QMessageBox::warning(this, "打开地图错误", e.what());
-//        return;
-//    }
-
-//    ui->MapSizeLabel->setText(QString::number(map.width) + " x " + QString::number(map.height));
-
-//    UpdateCanvas();
-//}
-
-//void MapEditor::OnSaveMapButtonClicked()
-//{
-//    QString mapFilePath = QFileDialog::getSaveFileName(this, tr("选择文件"),
-//        QDir(QCoreApplication::applicationDirPath()).filePath("maps"), tr("地图文件 (*.map)"));
-//    QFileInfo fileInfo = QFileInfo(mapFilePath);
-//    try
-//    {
-//        MapManager::SaveMap(fileInfo.filePath().toStdString(), map);
-//    }
-//    catch (exception &e)
-//    {
-//        QMessageBox::warning(this, "保存地图错误", e.what());
-//        return;
-//    }
-//}
-
-//void MapEditor::OnMapXBorderChanged(bool blocking)
-//{
-//    map.borderIsObstacle[0] = blocking;
-//    map.borderIsObstacle[1] = blocking;
-
-//    UpdateCanvas();
-//}
-
-//void MapEditor::OnMapYBorderChanged(bool blocking)
-//{
-//    map.borderIsObstacle[2] = blocking;
-//    map.borderIsObstacle[3] = blocking;
-
-//    UpdateCanvas();
-//}
-
-//void MapEditor::OnObstaclePainterButtonToggled(bool checked)
-//{
-//    if (checked)
-//    {
-//        ui->EraserButton->setChecked(false);
-//        ui->AddPortalButton->setChecked(false);
-//        ui->SpawnPointButton->setChecked(false);
-
-//        std::function<void(int, int, bool)> select = [this](auto &&PH1, auto &&PH2, auto &&PH3)
-//        {
-//            OnObstaclePainterMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), std::forward<decltype(PH3)>(PH3));
-//        };
-
-//        ui->Canvas->SetOnMouseSelect(select);
-//    }
-//    else
-//    {
-//        ui->Canvas->SetOnMouseSelect(nullptr);
-//    }
-//}
-
-//void MapEditor::OnObstaclePainterMouseSelect(int x, int y, bool rightButton)
-//{
-//    if (map.spawnPoint == Point({x, y}))
-//    {
-//        return;
-//    }
-
-//    for (const auto &portal: map.portals)
-//    {
-//        if (portal[0] == Point({x, y}) || portal[1] == Point({x, y}))
-//        {
-//            return;
-//        }
-//    }
-
-//    auto it = std::find(map.obstacles.cbegin(), map.obstacles.cend(), Point({x, y}));
-
-//    if (!rightButton && it == map.obstacles.cend())
-//    {
-//        map.obstacles.push_back({x, y});
-//        UpdateCanvas();
-//    }
-
-//    else if (rightButton && it != map.obstacles.cend())
-//    {
-//        map.obstacles.erase(it);
-//        UpdateCanvas();
-//    }
-//}
-
-//void MapEditor::OnEraseButtonToggled(bool checked)
-//{
-//    if (checked)
-//    {
-//        ui->ObstaclePainterButton->setChecked(false);
-//        ui->AddPortalButton->setChecked(false);
-//        ui->SpawnPointButton->setChecked(false);
-
-//        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
-//        {
-//            OnEraseMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
-//        };
-
-//        ui->Canvas->SetOnMouseSelect(select);
-//    }
-//    else
-//    {
-//        ui->Canvas->SetOnMouseSelect(nullptr);
-//    }
-//}
-
-//void MapEditor::OnEraseMouseSelect(int x, int y)
-//{
-//    auto it = std::find(map.obstacles.cbegin(), map.obstacles.cend(), Point({x, y}));
-
-//    if (it != map.obstacles.cend())
-//    {
-//        map.obstacles.erase(it);
-//        UpdateCanvas();
-//        return;
-//    }
-
-//    for (auto portal = map.portals.begin(); portal != map.portals.end(); ++portal)
-//    {
-//        if ((*portal)[0] == Point({x, y}) || (*portal)[1] == Point({x, y}))
-//        {
-//            map.portals.erase(portal);
-//            UpdateCanvas();
-//            return;
-//        }
-//    }
-//}
-
-//void MapEditor::OnAddPortalButtonToggled(bool checked)
-//{
-//    if (checked)
-//    {
-//        ui->ObstaclePainterButton->setChecked(false);
-//        ui->EraserButton->setChecked(false);
-//        ui->SpawnPointButton->setChecked(false);
-
-//        firstPortalPoint = {-1, -1};
-
-//        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
-//        {
-//            OnAddPortalMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
-//        };
-
-//        ui->Canvas->SetOnMouseSelect(select);
-//    }
-//    else
-//    {
-//        ui->Canvas->SetOnMouseSelect(nullptr);
-//    }
-//}
-
-//void MapEditor::OnAddPortalMouseSelect(int x, int y)
-//{
-//    if (map.spawnPoint == Point({x, y}))
-//    {
-//        QMessageBox::warning(this, "添加传送门错误", "传送门不允许放置在出生点");
-//        ui->AddPortalButton->setChecked(false);
-//        return;
-//    }
-
-//    if (std::find(map.obstacles.cbegin(), map.obstacles.cend(), Point({x, y})) != map.obstacles.cend())
-//    {
-//        QMessageBox::warning(this, "添加传送门错误", "传送门不允许放置在障碍物上");
-//        ui->AddPortalButton->setChecked(false);
-//        return;
-//    }
-
-//    for (const auto &portal: map.portals)
-//    {
-//        if (portal[0] == Point({x, y}) || portal[1] == Point({x, y}))
-//        {
-//            QMessageBox::warning(this, "添加传送门错误", "传送门不允许放置在传送门上");
-//            ui->AddPortalButton->setChecked(false);
-//            return;
-//        }
-//    }
-
-//    if (firstPortalPoint.x == -1)
-//    {
-//        firstPortalPoint = {x, y};
-//        return;
-//    }
-
-//    if (firstPortalPoint == Point({x, y}))
-//    {
-//        return;
-//    }
-
-//    map.portals.push_back({firstPortalPoint, {x, y}});
-//    ui->AddPortalButton->setChecked(false);
-//    UpdateCanvas();
-//}
-
-//void MapEditor::OnSetSpawnPointButtonToggled(bool checked)
-//{
-//    if (checked)
-//    {
-//        ui->ObstaclePainterButton->setChecked(false);
-//        ui->EraserButton->setChecked(false);
-//        ui->AddPortalButton->setChecked(false);
-
-//        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
-//        {
-//            OnSetSpawnPointMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
-//        };
-
-//        ui->Canvas->SetOnMouseSelect(select);
-//    }
-//    else
-//    {
-//        ui->Canvas->SetOnMouseSelect(nullptr);
-//    }
-//}
-
-//void MapEditor::OnSetSpawnPointMouseSelect(int x, int y)
-//{
-//    if (std::find(map.obstacles.cbegin(), map.obstacles.cend(), Point({x, y})) != map.obstacles.cend())
-//    {
-//        QMessageBox::warning(this, "设置出生点错误", "出生点不允许放置在障碍物上");
-//        ui->SpawnPointButton->setChecked(false);
-//        return;
-//    }
-
-//    for (const auto &portal: map.portals)
-//    {
-//        if (portal[0] == Point({x, y}) || portal[1] == Point({x, y}))
-//        {
-//            QMessageBox::warning(this, "设置出生点错误", "出生点不允许放置在传送门上");
-//            ui->SpawnPointButton->setChecked(false);
-//            return;
-//        }
-//    }
-
-//    map.spawnPoint = {x, y};
-//    ui->SpawnPointButton->setChecked(false);
-//    UpdateCanvas();
-//}
-
+void ConfigEditor::OnSaveConfigButtonClicked()
+{
+    QString configFilePath = QFileDialog::getSaveFileName(this, tr("选择文件"),
+    QDir(QCoreApplication::applicationDirPath()).filePath("config/"), tr("配置文件 (*.cfg)"));
+    QFileInfo fileInfo = QFileInfo(configFilePath);
+    try
+    {
+        ConfigManager::SaveConfig(fileInfo.filePath().toStdString(), config);
+    }
+    catch (exception &e)
+    {
+        QMessageBox::warning(this, "保存配置错误", e.what());
+        return;
+    }
+}

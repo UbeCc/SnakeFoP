@@ -10,13 +10,15 @@ Widget::Widget(QWidget *parent)
     playPage(new PlayPage(this)),
     gameConfigPath(QDir(QCoreApplication::applicationDirPath()).filePath("config/default.cfg")),
     gameMapPath(QDir(QCoreApplication::applicationDirPath()).filePath("maps/default.map")),
-    mapEditor(new MapEditor(this))
+    mapEditor(new MapEditor(this)),
+    configEditor(new ConfigEditor(this))
 {
     ui->setupUi(this);
     connect(ui->exitButton, &QPushButton::clicked, this, &QApplication::quit);
     connect(ui->replayButton, &QPushButton::clicked, this, &Widget::OnReplayButtonClicked);
     connect(ui->enterButton, &QPushButton::clicked, this, &Widget::OnEnterButtonClicked);
     connect(ui->MapEditorButton, &QPushButton::clicked, this, &Widget::OnMapEditorButtonClicked);
+    connect(ui->ConfigEditorButton, &QPushButton::clicked, this, &Widget::OnConfigEditorButtonClicked);
 
     const auto appDir = QDir(QCoreApplication::applicationDirPath());
     QDir::setCurrent(appDir.absolutePath());
@@ -61,6 +63,11 @@ void Widget::OnEnterButtonClicked()
 void Widget::OnMapEditorButtonClicked()
 {
     mapEditor->exec();
+}
+
+void Widget::OnConfigEditorButtonClicked()
+{
+    configEditor->exec();
 }
 
 

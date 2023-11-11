@@ -24,20 +24,9 @@ private slots:
 
     void OnSaveConfigButtonClicked();
 
-    void OnLevelButtonClicked();
-
-    void OnSeedButtonClicked();
-
-    void OnFoodNumButtonClicked();
-
-    void OnFoodPossibilityButtonClicked();
-
-
 private:
     Ui::ConfigEditor *ui;
     Config config;
-    Game *game;
-    const static Map dummyMap;
 };
 
 #endif // CONFIGEDITOR_H
