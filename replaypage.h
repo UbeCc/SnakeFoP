@@ -41,6 +41,8 @@ private slots:
 
     void OnExitButtonClicked();
 
+    void OnPlayRateBoxChanged();
+
 private:
     bool initFlag, playFlag;
     Widget *widget;
@@ -49,6 +51,7 @@ private:
     Ui::ReplayPage *ui;
     QTimer *gameTimer;
     Record record;
+    double playRate;
 
     void GameOver();
 };

@@ -48,12 +48,14 @@ ReplayPage::ReplayPage(QWidget *parent) :
     curStep(0),
     game(nullptr),
     ui(new Ui::ReplayPage),
-    gameTimer(nullptr)
+    gameTimer(nullptr),
+    playRate(1)
 {
     ui->setupUi(this);
     connect(ui->recordButton, &QPushButton::clicked, this, &ReplayPage::OnRecordButtonClicked);
     connect(ui->playButton, &QPushButton::clicked, this, &ReplayPage::OnPlayButtonClicked);
     connect(ui->exitButton, &QPushButton::clicked, this, &ReplayPage::OnExitButtonClicked);
+    connect(ui->playRateBox, &QDoubleSpinBox::valueChanged, this, &ReplayPage::OnPlayRateBoxChanged);
 }
 
 ReplayPage::~ReplayPage()
@@ -104,8 +106,7 @@ bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
             ui->Canvas->update();
         }
     });
-    gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
-
+    gameTimer->start((int) (TIME_INTERVAL / playRate * (1. / status.config.level)));
     return true;
 }
 
@@ -159,4 +160,11 @@ int ReplayPage::GetScore()
 int ReplayPage::GetLength()
 {
     return game->GetStatus().length;
+}
+
+void ReplayPage::OnPlayRateBoxChanged()
+{
+    playRate = ui->playRateBox->value();
+    gameTimer->stop();
+    gameTimer->start((int) (TIME_INTERVAL / playRate * (1. / game->GetStatus().config.level)));
 }
