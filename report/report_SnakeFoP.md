@@ -176,7 +176,7 @@ SnakeFoP
         Point spawnPoint; // 起始位置
     };
     ```
-    
+  
 - `MapManager`类设置如下
   
   ```cpp
@@ -189,8 +189,8 @@ SnakeFoP
         static void SaveMap(const string &path, const Map &map);
         [[nodiscard]] static string GetMapString(const Map &map);
     };
-    ```
-    
+  ```
+  
   - 主要函数：与`configmanager`类似，限于篇幅省略
 
 - **`configeditor`：配置编辑器**
@@ -580,7 +580,7 @@ SnakeFoP
 
 - **`main`：游戏启动入口，采用Qt默认配置，略**
 
-## 三、扩展功能
+## 四、扩展功能
 
 - #### 支持GUI地图绘制，而非手动输入坐标。绘制丰富地图更轻松
 
