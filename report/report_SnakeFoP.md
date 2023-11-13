@@ -17,8 +17,8 @@
 - **系统版本**
 
   1. MacOS Sonoma 14.0
-  2. Linux TODO
-  3. Windows TODO
+  2. Windows 10
+  3. Ubuntu 22.04
 
 - **编译器版本**
 
@@ -80,9 +80,9 @@ SnakeFoP
 
 下面对其进行解释
 
-- **`recordmanager`：记录管理器**
+### **`recordmanager`：记录管理器**
 
-  - `Record` 类设置如下
+- `Record` 类设置如下
 
     ```cpp
     struct Record {
@@ -120,27 +120,11 @@ SnakeFoP
     
   - 主要函数：
 
-    - `LoadRecord`：从指定路径中加载记录文件
+    - `LoadRecord`：从指定路径中加载记录文件（未列出错误检查）
     
-      ```cpp
-      Config ConfigManager::LoadConfig(const std::string &path) {
-          ifstream ifs(path);
-          if (!ifs.is_open()) {throw runtime_error("无法打开文件");}
-          return LoadConfigFromStream(ifs);
-      }
-      ```
-    
-    - `SaveRecord`：将记录文档保存至指定路径
-    
-      ```cpp
-      void ConfigManager::SaveConfig(const std::string &path, const Config &config) {
-          ofstream ofs(path);
-          if (!ofs.is_open()) {throw runtime_error("无法打开文件");}
-          ofs << GetConfigString(config);
-      }
-      ```
+    - `SaveRecord`：将记录文档保存至指定路径（未列出错误检查）
 
-- **`configmanager`：配置管理器**
+### **`configmanager`：配置管理器**
 
   - `Config`类设置如下
 
@@ -177,7 +161,7 @@ SnakeFoP
     - `LoadConfigFromString`：从`string`中读取配置，保存为`Config`
     - `GetConfigString`：将`Config`压缩成`string`类型
   
-- **`mapmanager`：地图管理器**
+### **`mapmanager`：地图管理器**
 
   - `Map`类设置如下
 
@@ -192,9 +176,9 @@ SnakeFoP
     };
     ```
   
-- `MapManager`类设置如下
+  - `MapManager`类设置如下
   
-  ```cpp
+    ```cpp
     class MapManager {
     private:
         static Map LoadMapFromStream(istream &stream);
@@ -204,11 +188,12 @@ SnakeFoP
         static void SaveMap(const string &path, const Map &map);
         [[nodiscard]] static string GetMapString(const Map &map);
     };
-  ```
+    ```
   
-  - 主要函数：与`configmanager`类似，限于篇幅省略
-
-- **`configeditor`：配置编辑器**
+  
+  - 主要函数：与`configmanager`类似
+  
+### **`configeditor`：配置编辑器**
 
   - 主要函数如下
 
@@ -231,9 +216,9 @@ SnakeFoP
     </div>
   </center>
 
-- **`mapeditor`：地图编辑器**
+### **`mapeditor`：地图编辑器**
 
-  - 除与`configeditor`类似函数外，主要函数如下，具体实现在`gamecanplaypage`处讲解
+  - 除与`configeditor`类似函数外，主要函数如下，具体实现在`playpage`处讲解
 
     ```cpp
     private slots
@@ -261,9 +246,7 @@ SnakeFoP
   </div>
 </center>	
 
-
-
-- **`gamecanvas`：游戏棋盘**
+### **`gamecanvas`：游戏棋盘**
 
   - `GameCanvas`类主要部分如下
 
@@ -282,116 +265,26 @@ SnakeFoP
     };
     ````
 
-    其中，`paintEvent`主要部分如下（有删减）
-
-    ```cpp
-    // 绘制背景
-    painter.setBrush(Qt::gray);
-    painter.setPen(Qt::transparent);
-    painter.drawRect(xOffset, yOffset, row * blockSize, col * blockSize);
-    
-    // 绘制边界，只取绘制borderIsObstacle[0]，绘制{1,2,3}同理
-    const static QPen borderPen(Qt::red, 3);
-    if (status.mapDefinition.borderIsObstacle[0]) {
-        painter.setPen(borderPen);
-        painter.drawLine(xOffset, yOffset, xOffset + row * blockSize, yOffset);
-    }
-    
-    // 绘制蛇（采用链表存储蛇）
-    painter.setBrush(Qt::green);
-    painter.setPen(Qt::transparent);
-    Point head = status.head;
-    painter.drawRect((int) (xOffset + margin + head.x * blockSize), int(yOffset + margin + head.y * blockSize), (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-    Point tail = status.tail;
-    Point curPoint = tail;
-    int l = -status.length;
-    while (curPoint != head) {
-        painter.setBrush(QColor::fromHsv(0, max(32, 255 + 8 * ++l), 255));
-        painter.drawRect((int) (xOffset + margin + curPoint.x * blockSize),
-            int(yOffset + margin + curPoint.y * blockSize),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-        curPoint = status.map[curPoint.x][curPoint.y];
-    }
-    
-    // 绘制食物
-    painter.setBrush(Qt::white);
-    painter.setPen(Qt::transparent);
-    auto &foods = status.foods;
-    for (const auto &food: foods) {
-        double sizeFactor = (3 + 2 * (3 - status.map[food.x][food.y].y)) * margin;
-        painter.drawEllipse((int) (xOffset + sizeFactor + food.x * blockSize),
-            (int) (yOffset + sizeFactor + food.y * blockSize),
-            (int) (blockSize - 2 * sizeFactor), (int) (blockSize - 2 * sizeFactor));
-    }
-    
-    // 绘制障碍
-    painter.setBrush(Qt::black);
-    painter.setPen(Qt::transparent);
-    auto obstacles = status.mapDefinition.obstacles;
-    for (const auto &obstacle: obstacles) {
-        painter.drawRect((int) (xOffset + margin + obstacle.x * blockSize),
-            (int) (yOffset + margin + obstacle.y * blockSize),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-    }
-    
-    // 绘制传送点
-    auto portals = status.mapDefinition.portals;
-    for (int i = 0; i < (int) portals.size(); ++i) {
-        const auto &portal = portals[i];
-        painter.setBrush(portalColors[i % 10]);
-        for (const auto &p: portal) {
-            painter.drawPolygon(
-                QPolygonF({
-                    QPointF(xOffset + p.x * blockSize + 3 * margin,
-                        yOffset + p.y * blockSize + blockSize / 2.),
-                    QPointF(xOffset + p.x * blockSize + blockSize / 2.,
-                        yOffset + p.y * blockSize + 3 * margin),
-                    QPointF(xOffset + (p.x + 1) * blockSize - 3 * margin,
-                        yOffset + p.y * blockSize + blockSize / 2.),
-                    QPointF(xOffset + p.x * blockSize + blockSize / 2.,
-                        yOffset + (p.y + 1) * blockSize - 3 * margin),
-                }));
-        }
-    }
-    ```
-
-- **`game`：游戏主体逻辑**
+### **`game`：游戏主体逻辑**
 
   - `game`主要定义如下
 
     ```cpp
-    class Game
-    {
+    class Game {
     public:
         enum Direction {Right = 0, Down = 1, Left = 2, Up = 3};
         enum State {Alive, Dead};
     private:
         default_random_engine random;
-        /// Game mode, 0 for normal, 1 for replay, 2 for display only
-        int mode;
-        struct GameStatus
-        {
+        int mode; // 游戏模式，0代表游戏模式，1代表回放模式，2代表只显示
+        struct GameStatus {
             const Map mapDefinition;
             const Config config;
             Direction direction;
             Direction preDirection;
             State state;
             int score, length, desiredLength;
-    
-    				/// Definition:
-            /// If p points to (x, y), this point is occupied by the snake.
-            /// If p[x] == -3, then p is the head of the snake.
-            /// If p[x] == -4, then p is empty.
-            /// If p[x] == -1, then p is an obstacle.
-            /// p[x] == -2 was assigned to portals but deprecated.
-            /// If p[x] == -5, then p is a food, p[y] being the score.
-            /// 0 ---> x
-            /// |
-            /// y
             vector<vector<Point>> map;
-            /// Definition:
-            /// If p points to (x, y), the other side is (x, y).
-            /// If p[x] == -4, then p is not a portal.
             vector<vector<Point>> portal;
             vector<Point> foods;
             Point head, tail;
@@ -399,14 +292,11 @@ SnakeFoP
     public:
         class SpecialPoint {
         public:
-            constexpr static Point Empty{-4, 0}, Obstacle{-1, 0}, Head{-3, 0}, Food{-5, 0};
+            constexpr static Point Empty{-4, 0}, Obstacle{-1, 0}, Head{-3, 0}, Food{-5, 0}; // 特殊点定义
         };
-    
     public
-    		/// @returns false if the direction is invalid
-        bool ChangeDirection(Direction direction);
-        /// @brief Move the snake one step forward.
-        int Step(Widget *widget);
+        bool ChangeDirection(Direction direction); // 方向不合法时返回false
+        int Step(Widget *widget); // 更新游戏状态
         [[nodiscard]] const GameStatus &GetStatus() const;
         [[nodiscard]] string GetStatisticsString() const;
         int GenerateFood(Widget *widget);
@@ -414,12 +304,31 @@ SnakeFoP
     }
     ```
 
+    其中，`map`定义如下
+
+    ```
+    利用地图中每一点的x,y值均大于等于0，将x值小于0的点设置为特殊点（见SpecialPoint）
+    考虑Point p{x,y}，
+    如果p指向(x,y)，即map[x][y]=p（注意此时x>=0,y>=0），表示p点被蛇占用
+    如果map[x][y].x=-3，表示p点是蛇头
+    如果map[x][y].x=-4，表示p点为空地
+    如果map[x][y].x=-2，表示p点指向传送点
+    如果map[x][y].x=-5，表示p点是食物，map[x][y].y是食物的分值
+    ```
+
+    `portal`定义如下
+
+    ```
+    考虑Point p{x1,y1}，
+    如果map[x1][y1].x=-4，表示p不是传送点
+    否则若portal[x1][y1]=Point{x2,y2}，表示p传送到(x2,y2)
+    ```
+
   - 主要函数为`Step`，每一帧执行一次，有删减
 
     ```cpp
     int Game::Step(Widget *widget) {
         if (state == Dead) {throw runtime_error("The snake is dead");}
-    
     		// 计算下一时刻的蛇头位置
       	Point nextHead = head;
         switch (direction) {
@@ -480,7 +389,7 @@ SnakeFoP
     }
     ```
 
-- **`widget`：主界面**
+### **`widget`：主界面**
 
   <center>
     <img src="./assets/widget.jpg" width="400" />
@@ -490,9 +399,9 @@ SnakeFoP
     </div>
   </center>	
 
-- **`settingpage`：游戏设置界面，略**
+### **`settingpage`：游戏设置界面，略**
 
-- **`playpage`：游戏界面**
+### **`playpage`：游戏界面**
 
   - `GameOver`函数
 
@@ -533,18 +442,16 @@ SnakeFoP
     </div>
   </center>	
 
-- **`replaypage`：回放界面**
+### **`replaypage`：回放界面**
 
   - `InitPlay`函数
 
     ```cpp
-    bool ReplayPage::InitPlay(const QFileInfo &fileInfo)
-    {
+    bool ReplayPage::InitPlay(const QFileInfo &fileInfo) {
         curStep = 0;
         widget->SetMode(true);
         ui->RecordLabel->setText(fileInfo.fileName());
         Record tmp;
-        
     		// 读取记录，playpage没有这一步
     		try {
             tmp = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), widget->GetGameRecord());
@@ -582,8 +489,8 @@ SnakeFoP
         return true;
     }
     ```
-
-- **`resultpage`：结果界面，略**
+  
+### **`resultpage`：结果界面，略**
 
   <center>
     <img src="./assets/resultpage.jpg" width="400" />
@@ -593,7 +500,7 @@ SnakeFoP
     </div>
   </center>	
 
-- **`main`：游戏启动入口，采用Qt默认配置，略**
+### **`main`：游戏启动入口，采用Qt默认配置，略**
 
 ## 四、扩展功能
 
