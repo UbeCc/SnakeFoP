@@ -23,28 +23,31 @@
 - **编译器版本**
 
   1. ```
+     Qt 6.5.2 On Mac
      Apple clang version 15.0.0 (clang-1500.0.40.1)
      Target: arm64-apple-darwin23.0.0
      Thread model: posix
      ```
 
   2. ```
-     TODO
+     Qt 6.6.0 On Windows
+     g++ (x86_64-posix-seh-rev3, Built by MinGW-W64 project) 11.2.0
+     Copyright (C) 2021 Free Software Foundation, Inc.
      ```
 
   3. ```
-     TODO
+     Qt 6.6.0 On Linux
      ```
 
-- **最低C++标准：**C++11
+- **最低C++标准：** C++ 17
 
-- **注：**默认maps/config/records文件夹位于可执行文件所在目录
+- **注：** 默认maps/config/records文件夹位于可执行文件所在目录
 
 ## 三、功能实现
 
 项目由Qt实现GUI，页面间以继承方式切换。项目文件树主要部分如下
 
-```shell
+```text
 SnakeFoP
 ├── climain.cpp
 ├── config
@@ -79,7 +82,7 @@ SnakeFoP
 
 - **`recordmanager`：记录管理器**
 
-  - `Record`类设置如下
+  - `Record` 类设置如下
 
     ```cpp
     struct Record {
@@ -93,7 +96,19 @@ SnakeFoP
     };
     ```
     
-  - `RecordManager`类设置如下
+  - 文件格式解释如下
+
+    ```text
+    1 配置信息, 由于存储配置文件路径无法保证在文件改变时仍能正确回放, 故此处将配置文件压缩为 1 行直接存储
+
+    2 地图信息, 同理直接用 1 行存储
+
+    3 - n 每一个动作的信息, 格式为 (动作名 时间戳 附加信息)
+    对于生成食物, 动作名为 F, 附加信息为食物坐标和分数
+    对于移动, 动作名为 M, 附加信息为移动方向, Q 代表结束
+    ```
+
+  - `RecordManager` 类设置如下
 
     ```cpp
     class RecordManager {
@@ -107,7 +122,7 @@ SnakeFoP
 
     - `LoadRecord`：从指定路径中加载记录文件
     
-      ```
+      ```cpp
       Config ConfigManager::LoadConfig(const std::string &path) {
           ifstream ifs(path);
           if (!ifs.is_open()) {throw runtime_error("无法打开文件");}
@@ -117,7 +132,7 @@ SnakeFoP
     
     - `SaveRecord`：将记录文档保存至指定路径
     
-      ```
+      ```cpp
       void ConfigManager::SaveConfig(const std::string &path, const Config &config) {
           ofstream ofs(path);
           if (!ofs.is_open()) {throw runtime_error("无法打开文件");}
