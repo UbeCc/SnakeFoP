@@ -17,8 +17,8 @@
 - **系统版本**
 
   1. MacOS Sonoma 14.0
-  2. Linux TODO
-  3. Windows TODO
+  2. Linux Mint 21.2
+  3. Windows 11 22H2
 
 - **编译器版本**
 
