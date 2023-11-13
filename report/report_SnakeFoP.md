@@ -84,45 +84,61 @@ SnakeFoP
 
 - `Record` 类设置如下
 
-    ```cpp
-    struct Record {
-        string name;
-        Map map;
-        Config config;
-        string sequence;
-        vector<int> timestamp;
-        vector<pair<Point, int> > foodSequence;
-        string moveSequence;
-    };
-    ```
-    
+  ```cpp
+  struct Record {
+      string name;
+      Map map;
+      Config config;
+      string sequence;
+      vector<int> timestamp;
+      vector<pair<Point, int> > foodSequence;
+      string moveSequence;
+  };
+  ```
+
   - 文件格式解释如下
 
     ```text
-    1 配置信息, 由于存储配置文件路径无法保证在文件改变时仍能正确回放, 故此处将配置文件压缩为 1 行直接存储
-
-    2 地图信息, 同理直接用 1 行存储
-
-    3 - n 每一个动作的信息, 格式为 (动作名 时间戳 附加信息)
+    第1行 配置信息, 由于存储配置文件路径无法保证在文件改变时仍能正确回放, 故此处将配置文件压缩为 1 行直接存储
+  
+    第2行 地图信息, 同理直接用 1 行存储
+  
+    第3~n行 每一个动作的信息, 格式为 (动作名 时间戳 附加信息)
     对于生成食物, 动作名为 F, 附加信息为食物坐标和分数
     对于移动, 动作名为 M, 附加信息为移动方向, Q 代表结束
     ```
 
-  - `RecordManager` 类设置如下
+- `RecordManager` 类设置如下
 
+  ```cpp
+  class RecordManager {
+  public:
+  		static Record LoadRecord(const string &path, Record &);
+  		static void SaveRecord(const string &path, const Record &record);
+  };
+  ```
+
+- 主要函数：
+
+  - `LoadRecord`：从指定路径中加载记录文件（未列出错误检查）
+    采用`ifstream`读取文件内容，主要操作如下
     ```cpp
-    class RecordManager {
-    public:
-    		static Record LoadRecord(const string &path, Record &);
-    		static void SaveRecord(const string &path, const Record &record);
-    };
+    ifstream ifs(path);
+    char buffer[1048576];
+    ifs.getline(buffer, 1048576);
+    if (!ifs.good()) {throw runtime_error("打开配置失败");}
+    
     ```
-    
-  - 主要函数：
 
-    - `LoadRecord`：从指定路径中加载记录文件（未列出错误检查）
-    
-    - `SaveRecord`：将记录文档保存至指定路径（未列出错误检查）
+  - `SaveRecord`：将记录文档保存至指定路径（未列出错误检查）
+    采用`ofstream`输出`Config`内容，主要操作如下
+    ```cpp
+    ofstream ofs(path);
+    if(!ofs.is_open()) {throw runtime_error("文件操作异常");}
+    string config = ConfigManager::GetConfigString(record.config);
+    replace(config.begin(), config.end(), '\n', ' '); // 去掉换行符，保证config只占一行
+    ofs << config << "\n";
+    ```
 
 ### **`configmanager`：配置管理器**
 
@@ -155,12 +171,13 @@ SnakeFoP
 
     - `LoadConfig`：从指定路径中加载配置文件
     - `SaveConfig`：将配置文档保存至指定路径
-  
+    
+    
     考虑到游戏记录中需包含配置信息，编写函数将配置以字符串形式存储
+    
+    - `LoadConfigFromString`：从`string`中读取配置，保存为`Config`。采用`streamstream`
+    - `GetConfigString`：将`Config`压缩成`string`类型。采用`stringstream`
 
-    - `LoadConfigFromString`：从`string`中读取配置，保存为`Config`
-    - `GetConfigString`：将`Config`压缩成`string`类型
-  
 ### **`mapmanager`：地图管理器**
 
   - `Map`类设置如下
@@ -189,14 +206,13 @@ SnakeFoP
         [[nodiscard]] static string GetMapString(const Map &map);
     };
     ```
-  
-  
+
+
   - 主要函数：与`configmanager`类似
-  
+
 ### **`configeditor`：配置编辑器**
 
   - 主要函数如下
-
     ```cpp
     private slots:
         void OnNewConfigButtonClicked(); // 创建配置
@@ -205,9 +221,20 @@ SnakeFoP
         void OnFoodProbability1ValueChanged(int value); // 修改食物1概率
         void OnFoodProbability2ValueChanged(int value); // 修改食物2概率
     ```
-
-    
-
+    由于在不同模式、目录中启动`Qt`可执行文件时，用`QDir`得到的目录不同，我们最终选择将`config`、`maps`、`records`保存到可执行文件同级目录中，以加载`config`为例，其余同理
+    ```cpp
+    QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"));
+    // QCoreApplication::applicationFilePath()返回可执行文件所在目录
+    QDir(QCoreApplication::applicationFilePath()).filePath("config/"), tr("配置文件 (*.cfg)");
+    QFileInfo fileInfo = QFileInfo(configFilePath);
+    Config config{};
+    try {
+        config = ConfigManager::LoadConfig(fileInfo.filePath().toStdString());
+    } catch (exception &e) {
+        QMessageBox::warnings(this, "打开配置错误", e.what());
+        return;
+    }
+    ```
   <center>
     <img src="./assets/configeditor.jpg" width="400" />
     <br>
@@ -236,8 +263,6 @@ SnakeFoP
         void OnSetSpawnPointMouseSelect(int x, int y); // 初始点选中
     ```
 
-    
-
 <center>
   <img src="./assets/mapeditor.jpg" width="400" />
   <br>
@@ -264,6 +289,30 @@ SnakeFoP
         void mouseMoveEvent(QMouseEvent *event) override;
     };
     ````
+  - 主要函数为`PaintEvent`，需要注意这里的对齐方式
+    `gamecanvas.ui`将矩形画布的大小设置为$[(0,0),(400,300)]$，即$400x300$的框；而每张地图的$row,col$数不保证相同，这导致$\dfrac{400}{row}=\dfrac{{300}}{col}$非恒成立。为了保证格子均为正方形，我们需要对原矩形画布进行裁剪。
+    
+    > 先取格子数$blozkSize=min(\dfrac{width}{row},\dfrac{height}{col})$
+    > 裁剪过后的宽度$width=blockSize*row$，高度$height=blockSize*col$
+
+    这样会产生误差。我们将裁剪后的矩形画布放到原画布中心位置，其左/右侧偏差$xOffset=\dfrac{(size.width()-width)}{2}$，上/下偏差$yOffset=\dfrac{(size.height()-height)}{2}$，除二是因为左右/上下均有误差且相等
+    
+    需注意此后我们进行的蛇、食物、传送点、障碍绘制均基于原画布左上角，这意味着每次绘制时我们都需要相应地加上$xOffset$，$yOffset$，如绘制障碍物
+    ```cpp
+    auto obstacles = status.mapDefinition.obstacles;
+    for (const auto &obstacle: obstacles) {
+        painter.drawRect((int) (xOffset + margin + obstacle.x * blockSize),
+            (int) (yOffset + margin + obstacle.y * blockSize),
+            (int) (blockSize - margin), (int) (blockSize - margin));
+    }
+    ```
+    枚举每个正方形的左上、右下点坐标即可。
+    注意到绘制时还出现了margin，其定义如下
+    ```cpp
+    constexpr double BLOCK_MARGIN = 0.05;
+    const double margin = blockSize * BLOCK_MARGIN;
+    ```
+    由于游戏支持设置四个边界是否可传送，我们需要在`gamecanvas`中体现出边界是否可传送，故需留出边框线位置，`margin`即是方格距边界的距离。
 
 ### **`game`：游戏主体逻辑**
 
@@ -307,12 +356,16 @@ SnakeFoP
     其中，`map`定义如下
 
     ```
-    利用地图中每一点的x,y值均大于等于0，将x值小于0的点设置为特殊点（见SpecialPoint）
-    考虑Point p{x,y}，
+    利用地图中每一点的x,y值均大于等于0，将x值小于0的点设置为特殊点（见`SpecialPoint`类）。考虑Point p{x,y}，
+    
     如果p指向(x,y)，即map[x][y]=p（注意此时x>=0,y>=0），表示p点被蛇占用
+    
     如果map[x][y].x=-3，表示p点是蛇头
+    
     如果map[x][y].x=-4，表示p点为空地
+    
     如果map[x][y].x=-2，表示p点指向传送点
+    
     如果map[x][y].x=-5，表示p点是食物，map[x][y].y是食物的分值
     ```
 
@@ -320,16 +373,21 @@ SnakeFoP
 
     ```
     考虑Point p{x1,y1}，
+
     如果map[x1][y1].x=-4，表示p不是传送点
+    
     否则若portal[x1][y1]=Point{x2,y2}，表示p传送到(x2,y2)
     ```
 
-  - 主要函数为`Step`，每一帧执行一次，有删减
+  - 主要函数为`Step`，每一帧执行一次，有删减。需按逻辑顺序一步步写
 
     ```cpp
     int Game::Step(Widget *widget) {
+        // 0. 判断游戏是否结束
         if (state == Dead) {throw runtime_error("The snake is dead");}
-    		// 计算下一时刻的蛇头位置
+    		
+    
+        // 1. 计算下一时刻的蛇头位置
       	Point nextHead = head;
         switch (direction) {
             case Right: nextHead.x++; break;
@@ -338,58 +396,111 @@ SnakeFoP
             case Up: nextHead.y--; break;
             default: break;
         }
+      
+      
+        // 2. 检查新蛇头所在点情况
+        // 2.1 检查出界
         if (nextHead.x < 0 || nextHead.x >= mapDefinition.width) {
-            // 碰到垂直边界
+            // 2.1.1 碰到垂直边界
             if (mapDefinition.borderIsObstacle[2] || mapDefinition.borderIsObstacle[3]) {
                 state = Dead;
                 return 0;
             }
-            // 碰到可传送边界
+            // 2.1.2 碰到可传送边界
             if (nextHead.x < 0) nextHead.x = mapDefinition.width - 1;
             else nextHead.x = 0;
         }
-    				// 碰到水平边界同理，略
+    				// 2.2 碰到水平边界同理，略
       
-        // 是否碰到传送点
+        // 2.2 检查是否碰到传送点
         if (portal[nextHead.x][nextHead.y] != SpecialPoint::Empty) nextHead = status.portal[nextHead.x][nextHead.y];
-    		// 是否碰到障碍
+    
+        // 2.3 是否碰到障碍
       	if (map[nextHead.x][nextHead.y].x == SpecialPoint::Obstacle.x) {
             state = Dead;
             return 0;
         }
-        // 碰到自己，注意尾部不能是头部
+    
+        // 2.4 碰到自己，注意尾部不能是头部
         if (map[nextHead.x][nextHead.y].x != SpecialPoint::Empty.x
             && map[nextHead.x][nextHead.y].x != SpecialPoint::Food.x
             && !(nextHead == tail && status.desiredLength == status.length)) {
             state = Dead;
             return 0;
-        }
-    
-        // 是否碰到食物
+        }    
+        // 2.5 是否碰到食物
         if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) {
             status.score += map[nextHead.x][nextHead.y].y;
             status.desiredLength += map[nextHead.x][nextHead.y].y;
             status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
             if (mode == 0) tot = GenerateFood(widget);
         }
-    
-        // 移动
+      
+        // 3. 修改操作
+        // 3.1 修改尾部
         Point nextTail = map[tail.x][tail.y];
-        // 变长
+    
+        // 3.2 若仍未到最大长度，变长
         if (status.length < status.desiredLength) ++status.length;
-    		// 或向前
+    		// 3.3 已到当前最大长度，向前
       	else {
             map[tail.x][tail.y] = SpecialPoint::Empty;
             tail = nextTail;
         }
+        // 3.4 更新头部
         map[head.x][head.y] = nextHead;
         head = nextHead;
         map[head.x][head.y] = SpecialPoint::Head;
+        // 4. 返回生成的食物数量
         return tot;
     }
-    ```
 
 ### **`widget`：主界面**
+
+  - 为避免各界面间过度耦合，项目中没有使用全局变量，而是采用**以`widget`为基类，各`page`页面继承同一个`widget`的方式**，主要是`playpage`和`replaypage`共用。
+
+  `widget`类额外定义的主要接口及变量如下
+  ```cpp
+  // 更新当前游戏记录，游戏/回放都需要
+  void ResetRecord(const Map &, const Config &); // 重放时需要
+  void ResetRecord(const Record &); // 重放时需要
+  void ResetRecord(); // 游戏时需要，以清空之前记录
+
+  // 游戏时用，更新当前记录
+  void UpdateRecordFood(int, int, int); 
+  void UpdateRecordMovement(char);
+  void UpdateTime(int);
+  void SetGameConfigPath(const QFileInfo &path);
+  void SetGameMapPath(const QFileInfo &path);
+  void SetMode(bool _mode);
+
+  // 回放时用，进行状态更新
+  char NextAction(); //
+  char GetCurrentAction();
+  int GetCurrentStep();
+  pair<Point, int> GetNextFood();
+  char GetNextMovement();
+  bool GetMode() const;
+  Record &GetGameRecord();
+  [[nodiscard]] Record GetRecord() const;
+  [[nodiscard]] bool IsEnd() const;
+
+  SettingPage *settingPage;
+  ReplayPage *replayPage;
+  PlayPage *playPage;
+
+  int seqPtr;
+  int movementPtr;
+  int foodPtr;
+  Record gameRecord;
+  ```
+
+  而`settingpage`，`replaypage`，`playpage`均含`Widget *widget`
+
+
+  如果不采用继承，需要定义全局变量，或在`widget`类里定义`static Record gameRecord`。限制应用多开，因为所有窗口都在共用同一个`record`；这也不便于本项目嵌入到其他游戏平台类项目中。
+
+  在`widget`初始化时，先将`{setting,replay,page}page`初始化，**将其`Widget`成员变量均设置为当前`widget`**，随后操作时只需**调用如`widget->NextAction()`**即可
 
   <center>
     <img src="./assets/widget.jpg" width="400" />
@@ -403,34 +514,22 @@ SnakeFoP
 
 ### **`playpage`：游戏界面**
 
-  - `GameOver`函数
-
+  - `GameOver`函数，主要涉及以时间戳命名，细节如下
     ```cpp
-    void PlayPage::GameOver() //主要涉及记录保存 {
-    		gameTimer->stop();
-        qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-        QDateTime dateTime;
-        dateTime.setMSecsSinceEpoch(timestamp);
-        QString format = "yyyy-MM-dd-hh-mm-ss";
-        QString formattedDateTime = dateTime.toString(format);
-        try {
-            RecordManager::SaveRecord(
-                QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec")
-                    .toStdString(), widget->GetRecord());
-        } catch (exception &e) {
-            QMessageBox::warning(this, "保存回放错误", e.what());
-            this->hide();
-            widget->show();
-            return;
-        }
-        // 判断是否结束
-        if (resultPage->exec() == QDialog::Accepted) {
-            widget->show();
-            this->hide();
-        } else {
-            this->done(0);
-            widget->close();
-        }
+    qint64 timestamp = QDateTime::currentMSecsSinceEpoch(); // 获取当前时间戳，为qint64类型
+    QDateTime dateTime;
+    dateTime.setMSecsSinceEpoch(timestamp); // 将qint64时间戳转化为QDateTime格式
+    QString format = "yyyy-MM-dd-hh-mm-ss";
+    QString formattedDateTime = dateTime.toString(format); // 将QDateTime转化为指定格式串
+    try {
+        RecordManager::SaveRecord(
+            QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec")
+                .toStdString(), widget->GetRecord()); // 保存
+    } catch (exception &e) {
+        QMessageBox::warning(this, "保存回放错误", e.what());
+        this->hide();
+        widget->show();
+        return;
     }
     ```
 
@@ -445,51 +544,21 @@ SnakeFoP
 ### **`replaypage`：回放界面**
 
   - `InitPlay`函数
-
+    - 每一次刷新时，先更新`curStep`时触发的方向改变/食物生成，再移动蛇
     ```cpp
-    bool ReplayPage::InitPlay(const QFileInfo &fileInfo) {
-        curStep = 0;
-        widget->SetMode(true);
-        ui->RecordLabel->setText(fileInfo.fileName());
-        Record tmp;
-    		// 读取记录，playpage没有这一步
-    		try {
-            tmp = RecordManager::LoadRecord(fileInfo.filePath().toStdString(), widget->GetGameRecord());
-        } catch (exception &e) {
-            QMessageBox::warning(this, "打开地图错误", e.what());
-            return false;
+    connect(gameTimer, &QTimer::timeout, this, [&]() {
+        if (widget->IsEnd()) {return;}
+        while (!widget->IsEnd() && widget->GetCurrentStep() == curStep) Step(); // 更新蛇方向/生成食物
+        if (!widget->IsEnd()) /*蛇移动*/{
+            ++curStep;
+            game->Step(widget);
+            ui->ScoreLabel->setText(QString::number(status.score));
+            ui->LengthLabel->setText(QString::number(status.length));
+            ui->Canvas->update();
         }
-        widget->ResetRecord();
-        widget->ResetRecord(tmp);
-        delete game;
-        game = new Game(widget->GetMap(), widget->GetConfig(), 1, widget);
-        ui->Canvas->SetGame(game);
-        auto &status = game->GetStatus();
-        game->SetStatus(Game::Alive);
-        delete gameTimer;
-        gameTimer = new QTimer(this);
-        // 每帧行动
-        connect(gameTimer, &QTimer::timeout, this, [&]() {
-            if (widget->IsEnd()) {
-                return;
-            }
-            // 更新蛇方向/生成食物
-            while (!widget->IsEnd() && widget->GetCurrentStep() == curStep) Step();
-            // 蛇移动
-            if (!widget->IsEnd()) {
-                ++curStep;
-                game->Step(widget);
-                ui->ScoreLabel->setText(QString::number(status.score));
-                ui->LengthLabel->setText(QString::number(status.length));
-                ui->Canvas->update();
-            }
-        });
-        // 调整gameTimer的间隔，可以实现快进
-        gameTimer->start((int) (TIME_INTERVAL / playRate * (1. / status.config.level)));
-        return true;
-    }
+    });
     ```
-  
+
 ### **`resultpage`：结果界面，略**
 
   <center>
@@ -499,7 +568,6 @@ SnakeFoP
       <b>结束页效果图</b>
     </div>
   </center>	
-
 ### **`main`：游戏启动入口，采用Qt默认配置，略**
 
 ## 四、扩展功能
@@ -509,3 +577,5 @@ SnakeFoP
 - #### 支持回放倍速，再也不用担心看不清蛇的轨迹了
 
 - #### 设置传送点，蛇可以触此传送，增添游戏趣味性
+
+- #### 支持应用多开，可以同时打开多个贪吃蛇
