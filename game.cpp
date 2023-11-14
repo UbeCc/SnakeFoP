@@ -21,6 +21,7 @@ Game::Game(const Map &map, const Config &config, int mode)
         1,
         2,
         vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+        vector<vector<Direction>>(map.width, vector<Direction>(map.height, Right)),
         vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
         vector<Point>(),
         map.spawnPoint,
@@ -34,7 +35,6 @@ Game::Game(const Map &map, const Config &config, int mode)
 
     for (auto portal: map.portals)
     {
-        // QUESTION
         status.portal[portal[0].x][portal[0].y] = portal[1];
         status.portal[portal[1].x][portal[1].y] = portal[0];
     }
@@ -55,6 +55,7 @@ Game::Game(const Map &map, const Config &config, int mode, Widget *widget)
         1,
         2,
         vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
+        vector<vector<Direction>>(map.width, vector<Direction>(map.height, Right)),
         vector<vector<Point>>(map.width, vector<Point>(map.height, SpecialPoint::Empty)),
         vector<Point>(),
         map.spawnPoint,
@@ -122,11 +123,7 @@ int Game::Step(Widget *widget)
     // Calculate next head
     Point nextHead = head;
 
-//    Right = 0,
-//    Down = 1,
-//    Left = 2,
-//    Up = 3
-
+    status.directionMap[head.x][head.y] = direction;
     switch (direction)
     {
         case Right:
@@ -234,6 +231,7 @@ int Game::Step(Widget *widget)
     map[head.x][head.y] = nextHead;
     head = nextHead;
     map[head.x][head.y] = SpecialPoint::Head;
+    status.directionMap[head.x][head.y] = direction;
     return tot;
 }
 
@@ -372,4 +370,21 @@ string Game::GetStatisticsString() const
 void Game::SetStatus(State state)
 {
     status.state = state;
+}
+
+Game::Direction operator-(Game::Direction d)
+{
+    switch (d)
+    {
+        case Game::Direction::Up:
+            return Game::Direction::Down;
+        case Game::Direction::Down:
+            return Game::Direction::Up;
+        case Game::Direction::Left:
+            return Game::Direction::Right;
+        case Game::Direction::Right:
+            return Game::Direction::Left;
+        default:
+            throw runtime_error("Invalid direction");
+    }
 }
