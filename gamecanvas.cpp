@@ -22,6 +22,8 @@ const QColor GameCanvas::portalColors[] = {
 void GameCanvas::SetGame(const Game *_game)
 {
     this->game = _game;
+    const auto &mapDef = _game->GetStatus().mapDefinition;
+    setMinimumSize(mapDef.width * 25, mapDef.height * 25);
     update();
 }
 
@@ -33,7 +35,7 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     }
 
     auto &status = game->GetStatus();
-    int col = status.mapDefinition.height, row = status.mapDefinition.width;
+    const int col = status.mapDefinition.height, row = status.mapDefinition.width;
 
     auto size = event->rect().size();
     int width = size.width(), height = size.height();
@@ -82,22 +84,157 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         painter.drawLine(xOffset, yOffset + col * blockSize, xOffset, yOffset);
     }
 
-    // draw snake
-    painter.setBrush(Qt::green);
+    // draw snake head
+    const static QBrush headBrush(QColor::fromHsv(91, 255, 56));
+    painter.setBrush(headBrush);
     painter.setPen(Qt::transparent);
     Point head = status.head;
-    painter.drawRect((int) (xOffset + margin + head.x * blockSize), int(yOffset + margin + head.y * blockSize),
-        (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+
+    switch (status.directionMap[head.x][head.y])
+    {
+        case Game::Direction::Up:
+            painter.drawRect((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + blockSize / 2. - margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize / 2.));
+            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+                0 * 16, 180 * 16);
+            break;
+        case Game::Direction::Down:
+            painter.drawRect((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize / 2.));
+            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+                180 * 16, 180 * 16);
+            break;
+        case Game::Direction::Left:
+            painter.drawRect((int) (xOffset + head.x * blockSize + blockSize / 2. - margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize / 2.), (int) (blockSize - 2 * margin));
+            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+                90 * 16, 180 * 16);
+            break;
+        case Game::Direction::Right:
+            painter.drawRect((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize / 2.), (int) (blockSize - 2 * margin));
+            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
+                (int) (yOffset + head.y * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+                270 * 16, 180 * 16);
+            break;
+    }
 
     Point tail = status.tail;
     Point curPoint = tail;
+    Point nextPoint = status.map[tail.x][tail.y];
+    Point previousPoint = tail;
     int l = -status.length;
+
+    // Draw snake tail if any
+    if (curPoint != head)
+    {
+        painter.setBrush(QColor::fromHsv(90, max(32, 255 + 8 * ++l), 104));
+        switch (status.directionMap[curPoint.x][curPoint.y])
+        {
+            case Game::Direction::Up:
+                painter.drawPolygon(QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                        (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                        (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 2.),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize / 4. * 3 - margin)),
+                }));
+                break;
+            case Game::Direction::Down:
+                painter.drawPolygon(QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 2.),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize / 4. * 1 + margin)),
+                }));
+                break;
+            case Game::Direction::Left:
+                painter.drawPolygon(QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                        (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 4. * 3 - margin),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize / 2.)),
+                }));
+                break;
+            case Game::Direction::Right:
+                painter.drawPolygon(QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                        (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 4. * 1 + margin),
+                        (int) (yOffset + curPoint.y * blockSize + blockSize / 2.)),
+                }));
+                break;
+        }
+
+        curPoint = nextPoint;
+    }
+
     while (curPoint != head)
     {
-        painter.setBrush(QColor::fromHsv(0, max(32, 255 + 8 * ++l), 255));
-        painter.drawRect((int) (xOffset + margin + curPoint.x * blockSize),
-            int(yOffset + margin + curPoint.y * blockSize),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        nextPoint = status.map[curPoint.x][curPoint.y];
+        painter.setBrush(QColor::fromHsv(90, max(32, 255 + 8 * ++l), 104));
+
+        const Game::Direction previousDirection = -status.directionMap[previousPoint.x][previousPoint.y];
+        const Game::Direction nextDirection = status.directionMap[curPoint.x][curPoint.y];
+
+        if ((previousDirection == Game::Direction::Up && nextDirection == Game::Direction::Right) ||
+            (previousDirection == Game::Direction::Right && nextDirection == Game::Direction::Up))
+        {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize + margin),
+                (int) (yOffset + curPoint.y * blockSize - blockSize + 3 * margin),
+                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                180 * 16, 90 * 16);
+        }
+        else if ((previousDirection == Game::Direction::Up && nextDirection == Game::Direction::Left) ||
+            (previousDirection == Game::Direction::Left && nextDirection == Game::Direction::Up))
+        {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize - blockSize + 3 * margin),
+                (int) (yOffset + curPoint.y * blockSize - blockSize + 3 * margin),
+                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                270 * 16, 90 * 16);
+        }
+        else if ((previousDirection == Game::Direction::Down && nextDirection == Game::Direction::Right) ||
+            (previousDirection == Game::Direction::Right && nextDirection == Game::Direction::Down))
+        {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize + margin),
+                (int) (yOffset + curPoint.y * blockSize + margin),
+                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                90 * 16, 90 * 16);
+        }
+        else if ((previousDirection == Game::Direction::Down && nextDirection == Game::Direction::Left) ||
+            (previousDirection == Game::Direction::Left && nextDirection == Game::Direction::Down))
+        {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize - blockSize + 3 * margin),
+                (int) (yOffset + curPoint.y * blockSize + margin),
+                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                0 * 16, 90 * 16);
+        }
+        else
+        {
+            painter.drawRect((int) (xOffset + margin + curPoint.x * blockSize),
+                (int) (yOffset + margin + curPoint.y * blockSize),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        }
+
+        previousPoint = curPoint;
         curPoint = status.map[curPoint.x][curPoint.y];
     }
 
@@ -134,17 +271,16 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         for (const auto &p: portal)
         {
             // Draw a rhombus
-            painter.drawPolygon(
-                QPolygonF({
-                    QPointF(xOffset + p.x * blockSize + 3 * margin,
-                        yOffset + p.y * blockSize + blockSize / 2.),
-                    QPointF(xOffset + p.x * blockSize + blockSize / 2.,
-                        yOffset + p.y * blockSize + 3 * margin),
-                    QPointF(xOffset + (p.x + 1) * blockSize - 3 * margin,
-                        yOffset + p.y * blockSize + blockSize / 2.),
-                    QPointF(xOffset + p.x * blockSize + blockSize / 2.,
-                        yOffset + (p.y + 1) * blockSize - 3 * margin),
-                }));
+            painter.drawPolygon(QPolygon({
+                QPoint((int) (xOffset + p.x * blockSize + 3 * margin),
+                    (int) (yOffset + p.y * blockSize + blockSize / 2.)),
+                QPoint((int) (xOffset + p.x * blockSize + blockSize / 2.),
+                    (int) (yOffset + p.y * blockSize + 3 * margin)),
+                QPoint((int) (xOffset + (p.x + 1) * blockSize - 3 * margin),
+                    (int) (yOffset + p.y * blockSize + blockSize / 2.)),
+                QPoint((int) (xOffset + p.x * blockSize + blockSize / 2.),
+                    (int) (yOffset + (p.y + 1) * blockSize - 3 * margin)),
+            }));
         }
     }
 }

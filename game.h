@@ -55,6 +55,8 @@ private:
         /// y
         vector<vector<Point>> map;
 
+        vector<vector<Direction>> directionMap;
+
         /// Definition:
         /// If p points to (x, y), the other side is (x, y).
         /// If p[x] == -4, then p is not a portal.
@@ -104,5 +106,7 @@ public:
 
     void UpdateFood(Widget *widget);
 };
+
+Game::Direction operator-(Game::Direction d);
 
 #endif //SNAKEFOP_GAME_H
