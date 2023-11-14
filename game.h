@@ -73,6 +73,10 @@ public:
         constexpr static Point Obstacle{-1, 0};
         constexpr static Point Head{-3, 0};
         constexpr static Point Food{-5, 0};
+        constexpr static Point Up{0, -1};
+        constexpr static Point Down{0, 1};
+        constexpr static Point Left{-1, 0};
+        constexpr static Point Right{1, 0};
     };
 
 public:

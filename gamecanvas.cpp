@@ -82,7 +82,7 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         painter.drawLine(xOffset, yOffset + col * blockSize, xOffset, yOffset);
     }
 
-    // draw snake
+    // draw snake head
     painter.setBrush(Qt::green);
     painter.setPen(Qt::transparent);
     Point head = status.head;
@@ -91,13 +91,101 @@ void GameCanvas::paintEvent(QPaintEvent *event)
 
     Point tail = status.tail;
     Point curPoint = tail;
+    Point nextPoint = status.map[tail.x][tail.y];
+    Point previousPoint = tail;
     int l = -status.length;
+
+    // Draw snake tail
+    if (curPoint != head) {
+        painter.setBrush(QColor::fromHsv(0, max(32, 255 + 8 * ++l), 255));
+        Point direction = nextPoint - curPoint;
+        if (direction == Game::SpecialPoint::Up) {
+            painter.drawPolygon(
+                QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                           (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                           (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 2.),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize / 4. * 3 - margin)),
+                }));
+        }
+        else if (direction == Game::SpecialPoint::Down) {
+            painter.drawPolygon(
+                QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 2.),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize / 4. * 1 + margin)),
+                }));
+        }
+        else if (direction == Game::SpecialPoint::Left) {
+            painter.drawPolygon(
+                QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                           (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 4. * 3 - margin),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize / 2.)),
+                }));
+        }
+        else if (direction == Game::SpecialPoint::Right) {
+            painter.drawPolygon(
+                QPolygon({
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                           (int) (yOffset + curPoint.y * blockSize + margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
+                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 4. * 1 + margin),
+                           (int) (yOffset + curPoint.y * blockSize + blockSize / 2.)),
+                }));
+        }
+
+        curPoint = nextPoint;
+    }
+
     while (curPoint != head)
     {
+        nextPoint = status.map[curPoint.x][curPoint.y];
         painter.setBrush(QColor::fromHsv(0, max(32, 255 + 8 * ++l), 255));
-        painter.drawRect((int) (xOffset + margin + curPoint.x * blockSize),
-            int(yOffset + margin + curPoint.y * blockSize),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+
+        Point previousDirection = previousPoint - curPoint;
+        Point nextDirection = nextPoint - curPoint;
+
+        if ((previousDirection == Game::SpecialPoint::Up && nextDirection == Game::SpecialPoint::Right) ||
+            (previousDirection == Game::SpecialPoint::Right && nextDirection == Game::SpecialPoint::Up)) {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize + margin),
+                            (int) (yOffset + curPoint.y * blockSize - blockSize + 3 * margin),
+                            (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                            180 * 16, 90 * 16);
+        } else if ((previousDirection == Game::SpecialPoint::Up && nextDirection == Game::SpecialPoint::Left) ||
+                   (previousDirection == Game::SpecialPoint::Left && nextDirection == Game::SpecialPoint::Up)) {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize - blockSize + 3 * margin),
+                            (int) (yOffset + curPoint.y * blockSize - blockSize + 3 * margin),
+                            (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                            270 * 16, 90 * 16);
+        } else if ((previousDirection == Game::SpecialPoint::Down && nextDirection == Game::SpecialPoint::Right) ||
+                   (previousDirection == Game::SpecialPoint::Right && nextDirection == Game::SpecialPoint::Down)) {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize + margin),
+                            (int) (yOffset + curPoint.y * blockSize + margin),
+                            (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                            90 * 16, 90 * 16);
+        } else if ((previousDirection == Game::SpecialPoint::Down && nextDirection == Game::SpecialPoint::Left) ||
+                   (previousDirection == Game::SpecialPoint::Left && nextDirection == Game::SpecialPoint::Down)) {
+            painter.drawPie((int) (xOffset + curPoint.x * blockSize - blockSize + 3 * margin),
+                            (int) (yOffset + curPoint.y * blockSize + margin),
+                            (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+                            0 * 16, 90 * 16);
+        } else {
+            painter.drawRect((int) (xOffset + margin + curPoint.x * blockSize),
+                             (int) (yOffset + margin + curPoint.y * blockSize),
+                             (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        }
+
+        previousPoint = curPoint;
         curPoint = status.map[curPoint.x][curPoint.y];
     }
 
