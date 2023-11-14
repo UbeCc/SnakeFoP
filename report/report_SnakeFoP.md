@@ -149,9 +149,9 @@ struct Config {
     array<float, 3> foodProbabilities;
 };
 ```
-    
+
 `ConfigManager`类设置如下
-  
+
 ```cpp
 class ConfigManager {
 private:
@@ -163,12 +163,13 @@ public:
     [[nodiscard]] static string GetConfigString(const Config &config);
 };
 ```
-    
+
 主要函数包括：
 
 - `LoadConfig`：从指定路径中加载配置文件
 - `SaveConfig`：将配置文档保存至指定路径
-    
+  
+
 考虑到游戏记录中需包含配置信息，编写函数将配置以字符串形式存储
     
 - `LoadConfigFromString`：从`string`中读取配置，保存为`Config`。采用`stringstream`
@@ -188,9 +189,9 @@ struct Map {
     Point spawnPoint; // 起始位置
 };
 ```
-  
+
 `MapManager`类设置如下
-  
+
 ```cpp
 class MapManager {
 private:
@@ -208,7 +209,7 @@ public:
 ### `configeditor`：配置编辑器
 
 主要函数如下
-  
+
 ```cpp
 private slots:
     void OnNewConfigButtonClicked(); // 创建配置
@@ -244,7 +245,7 @@ try {
 
 ### `mapeditor`：地图编辑器
 
-除与 `configeditor` 类似函数外，主要函数如下, 大都是基本的 GUI 回调逻辑. 需要特别指出的一点是 mapEditor 通过 **传递函数参数** 给 `GameCanvas` 的方式实现 `OnObstaclePainterMouseSelect` 等鼠标回调, 以保存 `GameCanvas` 对自身属性计算 (如大小等) 的封装和保护.
+除与 `configeditor` 类似函数外，主要函数如下, 大都是基本的 `GUI` 回调逻辑. 需要特别指出的一点是 mapEditor 通过 **传递函数参数** 给 `GameCanvas` 的方式实现 `OnObstaclePainterMouseSelect` 等鼠标回调, 以保存 `GameCanvas` 对自身属性计算 (如大小等) 的封装和保护.
 
 ```cpp
 private slots:
@@ -301,6 +302,7 @@ public slots:
     
 需注意此后我们进行的蛇、食物、传送点、障碍绘制均基于原画布左上角，这意味着每次绘制时我们都需要相应地加上 $xOffset$，$yOffset$，如绘制障碍物
     
+
 ```cpp
 auto obstacles = status.mapDefinition.obstacles;
 for (const auto &obstacle: obstacles) {
@@ -360,17 +362,17 @@ public
 
 其中，`map`定义如下:
 
-  - 利用地图中每一点的x,y值均大于等于0，将x值小于0的点设置为特殊点（见 `SpecialPoint` 类）。考虑Point p{x,y}，
+  - 利用地图中每一点的x,y值均大于等于0，将x值小于0的点设置为特殊点（见 `SpecialPoint` 类）。考虑`Point p{x,y}`，
   
-  - 如果p指向(x,y)，即map[x][y]=p（注意此时x>=0,y>=0），表示p点被蛇占用
+  - 如果`p`指向`(x,y)`，即`map[x][y]=p`（注意此时`x>=0`,`y>=0`），表示p点被蛇占用
   
-  - 如果map[x][y].x=-3，表示p点是蛇头
+  - 如果`map[x][y].x=-3`，表示p点是蛇头
   
-  - 如果map[x][y].x=-4，表示p点为空地
+  - 如果`map[x][y].x=-4`，表示p点为空地
   
-  - 如果map[x][y].x=-2，表示p点指向传送点
+  - 如果`map[x][y].x=-2`，表示p点指向传送点
   
-  - 如果map[x][y].x=-5，表示p点是食物，map[x][y].y是食物的分值
+  - 如果`map[x][y].x=-5`，表示p点是食物，`map[x][y].y`是食物的分值
 
 这样的设计能够在 **常数时间** 内访问蛇尾和蛇头, 且能够在 **常数时间** 内完成蛇向前移动一步的操作. 同时, 这样的数据结构还允许在 **线性时间** 内完成从蛇尾到蛇头的遍历并获取坐标.
 
@@ -561,4 +563,4 @@ Record gameRecord;
 
 ### 设置传送点，蛇可以触此传送，增添游戏趣味性
 
-通过传送点设计，显著增加了贪吃蛇 AI 算法的难度，使得游戏更加具有挑战性。（也因此我们没有实现 AI）
+通过传送点设计，显著增加了贪吃蛇 AI 算法的难度，使得游戏更加具有挑战性。~~也因此我们没有实现 AI~~
