@@ -62,10 +62,27 @@ DISTFILES += \
     maps/* \
     record/*\
 
-copyconfig.commands = $(COPY_DIR) $$shell_path("$$PWD/config") $$shell_path("$$OUT_PWD/")
-copymaps.commands = $(COPY_DIR) $$shell_path("$$PWD/maps") $$shell_path("$$OUT_PWD/")
-first.depends = $(first) copymaps copyconfig
-export(first.depends)
-export(copyconfig.commands)
-export(copymaps.commands)
-QMAKE_EXTRA_TARGETS += first copyconfig copymaps
+win32 {
+    copyconfig.commands = $(COPY_DIR) $$shell_path("$$PWD/config") $$shell_path("$$OUT_PWD/")
+    copymaps.commands = $(COPY_DIR) $$shell_path("$$PWD/maps") $$shell_path("$$OUT_PWD/")
+    first.depends = $(first) copymaps copyconfig
+    export(first.depends)
+    export(copyconfig.commands)
+    export(copymaps.commands)
+    QMAKE_EXTRA_TARGETS += first copyconfig copymaps
+}
+
+unix {
+    copyconfig.commands = $(COPY_DIR) $$shell_path("$$PWD/config") $$shell_path("$$OUT_PWD/")
+    copymaps.commands = $(COPY_DIR) $$shell_path("$$PWD/maps") $$shell_path("$$OUT_PWD/")
+    first.depends = $(first) copymaps copyconfig
+    export(first.depends)
+    export(copyconfig.commands)
+    export(copymaps.commands)
+    QMAKE_EXTRA_TARGETS += first copyconfig copymaps
+}
+
+mac {
+    system("chmod +x $${PWD}/run_macos.sh")
+    QMAKE_POST_LINK += $$quote($${PWD}/run_macos.sh $${PWD} $${OUT_PWD})
+}
