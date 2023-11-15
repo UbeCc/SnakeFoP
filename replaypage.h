@@ -31,6 +31,11 @@ public:
 
     int GetLength();
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *) override;
+
 private slots:
 
     void Step();

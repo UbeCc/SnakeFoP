@@ -168,3 +168,20 @@ void ReplayPage::OnPlayRateBoxChanged()
     gameTimer->stop();
     gameTimer->start((int) (TIME_INTERVAL / playRate * (1. / game->GetStatus().config.level)));
 }
+
+void ReplayPage::closeEvent(QCloseEvent *event)
+{
+    if (gameTimer != nullptr && gameTimer->isActive()) gameTimer->stop();
+    this->hide();
+    widget->show();
+    event->ignore();
+}
+
+void ReplayPage::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape)
+    {
+        if (gameTimer != nullptr && gameTimer->isActive()) gameTimer->stop();
+        this->hide();
+        widget->show();
+    }
+}
