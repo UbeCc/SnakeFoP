@@ -20,6 +20,7 @@ PlayPage::PlayPage(QWidget *parent) :
     resultPage(new ResultPage(this))
 {
     ui->setupUi(this);
+    gameTimer->setTimerType(Qt::PreciseTimer);
     connect(gameTimer, &QTimer::timeout, this, [&]()
     {
         ++steps;
@@ -95,7 +96,10 @@ bool PlayPage::InitPlay()
     ui->LengthLabel->setText("1");
     ui->Canvas->SetGame(game);
     auto &status = game->GetStatus();
-    gameTimer->start((int) (TIME_INTERVAL * (1. / status.config.level)));
+
+    // Set timer and pause at entry
+    gameTimer->setInterval((int) (TIME_INTERVAL * (1. / status.config.level)));
+    ui->PausedLabel->show();
 
     return true;
 }
@@ -162,9 +166,14 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             }
             break;
         case Qt::Key_Space:
-            gameTimer->stop();
-            QMessageBox::information(this, "暂停", "按下OK键以继续...");
-            gameTimer->start();
+            if(gameTimer->isActive()) {
+                gameTimer->stop();
+                ui->PausedLabel->show();
+            }
+            else {
+                gameTimer->start();
+                ui->PausedLabel->hide();
+            }
             break;
         default:
             break;
