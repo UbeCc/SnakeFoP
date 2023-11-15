@@ -26,6 +26,9 @@ public slots:
     void mousePressEvent(QMouseEvent *event) override;
 
     void mouseMoveEvent(QMouseEvent *event) override;
+
+private:
+    void CalculateBlockSizeAndOffset(int &blockSize, int &row, int &col, int &xOffset, int &yOffset) const;
 };
 
 #endif // GAMECANVAS_H

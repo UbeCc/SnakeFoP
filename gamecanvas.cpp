@@ -27,6 +27,39 @@ void GameCanvas::SetGame(const Game *_game)
     update();
 }
 
+void GameCanvas::CalculateBlockSizeAndOffset(int &blockSize, int &row, int &col, int &xOffset, int &yOffset) const
+{
+    auto size = this->rect().size();
+    int width = size.width(), height = size.height();
+
+    const auto &map = game->GetStatus().mapDefinition;
+    col = map.height, row = map.width;
+
+    int visualCol = col, visualRow = row;
+
+    // HBorder is the top and bottom border (horizontal), VBorder is the left and right border
+    bool hBorder = map.borderIsObstacle[0] || map.borderIsObstacle[1],
+        vBorder = map.borderIsObstacle[2] || map.borderIsObstacle[3];
+
+    if (hBorder)
+    {
+        visualCol += 2;
+    }
+
+    if (vBorder)
+    {
+        visualRow += 2;
+    }
+
+    blockSize = min(width / visualRow, height / visualCol);
+
+    width = blockSize * visualRow;
+    height = blockSize * visualCol;
+
+    xOffset = (size.width() - width) / 2 + (vBorder ? blockSize : 0);
+    yOffset = (size.height() - height) / 2 + (hBorder ? blockSize : 0);
+}
+
 void GameCanvas::paintEvent(QPaintEvent *event)
 {
     if (!game)
@@ -35,53 +68,69 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     }
 
     auto &status = game->GetStatus();
-    const int col = status.mapDefinition.height, row = status.mapDefinition.width;
-
-    auto size = event->rect().size();
-    int width = size.width(), height = size.height();
-
-    const int blockSize = min(width / row, height / col);
-
-    width = blockSize * row;
-    height = blockSize * col;
-
-    const int xOffset = (size.width() - width) / 2;
-    const int yOffset = (size.height() - height) / 2;
+    int col, row, blockSize, xOffset, yOffset;
+    CalculateBlockSizeAndOffset(blockSize, row, col, xOffset, yOffset);
 
     constexpr double BLOCK_MARGIN = 0.05;
     const double margin = blockSize * BLOCK_MARGIN;
 
     QPainter painter(this);
 
+    bool hBorder = status.mapDefinition.borderIsObstacle[0] || status.mapDefinition.borderIsObstacle[1],
+        vBorder = status.mapDefinition.borderIsObstacle[2] || status.mapDefinition.borderIsObstacle[3];
+
     // draw playground
     painter.setBrush(Qt::gray);
     painter.setPen(Qt::transparent);
-    painter.drawRect(xOffset, yOffset, row * blockSize, col * blockSize);
+    painter.drawRect((int) (xOffset - (vBorder ? blockSize : 0) - margin),
+        (int) (yOffset - (hBorder ? blockSize : 0) - margin),
+        (int) (row * blockSize + (vBorder ? 2 : 0) * blockSize + 2 * margin),
+        (int) (col * blockSize + (hBorder ? 2 : 0) * blockSize + 2 * margin));
 
     // draw border
-    const static QPen borderPen(Qt::red, 3);
-    if (status.mapDefinition.borderIsObstacle[0])
+    const static QBrush borderBrush(QColor::fromHsv(0, 0, 72));
+    painter.setBrush(borderBrush);
+
+    if (hBorder)
     {
-        painter.setPen(borderPen);
-        painter.drawLine(xOffset, yOffset, xOffset + row * blockSize, yOffset);
+        for (int i = 0; i < status.mapDefinition.width; ++i)
+        {
+            painter.drawRect((int) (xOffset + i * blockSize + margin),
+                (int) (yOffset - blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+            painter.drawRect((int) (xOffset + i * blockSize + margin),
+                (int) (yOffset + status.mapDefinition.height * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        }
     }
 
-    if (status.mapDefinition.borderIsObstacle[1])
+    if (vBorder)
     {
-        painter.setPen(borderPen);
-        painter.drawLine(xOffset + row * blockSize, yOffset + col * blockSize, xOffset, yOffset + col * blockSize);
+        for (int i = 0; i < status.mapDefinition.height; ++i)
+        {
+            painter.drawRect((int) (xOffset - blockSize + margin),
+                (int) (yOffset + i * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+            painter.drawRect((int) (xOffset + status.mapDefinition.width * blockSize + margin),
+                (int) (yOffset + i * blockSize + margin),
+                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        }
     }
 
-    if (status.mapDefinition.borderIsObstacle[2])
+    if (hBorder && vBorder)
     {
-        painter.setPen(borderPen);
-        painter.drawLine(xOffset + row * blockSize, yOffset, xOffset + row * blockSize, yOffset + col * blockSize);
-    }
-
-    if (status.mapDefinition.borderIsObstacle[3])
-    {
-        painter.setPen(borderPen);
-        painter.drawLine(xOffset, yOffset + col * blockSize, xOffset, yOffset);
+        painter.drawRect((int) (xOffset - blockSize + margin),
+            (int) (yOffset - blockSize + margin),
+            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        painter.drawRect((int) (xOffset + status.mapDefinition.width * blockSize + margin),
+            (int) (yOffset - blockSize + margin),
+            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        painter.drawRect((int) (xOffset - blockSize + margin),
+            (int) (yOffset + status.mapDefinition.height * blockSize + margin),
+            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        painter.drawRect((int) (xOffset + status.mapDefinition.width * blockSize + margin),
+            (int) (yOffset + status.mapDefinition.height * blockSize + margin),
+            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
     }
 
     // draw snake head
@@ -132,7 +181,6 @@ void GameCanvas::paintEvent(QPaintEvent *event)
 
     Point tail = status.tail;
     Point curPoint = tail;
-    Point nextPoint = status.map[tail.x][tail.y];
     Point previousPoint = tail;
     int l = -status.length;
 
@@ -184,12 +232,11 @@ void GameCanvas::paintEvent(QPaintEvent *event)
                 break;
         }
 
-        curPoint = nextPoint;
+        curPoint = status.map[curPoint.x][curPoint.y];
     }
 
     while (curPoint != head)
     {
-        nextPoint = status.map[curPoint.x][curPoint.y];
         painter.setBrush(QColor::fromHsv(90, max(32, 255 + 8 * ++l), 104));
 
         const Game::Direction previousDirection = -status.directionMap[previousPoint.x][previousPoint.y];
@@ -306,19 +353,8 @@ void GameCanvas::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-    auto &status = game->GetStatus();
-    int col = status.mapDefinition.height, row = status.mapDefinition.width;
-
-    auto size = this->rect().size();
-    int width = size.width(), height = size.height();
-
-    const int blockSize = min(width / row, height / col);
-
-    width = blockSize * row;
-    height = blockSize * col;
-
-    const int xOffset = (size.width() - width) / 2;
-    const int yOffset = (size.height() - height) / 2;
+    int col, row, blockSize, xOffset, yOffset;
+    CalculateBlockSizeAndOffset(blockSize, row, col, xOffset, yOffset);
 
     const int x = ((int) event->position().x() - xOffset) / blockSize,
         y = ((int) event->position().y() - yOffset) / blockSize;
