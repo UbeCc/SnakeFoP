@@ -3,8 +3,9 @@
 #### 《程序设计基础》2023秋，兴军亮老师课堂
 
 <div style="justify-content: center; text-align: center;">
-  <img src="./assets/cover.png" width="400" />
+  <img src="./assets/cover.jpg" width="400" />
 </div>
+
 
 ## 一、成员及分工
 
@@ -546,12 +547,13 @@ Record gameRecord;
 通过精妙的 GUI 设计，我们实现了地图绘制功能。用户可以通过用鼠标在地图上拖动来绘制和擦除障碍物，也可以通过点击按钮来绘制边界、传送点、初始点。这种方式使得地图绘制更加直观，也更加容易上手。所有的样例地图都是通过这种方式绘制的。
 
 <div style="justify-content: center; text-align: center;">
-  <img src="./assets/mapeditoroperation.png" width="400" />
+  <img src="./assets/mapeditoroperation.jpg" width="400" />
   <br>
   <div>
     <b>地图绘制功能</b>
   </div>
 </div>
+
 
 ### 跨平台支持，Windows、MacOS、Linux 通吃
 
