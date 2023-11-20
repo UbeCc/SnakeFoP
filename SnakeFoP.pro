@@ -63,8 +63,8 @@ DISTFILES += \
     record/*\
 
 win32 {
-    copyconfig.commands = $(COPY_DIR) $$shell_path("$$PWD/config") $$shell_path("$$OUT_PWD/")
-    copymaps.commands = $(COPY_DIR) $$shell_path("$$PWD/maps") $$shell_path("$$OUT_PWD/")
+    copyconfig.commands = $(COPY_DIR) $$shell_path("$$PWD/config") $$shell_path("$$OUT_PWD/debug/config")
+    copymaps.commands = $(COPY_DIR) $$shell_path("$$PWD/maps") $$shell_path("$$OUT_PWD/debug/maps")
     first.depends = $(first) copymaps copyconfig
     export(first.depends)
     export(copyconfig.commands)
