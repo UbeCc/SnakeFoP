@@ -23,14 +23,14 @@ void GameCanvas::SetGame(const Game *_game)
 {
     this->game = _game;
     const auto &mapDef = _game->GetStatus().mapDefinition;
-    setMinimumSize(mapDef.width * 25, mapDef.height * 25);
+    setMinimumSize(mapDef.width * 25 + 10, mapDef.height * 25 + 10);
     update();
 }
 
 void GameCanvas::CalculateBlockSizeAndOffset(int &blockSize, int &row, int &col, int &xOffset, int &yOffset) const
 {
     auto size = this->rect().size();
-    int width = size.width(), height = size.height();
+    int width = size.width() - 10, height = size.height() - 10;
 
     const auto &map = game->GetStatus().mapDefinition;
     col = map.height, row = map.width;
@@ -72,7 +72,7 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     CalculateBlockSizeAndOffset(blockSize, row, col, xOffset, yOffset);
 
     constexpr double BLOCK_MARGIN = 0.05;
-    const double margin = blockSize * BLOCK_MARGIN;
+    const int margin = (int)std::ceil(blockSize * BLOCK_MARGIN);
 
     QPainter painter(this);
 
@@ -80,12 +80,20 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         vBorder = status.mapDefinition.borderIsObstacle[2] || status.mapDefinition.borderIsObstacle[3];
 
     // draw playground
+    const static QPen canvasBorderPen(Qt::gray, 2);
+    painter.setPen(canvasBorderPen);
+    painter.setBrush(Qt::transparent);
+    painter.drawRect(xOffset - (vBorder ? blockSize : 0) - 3,
+        yOffset - (hBorder ? blockSize : 0) - 3,
+        row * blockSize + (vBorder ? 2 : 0) * blockSize + 6,
+        col * blockSize + (hBorder ? 2 : 0) * blockSize + 6);
+
     painter.setBrush(Qt::gray);
     painter.setPen(Qt::transparent);
-    painter.drawRect((int) (xOffset - (vBorder ? blockSize : 0) - margin),
-        (int) (yOffset - (hBorder ? blockSize : 0) - margin),
-        (int) (row * blockSize + (vBorder ? 2 : 0) * blockSize + 2 * margin),
-        (int) (col * blockSize + (hBorder ? 2 : 0) * blockSize + 2 * margin));
+    painter.drawRect(xOffset - (vBorder ? blockSize : 0),
+        yOffset - (hBorder ? blockSize : 0),
+        row * blockSize + (vBorder ? 2 : 0) * blockSize,
+        col * blockSize + (hBorder ? 2 : 0) * blockSize);
 
     // draw border
     const static QBrush borderBrush(QColor::fromHsv(0, 0, 72));
@@ -95,12 +103,12 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     {
         for (int i = 0; i < status.mapDefinition.width; ++i)
         {
-            painter.drawRect((int) (xOffset + i * blockSize + margin),
-                (int) (yOffset - blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-            painter.drawRect((int) (xOffset + i * blockSize + margin),
-                (int) (yOffset + status.mapDefinition.height * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+            painter.drawRect(xOffset + i * blockSize + margin,
+                yOffset - blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin);
+            painter.drawRect(xOffset + i * blockSize + margin,
+                yOffset + status.mapDefinition.height * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin);
         }
     }
 
@@ -108,29 +116,29 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     {
         for (int i = 0; i < status.mapDefinition.height; ++i)
         {
-            painter.drawRect((int) (xOffset - blockSize + margin),
-                (int) (yOffset + i * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-            painter.drawRect((int) (xOffset + status.mapDefinition.width * blockSize + margin),
-                (int) (yOffset + i * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+            painter.drawRect(xOffset - blockSize + margin,
+                yOffset + i * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin);
+            painter.drawRect(xOffset + status.mapDefinition.width * blockSize + margin,
+                yOffset + i * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin);
         }
     }
 
     if (hBorder && vBorder)
     {
-        painter.drawRect((int) (xOffset - blockSize + margin),
-            (int) (yOffset - blockSize + margin),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-        painter.drawRect((int) (xOffset + status.mapDefinition.width * blockSize + margin),
-            (int) (yOffset - blockSize + margin),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-        painter.drawRect((int) (xOffset - blockSize + margin),
-            (int) (yOffset + status.mapDefinition.height * blockSize + margin),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
-        painter.drawRect((int) (xOffset + status.mapDefinition.width * blockSize + margin),
-            (int) (yOffset + status.mapDefinition.height * blockSize + margin),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        painter.drawRect(xOffset - blockSize + margin,
+            yOffset - blockSize + margin,
+            blockSize - 2 * margin, blockSize - 2 * margin);
+        painter.drawRect(xOffset + status.mapDefinition.width * blockSize + margin,
+            yOffset - blockSize + margin,
+            blockSize - 2 * margin, blockSize - 2 * margin);
+        painter.drawRect(xOffset - blockSize + margin,
+            yOffset + status.mapDefinition.height * blockSize + margin,
+            blockSize - 2 * margin, blockSize - 2 * margin);
+        painter.drawRect(xOffset + status.mapDefinition.width * blockSize + margin,
+            yOffset + status.mapDefinition.height * blockSize + margin,
+            blockSize - 2 * margin, blockSize - 2 * margin);
     }
 
     // draw snake head
@@ -142,39 +150,39 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     switch (status.directionMap[head.x][head.y])
     {
         case Game::Direction::Up:
-            painter.drawRect((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + blockSize / 2. - margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize / 2.));
-            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+            painter.drawRect(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + blockSize / 2 - margin,
+                blockSize - 2 * margin, blockSize / 2);
+            painter.drawPie(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin,
                 0 * 16, 180 * 16);
             break;
         case Game::Direction::Down:
-            painter.drawRect((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize / 2.));
-            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+            painter.drawRect(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize - 2 * margin, blockSize / 2);
+            painter.drawPie(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin,
                 180 * 16, 180 * 16);
             break;
         case Game::Direction::Left:
-            painter.drawRect((int) (xOffset + head.x * blockSize + blockSize / 2. - margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize / 2.), (int) (blockSize - 2 * margin));
-            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+            painter.drawRect(xOffset + head.x * blockSize + blockSize / 2 - margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize / 2, blockSize - 2 * margin);
+            painter.drawPie(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin,
                 90 * 16, 180 * 16);
             break;
         case Game::Direction::Right:
-            painter.drawRect((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize / 2.), (int) (blockSize - 2 * margin));
-            painter.drawPie((int) (xOffset + head.x * blockSize + margin),
-                (int) (yOffset + head.y * blockSize + margin),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin),
+            painter.drawRect(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize / 2, blockSize - 2 * margin);
+            painter.drawPie(xOffset + head.x * blockSize + margin,
+                yOffset + head.y * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin,
                 270 * 16, 180 * 16);
             break;
     }
@@ -192,42 +200,42 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         {
             case Game::Direction::Up:
                 painter.drawPolygon(QPolygon({
-                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
-                        (int) (yOffset + curPoint.y * blockSize + margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
-                        (int) (yOffset + curPoint.y * blockSize + margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 2.),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize / 4. * 3 - margin)),
+                    QPoint(xOffset + curPoint.x * blockSize + margin,
+                        yOffset + curPoint.y * blockSize + margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize - margin,
+                        yOffset + curPoint.y * blockSize + margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize / 2,
+                        yOffset + curPoint.y * blockSize + blockSize * 3 / 4 - margin),
                 }));
                 break;
             case Game::Direction::Down:
                 painter.drawPolygon(QPolygon({
-                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 2.),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize / 4. * 1 + margin)),
+                    QPoint(xOffset + curPoint.x * blockSize + margin,
+                        yOffset + curPoint.y * blockSize + blockSize - margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize - margin,
+                        yOffset + curPoint.y * blockSize + blockSize - margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize / 2,
+                        yOffset + curPoint.y * blockSize + blockSize / 4 + margin),
                 }));
                 break;
             case Game::Direction::Left:
                 painter.drawPolygon(QPolygon({
-                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
-                        (int) (yOffset + curPoint.y * blockSize + margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + margin),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 4. * 3 - margin),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize / 2.)),
+                    QPoint(xOffset + curPoint.x * blockSize + margin,
+                        yOffset + curPoint.y * blockSize + margin),
+                    QPoint(xOffset + curPoint.x * blockSize + margin,
+                        yOffset + curPoint.y * blockSize + blockSize - margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize * 3 / 4 - margin,
+                        yOffset + curPoint.y * blockSize + blockSize / 2),
                 }));
                 break;
             case Game::Direction::Right:
                 painter.drawPolygon(QPolygon({
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
-                        (int) (yOffset + curPoint.y * blockSize + margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize - margin),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize - margin)),
-                    QPoint((int) (xOffset + curPoint.x * blockSize + blockSize / 4. * 1 + margin),
-                        (int) (yOffset + curPoint.y * blockSize + blockSize / 2.)),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize - margin,
+                        yOffset + curPoint.y * blockSize + margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize - margin,
+                        yOffset + curPoint.y * blockSize + blockSize - margin),
+                    QPoint(xOffset + curPoint.x * blockSize + blockSize / 4 + margin,
+                        yOffset + curPoint.y * blockSize + blockSize / 2),
                 }));
                 break;
         }
@@ -245,40 +253,39 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         if ((previousDirection == Game::Direction::Up && nextDirection == Game::Direction::Right) ||
             (previousDirection == Game::Direction::Right && nextDirection == Game::Direction::Up))
         {
-            painter.drawPie((int) (xOffset + curPoint.x * blockSize + margin),
-                (int) (yOffset + curPoint.y * blockSize - blockSize + 3 * margin),
-                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+            painter.drawPie(xOffset + curPoint.x * blockSize + margin,
+                yOffset + curPoint.y * blockSize - blockSize + 3 * margin,
+                2 * blockSize - 4 * margin, 2 * blockSize - 4 * margin,
                 180 * 16, 90 * 16);
         }
         else if ((previousDirection == Game::Direction::Up && nextDirection == Game::Direction::Left) ||
             (previousDirection == Game::Direction::Left && nextDirection == Game::Direction::Up))
         {
-            painter.drawPie((int) (xOffset + curPoint.x * blockSize - blockSize + 3 * margin),
-                (int) (yOffset + curPoint.y * blockSize - blockSize + 3 * margin),
-                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+            painter.drawPie(xOffset + curPoint.x * blockSize - blockSize + 3 * margin,
+                yOffset + curPoint.y * blockSize - blockSize + 3 * margin,
+                2 * blockSize - 4 * margin, 2 * blockSize - 4 * margin,
                 270 * 16, 90 * 16);
         }
         else if ((previousDirection == Game::Direction::Down && nextDirection == Game::Direction::Right) ||
             (previousDirection == Game::Direction::Right && nextDirection == Game::Direction::Down))
         {
-            painter.drawPie((int) (xOffset + curPoint.x * blockSize + margin),
-                (int) (yOffset + curPoint.y * blockSize + margin),
-                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+            painter.drawPie(xOffset + curPoint.x * blockSize + margin,
+                yOffset + curPoint.y * blockSize + margin,
+                2 * blockSize - 4 * margin, 2 * blockSize - 4 * margin,
                 90 * 16, 90 * 16);
         }
         else if ((previousDirection == Game::Direction::Down && nextDirection == Game::Direction::Left) ||
             (previousDirection == Game::Direction::Left && nextDirection == Game::Direction::Down))
         {
-            painter.drawPie((int) (xOffset + curPoint.x * blockSize - blockSize + 3 * margin),
-                (int) (yOffset + curPoint.y * blockSize + margin),
-                (int) (2 * blockSize - 4 * margin), (int) (2 * blockSize - 4 * margin),
+            painter.drawPie(xOffset + curPoint.x * blockSize - blockSize + 3 * margin,
+                yOffset + curPoint.y * blockSize + margin,
+                2 * blockSize - 4 * margin, 2 * blockSize - 4 * margin,
                 0 * 16, 90 * 16);
         }
         else
         {
-            painter.drawRect((int) (xOffset + margin + curPoint.x * blockSize),
-                (int) (yOffset + margin + curPoint.y * blockSize),
-                (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+            painter.drawRect(xOffset + curPoint.x * blockSize + margin, yOffset + curPoint.y * blockSize + margin,
+                blockSize - 2 * margin, blockSize - 2 * margin);
         }
 
         previousPoint = curPoint;
@@ -291,10 +298,10 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     auto &foods = status.foods;
     for (const auto &food: foods)
     {
-        double sizeFactor = (3 + 2 * (3 - status.map[food.x][food.y].y)) * margin;
-        painter.drawEllipse((int) (xOffset + sizeFactor + food.x * blockSize),
-            (int) (yOffset + sizeFactor + food.y * blockSize),
-            (int) (blockSize - 2 * sizeFactor), (int) (blockSize - 2 * sizeFactor));
+        int sizeFactor = std::min((3 + 2 * (3 - status.map[food.x][food.y].y)) * margin, blockSize / 2 - 1);
+        painter.drawEllipse(xOffset + sizeFactor + food.x * blockSize,
+            yOffset + sizeFactor + food.y * blockSize,
+            blockSize - 2 * sizeFactor, blockSize - 2 * sizeFactor);
     }
 
     // draw obstacles
@@ -303,9 +310,9 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     auto obstacles = status.mapDefinition.obstacles;
     for (const auto &obstacle: obstacles)
     {
-        painter.drawRect((int) (xOffset + margin + obstacle.x * blockSize),
-            (int) (yOffset + margin + obstacle.y * blockSize),
-            (int) (blockSize - 2 * margin), (int) (blockSize - 2 * margin));
+        painter.drawRect(xOffset + margin + obstacle.x * blockSize,
+            yOffset + margin + obstacle.y * blockSize,
+            blockSize - 2 * margin, blockSize - 2 * margin);
     }
 
     // draw portals
@@ -318,15 +325,14 @@ void GameCanvas::paintEvent(QPaintEvent *event)
         for (const auto &p: portal)
         {
             // Draw a rhombus
+            const int xCenter = xOffset + p.x * blockSize + blockSize / 2,
+                yCenter = yOffset + p.y * blockSize + blockSize / 2;
+
             painter.drawPolygon(QPolygon({
-                QPoint((int) (xOffset + p.x * blockSize + 3 * margin),
-                    (int) (yOffset + p.y * blockSize + blockSize / 2.)),
-                QPoint((int) (xOffset + p.x * blockSize + blockSize / 2.),
-                    (int) (yOffset + p.y * blockSize + 3 * margin)),
-                QPoint((int) (xOffset + (p.x + 1) * blockSize - 3 * margin),
-                    (int) (yOffset + p.y * blockSize + blockSize / 2.)),
-                QPoint((int) (xOffset + p.x * blockSize + blockSize / 2.),
-                    (int) (yOffset + (p.y + 1) * blockSize - 3 * margin)),
+                QPoint(xCenter, yCenter - blockSize / 2 + 2 * margin),
+                QPoint(xCenter + blockSize / 2 - 2 * margin, yCenter),
+                QPoint(xCenter, yCenter + blockSize / 2 - 2 * margin),
+                QPoint(xCenter - blockSize / 2 + 2 * margin, yCenter),
             }));
         }
     }
