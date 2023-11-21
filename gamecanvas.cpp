@@ -298,10 +298,11 @@ void GameCanvas::paintEvent(QPaintEvent *event)
     auto &foods = status.foods;
     for (const auto &food: foods)
     {
-        int sizeFactor = std::min((3 + 2 * (3 - status.map[food.x][food.y].y)) * margin, blockSize / 2 - 1);
-        painter.drawEllipse(xOffset + sizeFactor + food.x * blockSize,
-            yOffset + sizeFactor + food.y * blockSize,
-            blockSize - 2 * sizeFactor, blockSize - 2 * sizeFactor);
+        const int sizeFactor = blockSize * (2 * status.map[food.x][food.y].y) / 10;
+        const int foodMargin = (blockSize - sizeFactor) / 2;
+        painter.drawEllipse(xOffset + foodMargin + food.x * blockSize,
+            yOffset + foodMargin + food.y * blockSize,
+            blockSize - 2 * foodMargin, blockSize - 2 * foodMargin);
     }
 
     // draw obstacles
