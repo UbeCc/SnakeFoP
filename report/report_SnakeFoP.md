@@ -2,7 +2,7 @@
 
 **《程序设计基础》2023秋，兴军亮老师课堂**
 
-<div style="text-align: right;">董业恺 (Ajax, 2022010426), 王浩然 (TODO)</div>
+<div style="text-align: right;">董业恺 (Ajax, 2022010426), 王浩然 (Ubec, 2022010229)</div>
 
 <div style="justify-content: center; text-align: center;">
   <img src="./assets/cover.jpg" width="400" />

@@ -1,7 +1,6 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 *.pro.user
-
 *~
 *.autosave
 *.a
@@ -79,6 +78,7 @@ CMakeLists.txt.user*
 # CMake generated files
 CMakeLists.txt
 cmake-build-debug/
+build/
 
 # CLion generated files
 .idea/
