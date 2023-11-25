@@ -1,6 +1,6 @@
 # 《贪吃蛇，但程设》项目报告
 
-**《程序设计基础》2023秋，兴军亮老师课堂**
+《程序设计基础》2023 秋，兴军亮老师课堂
 
 <div style="text-align: right;">董业恺 (Ajax, 2022010426), 王浩然 (Ubec, 2022010229)</div>
 
@@ -8,10 +8,9 @@
   <img src="./assets/cover.jpg" width="400" />
 </div>
 
-
 ## 〇、前言
 
-*(这一段主要是董业恺写的, ~~所以攻击性比较强~~)*
+_(这一段主要是董业恺写的, ~~所以攻击性比较强~~)_
 
 ### 我们是谁 (雾)
 
@@ -84,11 +83,11 @@ Qt 的跨平台功能虽然有, 但确实不那么完善. 比如生成工程文�
 
 ### 董业恺
 
-负责游戏逻辑、地图编辑器、UI优化，重构代码框架（解耦合），默认地图绘制，代码优化，git维护
+负责游戏逻辑、地图编辑器、UI 优化，重构代码框架（解耦合），默认地图绘制，代码优化，git 维护
 
 ### 王浩然
 
-负责UI逻辑、配置编辑器、游戏、回放逻辑，UI重构，文件操作，代码重写、优化，报告主要撰写
+负责 UI 逻辑、配置编辑器、游戏、回放逻辑，UI 重构，文件操作，代码重写、优化，报告主要撰写
 
 ## 二、项目运行环境
 
@@ -112,20 +111,22 @@ Qt 6.6.0 On Windows
 g++ (x86_64-posix-seh-rev3, Built by MinGW-W64 project) 11.2.0
 Copyright (C) 2021 Free Software Foundation, Inc.
 ```
+
 ```text
 Qt 6.6.0 On Linux
-懒得看了 (x
+g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+Copyright (C) 2021 Free Software Foundation, Inc.
 ```
 
-### 最低C++标准：
+### 最低 C++ 标准
 
 C++ 17 (部分 Notation 是 C++ 17 标准的, 如 `[[nodiscard]]`)
 
-**注：** 默认maps/config/records文件夹位于可执行文件所在目录
+**注：** 默认 maps/config/records 文件夹位于可执行文件所在目录
 
 ## 三、功能实现
 
-项目由Qt实现GUI，页面间以继承方式切换。项目文件树主要部分如下
+项目由 Qt 实现 GUI，页面间以继承方式切换。项目文件树主要部分如下
 
 ```text
 SnakeFoP
@@ -184,8 +185,8 @@ struct Record {
 ```cpp
 class RecordManager {
 public:
-		static Record LoadRecord(const string &path, Record &);
-		static void SaveRecord(const string &path, const Record &record);
+    static Record LoadRecord(const string &path, Record &);
+    static void SaveRecord(const string &path, const Record &record);
 };
 ```
 
@@ -243,10 +244,9 @@ public:
 
 - `LoadConfig`：从指定路径中加载配置文件
 - `SaveConfig`：将配置文档保存至指定路径
-  
 
 考虑到游戏记录中需包含配置信息，编写函数将配置以字符串形式存储
-    
+
 - `LoadConfigFromString`：从`string`中读取配置，保存为`Config`。采用`stringstream`
 - `GetConfigString`：将`Config`压缩成`string`类型。采用`stringstream`
 
@@ -344,7 +344,7 @@ private:
   <div>
     <b>地图编辑器效果图</b>
   </div>
-</div>	
+</div>
 
 ### `gamecanvas`：游戏棋盘
 
@@ -365,18 +365,17 @@ public slots:
 };
 ```
 
-主要函数为 `PaintEvent`，需要注意这里的对齐方式: 
+主要函数为 `PaintEvent`，需要注意这里的对齐方式:
 
 `gamecanvas.ui` 将矩形画布的大小设置为 $[(0,0),(400,300)]$，即$400x300$的框；而每张地图的 $row,col$ 数不保证相同，这导致 $\dfrac{400}{row}=\dfrac{{300}}{col}$ 非恒成立。为了保证格子均为正方形，我们需要对原矩形画布进行裁剪。同时，由于窗口可以通过鼠标操作调整大小，画布的大小也需要动态调整。
-    
-先取格子数 $blozkSize=min(\dfrac{width}{row},\dfrac{height}{col})$ 
+
+先取格子数 $blozkSize=min(\dfrac{width}{row},\dfrac{height}{col})$
 
 裁剪过后的宽度 $width=blockSize*row$，高度 $height=blockSize*col$
 
 这样会产生误差。我们将裁剪后的矩形画布放到原画布中心位置，其左/右侧偏差 $xOffset=\dfrac{(size.width()-width)}{2}$，上/下偏差 $yOffset=\dfrac{(size.height()-height)}{2}$，除二是因为左右/上下均有误差且相等
-    
+
 需注意此后我们进行的蛇、食物、传送点、障碍绘制均基于原画布左上角，这意味着每次绘制时我们都需要相应地加上 $xOffset$，$yOffset$，如绘制障碍物
-    
 
 ```cpp
 auto obstacles = status.mapDefinition.obstacles;
@@ -387,7 +386,7 @@ for (const auto &obstacle: obstacles) {
 }
 ```
 
-枚举每个正方形的左上、右下点坐标即可。注意到绘制时还出现了margin，其定义如下
+枚举每个正方形的左上、右下点坐标即可。注意到绘制时还出现了 margin，其定义如下
 
 ```cpp
 constexpr double BLOCK_MARGIN = 0.05;
@@ -437,63 +436,58 @@ public
 
 其中，`map`定义如下:
 
-  - 利用地图中每一点的x,y值均大于等于0，将x值小于0的点设置为特殊点（见 `SpecialPoint` 类）。考虑`Point p{x,y}`，
-  
-  - 如果`p`指向`(x,y)`，即`map[x][y]=p`（注意此时`x>=0`,`y>=0`），表示p点被蛇占用
-  
-  - 如果`map[x][y].x=-3`，表示p点是蛇头
-  
-  - 如果`map[x][y].x=-4`，表示p点为空地
-  
-  - 如果`map[x][y].x=-2`，表示p点指向传送点
-  
-  - 如果`map[x][y].x=-5`，表示p点是食物，`map[x][y].y`是食物的分值
+- 利用地图中每一点的 x,y 值均大于等于 0，将 x 值小于 0 的点设置为特殊点（见 `SpecialPoint` 类）。考虑`Point p{x,y}`，
+- 如果`p`指向`(x,y)`，即`map[x][y]=p`（注意此时`x>=0`,`y>=0`），表示 p 点被蛇占用
+- 如果`map[x][y].x=-3`，表示 p 点是蛇头
+- 如果`map[x][y].x=-4`，表示 p 点为空地
+- 如果`map[x][y].x=-2`，表示 p 点指向传送点
+- 如果`map[x][y].x=-5`，表示 p 点是食物，`map[x][y].y`是食物的分值
 
 这样的设计能够在 **常数时间** 内访问蛇尾和蛇头, 且能够在 **常数时间** 内完成蛇向前移动一步的操作. 同时, 这样的数据结构还允许在 **线性时间** 内完成从蛇尾到蛇头的遍历并获取坐标.
 
 为了游戏的趣味性和拓展性 ~~(其实是因为 Ajax 在写 map 类的时候看错文档要求了)~~, 我们定义类传送门 `portal`:
 
 一对传送门由两个点组成, 存储在 `Map::portals` 中, 当蛇 **将要走到某一端所在的格子** 时会被传送到 **另一端所在的格子**. 考虑 `Point p{x1,y1}`，如果
-    `portal[x1][y1] == Point{x2, y2}`，表示 p 会被传送到 `(x2, y2)`
+`portal[x1][y1] == Point{x2, y2}`，表示 p 会被传送到 `(x2, y2)`
 
 `Game` 主要函数为 `Step`，每一帧执行一次，有删减。需按 **逻辑顺序** 一步步写
 
-  1. 首先判断蛇是否依然存活, 如果已经死亡, 抛出异常. 这样的处理可以尽量避免 UI 的逻辑错误. ~~(问就是写 UI 的时候这里一直抛异常)~~
+1. 首先判断蛇是否依然存活, 如果已经死亡, 抛出异常. 这样的处理可以尽量避免 UI 的逻辑错误. ~~(问就是写 UI 的时候这里一直抛异常)~~
 
-     ```cpp
-       if (state == Dead) { throw runtime_error("The snake is dead"); }
-     ```
+   ```cpp
+     if (state == Dead) { throw runtime_error("The snake is dead"); }
+   ```
 
-  2. 然后对下一时刻的蛇头位置进行计算, 但并不更新.
+2. 然后对下一时刻的蛇头位置进行计算, 但并不更新.
 
-  3. 计算后:
+3. 计算后:
 
-     1. 首先检查蛇头是否出界, 防止越界访问导致异常. 如果出界了, 那么检查是否应该传送或者直接死亡.
+   1. 首先检查蛇头是否出界, 防止越界访问导致异常. 如果出界了, 那么检查是否应该传送或者直接死亡.
 
-     2. 此时蛇头一定在地图内, 然后检查是否碰到了传送点, 如果碰到了, 则将蛇头传送到另一端.
+   2. 此时蛇头一定在地图内, 然后检查是否碰到了传送点, 如果碰到了, 则将蛇头传送到另一端.
 
-     3. 然后检查蛇头是否碰到了障碍物, 如果碰到了, 则直接死亡.
+   3. 然后检查蛇头是否碰到了障碍物, 如果碰到了, 则直接死亡.
 
-     4. 此时检查蛇头是否碰到了自己, 如果碰到了, 则直接死亡. 但是这里存在一个特例: 如果蛇头碰到了蛇尾, 那么在下一时刻蛇尾可能已经离开了. 此时蛇不应该死亡. **但是** 如果此时蛇的长度并不最大, 则蛇尾 **不会** 离开, 此时蛇应该死亡. 因此此处的判断为:
+   4. 此时检查蛇头是否碰到了自己, 如果碰到了, 则直接死亡. 但是这里存在一个特例: 如果蛇头碰到了蛇尾, 那么在下一时刻蛇尾可能已经离开了. 此时蛇不应该死亡. **但是** 如果此时蛇的长度并不最大, 则蛇尾 **不会** 离开, 此时蛇应该死亡. 因此此处的判断为:
 
-        ```cpp
-        if (map[nextHead.x][nextHead.y].x != SpecialPoint::Empty.x
-             && map[nextHead.x][nextHead.y].x != SpecialPoint::Food.x
-             && !(nextHead == tail && status.desiredLength == status.length))
-        ```
+      ```cpp
+      if (map[nextHead.x][nextHead.y].x != SpecialPoint::Empty.x
+           && map[nextHead.x][nextHead.y].x != SpecialPoint::Food.x
+           && !(nextHead == tail && status.desiredLength == status.length))
+      ```
 
-  4. 这时已经确定蛇存活了, 接下来检查是否碰到了食物, 如果碰到了, 则更新蛇的长度和分数, 并且将食物从食物列表中删除. 此处 Game 的模式会影响食物的生成: 如果是 **游戏模式**, 则会在食物被吃掉后重新生成, 如果是 **回放模式**, 则不会重新生成.
+4. 这时已经确定蛇存活了, 接下来检查是否碰到了食物, 如果碰到了, 则更新蛇的长度和分数, 并且将食物从食物列表中删除. 此处 Game 的模式会影响食物的生成: 如果是 **游戏模式**, 则会在食物被吃掉后重新生成, 如果是 **回放模式**, 则不会重新生成.
 
-     ```cpp
-     if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) {
-         status.score += map[nextHead.x][nextHead.y].y;
-         status.desiredLength += map[nextHead.x][nextHead.y].y;
-         status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
-         if (mode == 0) tot = GenerateFood(widget);
-     }
-     ```
+   ```cpp
+   if (map[nextHead.x][nextHead.y].x == SpecialPoint::Food.x) {
+       status.score += map[nextHead.x][nextHead.y].y;
+       status.desiredLength += map[nextHead.x][nextHead.y].y;
+       status.foods.erase(find(status.foods.begin(), status.foods.end(), nextHead));
+       if (mode == 0) tot = GenerateFood(widget);
+   }
+   ```
 
-  5. 此时终于可以移动蛇了. **首先** 更新蛇尾的位置, **然后** 更新蛇头的位置, 最后为了记录食物生成情况, 返回生成食物的数量.
+5. 此时终于可以移动蛇了. **首先** 更新蛇尾的位置, **然后** 更新蛇头的位置, 最后为了记录食物生成情况, 返回生成食物的数量.
 
 ### `widget`：主界面
 
@@ -508,7 +502,7 @@ void ResetRecord(const Record &); // 重放时需要
 void ResetRecord(); // 游戏时需要，以清空之前记录
 
 // 游戏时用，更新当前记录
-void UpdateRecordFood(int, int, int); 
+void UpdateRecordFood(int, int, int);
 void UpdateRecordMovement(char);
 void UpdateTime(int);
 void SetGameConfigPath(const QFileInfo &path);
@@ -548,31 +542,31 @@ Record gameRecord;
   <div>
     <b>主界面效果图</b>
   </div>
-</div>	
+</div>
 
 ### `settingpage`：游戏设置界面，略
 
 ### `playpage`：游戏界面
 
-  - `GameOver`函数，主要涉及以时间戳命名，细节如下
-  
-    ```cpp
-    qint64 timestamp = QDateTime::currentMSecsSinceEpoch(); // 获取当前时间戳，为qint64类型
-    QDateTime dateTime;
-    dateTime.setMSecsSinceEpoch(timestamp); // 将qint64时间戳转化为QDateTime格式
-    QString format = "yyyy-MM-dd-hh-mm-ss";
-    QString formattedDateTime = dateTime.toString(format); // 将QDateTime转化为指定格式串
-    try {
-        RecordManager::SaveRecord(
-            QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec")
-                .toStdString(), widget->GetRecord()); // 保存
-    } catch (exception &e) {
-        QMessageBox::warning(this, "保存回放错误", e.what());
-        this->hide();
-        widget->show();
-        return;
-    }
-    ```
+- `GameOver`函数，主要涉及以时间戳命名，细节如下
+
+  ```cpp
+  qint64 timestamp = QDateTime::currentMSecsSinceEpoch(); // 获取当前时间戳，为qint64类型
+  QDateTime dateTime;
+  dateTime.setMSecsSinceEpoch(timestamp); // 将qint64时间戳转化为QDateTime格式
+  QString format = "yyyy-MM-dd-hh-mm-ss";
+  QString formattedDateTime = dateTime.toString(format); // 将QDateTime转化为指定格式串
+  try {
+      RecordManager::SaveRecord(
+          QDir(QCoreApplication::applicationDirPath()).filePath("records/" + formattedDateTime + ".rec")
+              .toStdString(), widget->GetRecord()); // 保存
+  } catch (exception &e) {
+      QMessageBox::warning(this, "保存回放错误", e.what());
+      this->hide();
+      widget->show();
+      return;
+  }
+  ```
 
   <div style="justify-content: center; text-align: center;">
     <img src="./assets/playpage.jpg" width="400" />
@@ -580,27 +574,26 @@ Record gameRecord;
     <div>
       <b>游戏界面效果图</b>
     </div>
-  </div>	
+  </div>
 
 ### `replaypage`：回放界面
 
-  - `InitPlay`函数
-  
-  - 每一次刷新时，先更新`curStep`时触发的方向改变/食物生成，再移动蛇
+- `InitPlay`函数
+- 每一次刷新时，先更新`curStep`时触发的方向改变/食物生成，再移动蛇
 
-    ```cpp
-    connect(gameTimer, &QTimer::timeout, this, [&]() {
-        if (widget->IsEnd()) {return;}
-        while (!widget->IsEnd() && widget->GetCurrentStep() == curStep) Step(); // 更新蛇方向/生成食物
-        if (!widget->IsEnd()) /*蛇移动*/{
-            ++curStep;
-            game->Step(widget);
-            ui->ScoreLabel->setText(QString::number(status.score));
-            ui->LengthLabel->setText(QString::number(status.length));
-            ui->Canvas->update();
-        }
-    });
-    ```
+  ```cpp
+  connect(gameTimer, &QTimer::timeout, this, [&]() {
+      if (widget->IsEnd()) {return;}
+      while (!widget->IsEnd() && widget->GetCurrentStep() == curStep) Step(); // 更新蛇方向/生成食物
+      if (!widget->IsEnd()) /*蛇移动*/{
+          ++curStep;
+          game->Step(widget);
+          ui->ScoreLabel->setText(QString::number(status.score));
+          ui->LengthLabel->setText(QString::number(status.length));
+          ui->Canvas->update();
+      }
+  });
+  ```
 
 ### `resultpage`：结果界面，略
 
@@ -610,16 +603,17 @@ Record gameRecord;
   <div>
     <b>结束页效果图</b>
   </div>
-</div>	
-### `main`：游戏启动入口，采用Qt默认配置，略
+</div>
+
+### `main`：游戏启动入口，采用 Qt 默认配置，略
 
 ## 四、扩展功能
 
-### 支持GUI，妈妈再也不用担心我不会用命令行啦
+### 支持 GUI，妈妈再也不用担心我不会用命令行啦
 
-作为一款娱乐游戏，**SnakeFoP**无需高效的指令切换，而更需要的是美观与直接，因此GUI相比CLI是更优解。GUI由于采用了大量的图形元素，界面会更显得具有艺术性，富有人性化。相较于枯燥的文本来说，精致且合理的图形大大增强了界面的易用性，用户体验感++！
+作为一款娱乐游戏，**SnakeFoP**无需高效的指令切换，而更需要的是美观与直接，因此 GUI 相比 CLI 是更优解。GUI 由于采用了大量的图形元素，界面会更显得具有艺术性，富有人性化。相较于枯燥的文本来说，精致且合理的图形大大增强了界面的易用性，用户体验感++！
 
-此外，我们认为GUI最大的便捷之处在于地图绘制。我们无需手动输入坐标，便可通过精妙的 GUI 设计绘制丰富地图。用户可以通过用鼠标在地图上拖动来绘制和擦除障碍物，也可以通过点击按钮来绘制边界、传送点、初始点。这种方式使得地图绘制更加直观，也更加容易上手。所有的样例地图都是通过这种方式绘制的。
+此外，我们认为 GUI 最大的便捷之处在于地图绘制。我们无需手动输入坐标，便可通过精妙的 GUI 设计绘制丰富地图。用户可以通过用鼠标在地图上拖动来绘制和擦除障碍物，也可以通过点击按钮来绘制边界、传送点、初始点。这种方式使得地图绘制更加直观，也更加容易上手。所有的样例地图都是通过这种方式绘制的。
 
 <div style="justify-content: center; text-align: center;">
   <img src="./assets/mapeditoroperation.jpg" width="400" />
@@ -631,7 +625,7 @@ Record gameRecord;
 
 ### 跨平台支持，Windows、MacOS、Linux 通吃
 
-通过 Qt 的跨平台特性，我们的项目在 **Windows**、**MacOS**、**Linux** 上皆可运行。这样可以使得我们的项目更加方便地使用。薄纱使用` conio.h` 的控制台应用 （x
+通过 Qt 的跨平台特性，我们的项目在 **Windows**、**MacOS**、**Linux** 上皆可运行。这样可以使得我们的项目更加方便地使用。薄纱使用`conio.h` 的控制台应用 （x
 
 ### 支持回放倍速，快慢皆在掌握之中
 
