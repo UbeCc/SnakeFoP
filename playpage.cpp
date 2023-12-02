@@ -20,6 +20,12 @@ PlayPage::PlayPage(QWidget *parent) :
     resultPage(new ResultPage(this))
 {
     ui->setupUi(this);
+    connect(this, &QDialog::rejected, this, [&](){
+        gameTimer->stop();
+        widget->show();
+        this->hide();
+    });
+
     gameTimer->setTimerType(Qt::PreciseTimer);
     connect(gameTimer, &QTimer::timeout, this, [&]()
     {
