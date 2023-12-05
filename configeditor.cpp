@@ -36,6 +36,9 @@ void ConfigEditor::OnLoadConfigButtonClicked()
 {
     QString configFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"),
         QDir(QCoreApplication::applicationFilePath()).filePath("config/"), tr("配置文件 (*.cfg)"));
+
+    if (configFilePath.isEmpty()) return;
+
     QFileInfo fileInfo = QFileInfo(configFilePath);
     Config config{};
 
@@ -61,6 +64,9 @@ void ConfigEditor::OnSaveConfigButtonClicked()
 {
     QString configFilePath = QFileDialog::getSaveFileName(this, tr("选择文件"),
         QDir(QCoreApplication::applicationDirPath()).filePath("config/"), tr("配置文件 (*.cfg)"));
+
+    if (configFilePath.isEmpty()) return;
+
     QFileInfo fileInfo = QFileInfo(configFilePath);
 
     Config config{

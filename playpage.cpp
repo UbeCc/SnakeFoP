@@ -137,7 +137,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
     {
         case Qt::Key_Up:
         case Qt::Key_W:
-            if (direction != Game::Down)
+            if (direction != Game::Down && gameTimer->isActive())
             {
                 game->ChangeDirection(Game::Up);
                 widget->UpdateTime(steps);
@@ -146,7 +146,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_Down:
         case Qt::Key_S:
-            if (direction != Game::Up)
+            if (direction != Game::Up && gameTimer->isActive())
             {
                 game->ChangeDirection(Game::Down);
                 widget->UpdateTime(steps);
@@ -155,7 +155,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_Left:
         case Qt::Key_A:
-            if (direction != Game::Right)
+            if (direction != Game::Right && gameTimer->isActive())
             {
                 game->ChangeDirection(Game::Left);
                 widget->UpdateTime(steps);
@@ -164,7 +164,7 @@ void PlayPage::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_Right:
         case Qt::Key_D:
-            if (direction != Game::Left)
+            if (direction != Game::Left && gameTimer->isActive())
             {
                 game->ChangeDirection(Game::Right);
                 widget->UpdateTime(steps);
