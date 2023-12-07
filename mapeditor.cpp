@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include "mapeditor.h"
 #include "ui_mapeditor.h"
+#include <sstream>
 
 using std::exception;
 
