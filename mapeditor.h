@@ -38,6 +38,8 @@ private slots:
 
     void OnSetSpawnPointButtonToggled(bool x);
 
+    void OnCommandLineReturnPressed();
+
 private:
     void UpdateCanvas();
 

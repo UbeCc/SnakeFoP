@@ -12,7 +12,7 @@ const Config MapEditor::dummyConfig = {
     {1, 0, 0}
 };
 
-MapEditor::MapEditor(QWidget *parent) :
+MapEditor::MapEditor(QWidget* parent) :
     QDialog(parent),
     ui(new Ui::MapEditor),
     game(nullptr),
@@ -28,6 +28,7 @@ MapEditor::MapEditor(QWidget *parent) :
     connect(ui->EraserButton, &QPushButton::toggled, this, &MapEditor::OnEraseButtonToggled);
     connect(ui->AddPortalButton, &QPushButton::toggled, this, &MapEditor::OnAddPortalButtonToggled);
     connect(ui->SpawnPointButton, &QPushButton::toggled, this, &MapEditor::OnSetSpawnPointButtonToggled);
+    connect(ui->CommandLine, &QLineEdit::returnPressed, this, &MapEditor::OnCommandLineReturnPressed);
 
     OnNewMapButtonClicked();
 }
@@ -73,7 +74,7 @@ void MapEditor::OnLoadMapButtonClicked()
     {
         map = MapManager::LoadMap(fileInfo.filePath().toStdString());
     }
-    catch (exception &e)
+    catch (exception&e)
     {
         QMessageBox::warning(this, "打开地图错误", e.what());
         return;
@@ -96,7 +97,7 @@ void MapEditor::OnSaveMapButtonClicked()
     {
         MapManager::SaveMap(fileInfo.filePath().toStdString(), map);
     }
-    catch (exception &e)
+    catch (exception&e)
     {
         QMessageBox::warning(this, "保存地图错误", e.what());
         return;
@@ -127,9 +128,10 @@ void MapEditor::OnObstaclePainterButtonToggled(bool checked)
         ui->AddPortalButton->setChecked(false);
         ui->SpawnPointButton->setChecked(false);
 
-        std::function<void(int, int, bool)> select = [this](auto &&PH1, auto &&PH2, auto &&PH3)
+        std::function<void(int, int, bool)> select = [this](auto&&PH1, auto&&PH2, auto&&PH3)
         {
-            OnObstaclePainterMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), std::forward<decltype(PH3)>(PH3));
+            OnObstaclePainterMouseSelect(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2),
+                std::forward<decltype(PH3)>(PH3));
         };
 
         ui->Canvas->SetOnMouseSelect(select);
@@ -147,7 +149,7 @@ void MapEditor::OnObstaclePainterMouseSelect(int x, int y, bool rightButton)
         return;
     }
 
-    for (const auto &portal: map.portals)
+    for (const auto&portal: map.portals)
     {
         if (portal[0] == Point({x, y}) || portal[1] == Point({x, y}))
         {
@@ -178,7 +180,7 @@ void MapEditor::OnEraseButtonToggled(bool checked)
         ui->AddPortalButton->setChecked(false);
         ui->SpawnPointButton->setChecked(false);
 
-        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
+        std::function<void(int, int, bool)> select = [this](auto&&x, auto&&y, [[maybe_unused]] auto&&_)
         {
             OnEraseMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
         };
@@ -223,7 +225,7 @@ void MapEditor::OnAddPortalButtonToggled(bool checked)
 
         firstPortalPoint = {-1, -1};
 
-        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
+        std::function<void(int, int, bool)> select = [this](auto&&x, auto&&y, [[maybe_unused]] auto&&_)
         {
             OnAddPortalMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
         };
@@ -252,7 +254,7 @@ void MapEditor::OnAddPortalMouseSelect(int x, int y)
         return;
     }
 
-    for (const auto &portal: map.portals)
+    for (const auto&portal: map.portals)
     {
         if (portal[0] == Point({x, y}) || portal[1] == Point({x, y}))
         {
@@ -286,7 +288,7 @@ void MapEditor::OnSetSpawnPointButtonToggled(bool checked)
         ui->EraserButton->setChecked(false);
         ui->AddPortalButton->setChecked(false);
 
-        std::function<void(int, int, bool)> select = [this](auto &&x, auto &&y, [[maybe_unused]] auto &&_)
+        std::function<void(int, int, bool)> select = [this](auto&&x, auto&&y, [[maybe_unused]] auto&&_)
         {
             OnSetSpawnPointMouseSelect(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
         };
@@ -308,7 +310,7 @@ void MapEditor::OnSetSpawnPointMouseSelect(int x, int y)
         return;
     }
 
-    for (const auto &portal: map.portals)
+    for (const auto&portal: map.portals)
     {
         if (portal[0] == Point({x, y}) || portal[1] == Point({x, y}))
         {
@@ -323,3 +325,127 @@ void MapEditor::OnSetSpawnPointMouseSelect(int x, int y)
     UpdateCanvas();
 }
 
+void MapEditor::OnCommandLineReturnPressed()
+{
+    const auto commandString = ui->CommandLine->text().toStdString();
+    std::stringstream command(commandString);
+
+    // Try read map size
+    {
+        int x, y;
+        command >> x >> y;
+        if (command.eof() || command.good())
+        {
+            ui->MapXSize->setValue(x);
+            ui->MapYSize->setValue(y);
+            OnNewMapButtonClicked();
+            goto successful_parse;
+        }
+    }
+
+    command = std::stringstream(commandString);
+    char c;
+    command >> c;
+
+    switch (c)
+    {
+        case 'o':
+        {
+            int x, y;
+            command >> x >> y;
+            if (command.eof() || command.good())
+            {
+                --x, --y;
+                if (x < 0 || x >= map.width || y < 0 || y >= map.height)
+                {
+                    QMessageBox::warning(this, "添加障碍物错误", "坐标超出地图范围");
+                    return;
+                }
+
+                OnObstaclePainterMouseSelect(x, y, false);
+                goto successful_parse;
+            }
+
+            break;
+        }
+
+        case 'p':
+        {
+            int x, y;
+            command >> x >> y;
+            if (command.eof() || command.good())
+            {
+                --x, --y;
+                if (x < 0 || x >= map.width || y < 0 || y >= map.height)
+                {
+                    QMessageBox::warning(this, "删除障碍物错误", "坐标超出地图范围");
+                    return;
+                }
+
+                OnEraseMouseSelect(x, y);
+                goto successful_parse;
+            }
+
+            break;
+        }
+
+        case 'w':
+        case 's':
+        case 'a':
+        case 'd':
+        {
+            int v;
+            command >> v;
+
+            if (command.eof() || command.good())
+            {
+                if (v != 0 && v != 1)
+                {
+                    goto unknown_command;
+                }
+
+                switch (c)
+                {
+                    case 'w':
+                    case 's':
+                    {
+                        ui->MapXBorder->setChecked(v == 1);
+                        break;
+                    }
+
+                    default:
+                    {
+                        ui->MapYBorder->setChecked(v == 1);
+                        break;
+                    }
+                }
+
+                goto successful_parse;
+            }
+
+            break;
+        }
+
+        case 'f':
+        {
+            OnSaveMapButtonClicked();
+            goto successful_parse;
+        }
+
+        case 'q':
+        {
+            this->accept();
+            goto successful_parse;
+        }
+
+        default:
+            break;
+    }
+
+unknown_command:
+    QMessageBox::warning(this, "未知命令", "未知命令");
+    return;
+
+successful_parse:
+    ui->CommandLine->clear();
+}
